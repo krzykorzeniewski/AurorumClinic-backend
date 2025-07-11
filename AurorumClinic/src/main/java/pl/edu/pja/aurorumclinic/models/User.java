@@ -75,7 +75,7 @@ public class User {
     @Column(name = "Refresh_Token_Expiry_Date", columnDefinition = "datetime2(5)")
     private LocalDateTime refreshTokenExpiryDate;
 
-    @Column(name = "Role")
+    @Column(name = "Role", length = 50)
     @Enumerated(EnumType.STRING)
     @NotNull
     private UserRole role;

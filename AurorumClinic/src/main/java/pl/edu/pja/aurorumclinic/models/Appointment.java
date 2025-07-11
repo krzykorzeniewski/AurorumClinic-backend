@@ -32,7 +32,7 @@ public class Appointment {
     @NotNull
     private LocalDateTime finishedAt;
 
-    @Column(name = "Status")
+    @Column(name = "Status", length = 50)
     @Enumerated(value = EnumType.STRING)
     @NotNull
     private AppointmentStatus status;

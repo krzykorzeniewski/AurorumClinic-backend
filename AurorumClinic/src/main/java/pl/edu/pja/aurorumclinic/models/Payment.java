@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,12 +35,12 @@ public class Payment {
 
     @Enumerated(value = EnumType.STRING)
     @NotNull
-    @Column(name = "Method")
+    @Column(name = "Method", length = 50)
     private PaymentMethod method;
 
     @Enumerated(value = EnumType.STRING)
     @NotNull
-    @Column(name = "Status")
+    @Column(name = "Status", length = 50)
     private PaymentStatus status;
 
     @OneToOne(optional = false)
