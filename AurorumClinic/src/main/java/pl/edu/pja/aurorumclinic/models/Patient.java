@@ -26,12 +26,6 @@ public class Patient {
     private boolean communicationPreferences;
 
     @OneToMany(mappedBy = "patient")
-    private List<Message> messages;
-
-    @OneToMany(mappedBy = "patient")
-    private List<Chatroom> chatrooms;
-
-    @OneToMany(mappedBy = "patient")
     private List<Appointment> appointments;
 
     @JoinColumn(name = "PK_Patient")

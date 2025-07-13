@@ -13,6 +13,7 @@ import pl.edu.pja.aurorumclinic.models.enums.UserRole;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -27,17 +28,17 @@ public class User {
     @Column(name = "PK_User")
     private Long id;
 
-    @Column(name = "Name")
+    @Column(name = "Name", columnDefinition = "nvarchar(50)")
     @Size(max = 50)
     @NotBlank
     private String name;
 
-    @Column(name = "Surname")
+    @Column(name = "Surname", columnDefinition = "nvarchar(50)")
     @Size(max = 50)
     @NotBlank
     private String surname;
 
-    @Column(name = "PESEL")
+    @Column(name = "PESEL", columnDefinition = "nvarchar(11)")
     @Size(min = 11, max = 11)
     private String pesel;
 
@@ -45,23 +46,22 @@ public class User {
     @NotNull
     private LocalDate birthdate;
 
-    @Column(name = "Email")
+    @Column(name = "Email", columnDefinition = "nvarchar(100)")
     @Email
     @Size(max = 100)
     @NotBlank
     private String email;
 
-    @Column(name = "Password")
+    @Column(name = "Password", columnDefinition = "nvarchar(200)")
     @Size(max = 200)
-    @NotBlank
     private String password;
 
-    @Column(name = "Phone_Number")
+    @Column(name = "Phone_Number", columnDefinition = "nvarchar(11)")
     @Size(max = 11)
     @NotBlank
     private String phoneNumber;
 
-    @Column(name = "Salt")
+    @Column(name = "Salt", columnDefinition = "nvarchar(20)")
     @Size(min = 20, max = 20)
     private String salt;
 
@@ -75,7 +75,7 @@ public class User {
     @Column(name = "Refresh_Token_Expiry_Date", columnDefinition = "datetime2(5)")
     private LocalDateTime refreshTokenExpiryDate;
 
-    @Column(name = "Role", length = 50)
+    @Column(name = "Role", length = 50, columnDefinition = "nvarchar(50)")
     @Enumerated(EnumType.STRING)
     @NotNull
     private UserRole role;
@@ -85,5 +85,8 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Patient patient;
+
+    @OneToMany(mappedBy = "user")
+    private List<Message> messages;
 
 }

@@ -26,13 +26,13 @@ public class Opinion {
     @Column(name = "Rating")
     private int rating;
 
-    @Column(name = "Comment")
-    @Size(min = 1, max = 800)
+    @Column(name = "Comment", columnDefinition = "nvarchar(2000)")
+    @Size(max = 2000)
     @NotBlank
     private String comment;
 
-    @Column(name = "Answer")
-    @Size(min = 1, max = 800)
+    @Column(name = "Answer", columnDefinition = "nvarchar(2000)")
+    @Size(max = 2000)
     private String answer;
 
     @Column(name = "Created_At", columnDefinition = "datetime2(2)")

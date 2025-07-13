@@ -37,7 +37,7 @@ public class Service {
     private BigDecimal price;
 
     @Size(max = 500)
-    @Column(name = "Description")
+    @Column(name = "Description", columnDefinition = "nvarchar(500)")
     @NotBlank
     private String description;
 

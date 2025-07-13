@@ -37,7 +37,7 @@ public class Survey {
     private LocalDateTime completedAt;
 
     @Size(max = 300)
-    @Column(name = "Comment")
+    @Column(name = "Comment", columnDefinition = "nvarchar(300)")
     private String comment;
 
     @OneToOne(optional = false)

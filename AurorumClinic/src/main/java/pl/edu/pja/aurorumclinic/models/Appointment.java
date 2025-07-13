@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import pl.edu.pja.aurorumclinic.models.enums.AppointmentStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -32,12 +33,12 @@ public class Appointment {
     @NotNull
     private LocalDateTime finishedAt;
 
-    @Column(name = "Status", length = 50)
+    @Column(name = "Status", length = 50, columnDefinition = "nvarchar(50)")
     @Enumerated(value = EnumType.STRING)
     @NotNull
     private AppointmentStatus status;
 
-    @Column(name = "Description")
+    @Column(name = "Description", columnDefinition = "nvarchar(500)")
     @Size(max = 500)
     @NotBlank
     private String description;
@@ -63,4 +64,7 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "FK_Patient")
     private Patient patient;
+
+    @OneToMany(mappedBy = "appointment")
+    private List<Message> messages;
 }

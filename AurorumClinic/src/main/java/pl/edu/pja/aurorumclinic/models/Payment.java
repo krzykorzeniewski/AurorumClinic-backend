@@ -35,12 +35,12 @@ public class Payment {
 
     @Enumerated(value = EnumType.STRING)
     @NotNull
-    @Column(name = "Method", length = 50)
+    @Column(name = "Method", length = 50, columnDefinition = "nvarchar(50)")
     private PaymentMethod method;
 
     @Enumerated(value = EnumType.STRING)
     @NotNull
-    @Column(name = "Status", length = 50)
+    @Column(name = "Status", length = 50, columnDefinition = "nvarchar(50)")
     private PaymentStatus status;
 
     @OneToOne(optional = false)

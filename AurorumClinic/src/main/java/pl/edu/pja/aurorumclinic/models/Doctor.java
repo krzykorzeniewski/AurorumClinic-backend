@@ -22,12 +22,12 @@ public class Doctor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "Description")
+    @Column(name = "Description", columnDefinition = "nvarchar(500)")
     @Size(max = 500)
     @NotBlank
     private String description;
 
-    @Column(name = "Specialization")
+    @Column(name = "Specialization", columnDefinition = "nvarchar(100)")
     @Size(max = 100)
     @NotBlank
     private String specialization;
@@ -36,17 +36,17 @@ public class Doctor {
     @NotNull
     private byte[] profilePicture;
 
-    @Column(name = "Education")
+    @Column(name = "Education", columnDefinition = "nvarchar(100)")
     @Size(max = 100)
     @NotBlank
     private String education;
 
-    @Column(name = "Experience")
+    @Column(name = "Experience", columnDefinition = "nvarchar(100)")
     @Size(max = 100)
     @NotBlank
     private String experience;
 
-    @Column(name = "PWZ_Number")
+    @Column(name = "PWZ_Number", columnDefinition = "nvarchar(7)")
     @Size(min = 7, max = 7)
     private String pwzNumber;
 
@@ -55,12 +55,6 @@ public class Doctor {
 
     @OneToMany(mappedBy = "doctor")
     private List<Schedule> schedules;
-
-    @OneToMany(mappedBy = "doctor")
-    private List<Message> messages;
-
-    @OneToMany(mappedBy = "doctor")
-    private List<Chatroom> chatrooms;
 
     @JoinColumn(name = "PK_Doctor")
     @OneToOne

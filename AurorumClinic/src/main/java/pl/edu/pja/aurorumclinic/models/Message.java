@@ -23,12 +23,12 @@ public class Message {
     @Column(name = "PK_Message")
     private Long id;
 
-    @Column(name = "Message")
+    @Column(name = "Message", columnDefinition = "nvarchar(500)")
     @Size(max = 500)
     @NotBlank
     private String message;
 
-    @Column(name = "Response")
+    @Column(name = "Response", columnDefinition = "nvarchar(500)")
     @Size(max = 500)
     private String response;
 
@@ -37,14 +37,12 @@ public class Message {
     private LocalDateTime sentAt;
 
     @ManyToOne
-    @JoinColumn(name = "FK_Doctor")
-    private Doctor doctor;
+    @JoinColumn(name = "FK_User")
+    private User user;
 
     @ManyToOne
-    @JoinColumn(name = "FK_Patient")
-    private Patient patient;
+    @JoinColumn(name = "FK_Appointment")
+    private Appointment appointment;
 
-    @ManyToOne
-    @JoinColumn(name = "FK_Chatroom")
-    private Chatroom chatroom;
+
 }
