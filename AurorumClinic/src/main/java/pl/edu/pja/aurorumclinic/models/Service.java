@@ -30,10 +30,11 @@ public class Service {
     @Column(name = "Duration")
     @Min(1)
     @Max(180)
+    @NotNull
     private int duration;
 
     @NotNull
-    @Column(name = "Price")
+    @Column(name = "Price", columnDefinition = "numeric(10,2)")
     private BigDecimal price;
 
     @Size(max = 500)

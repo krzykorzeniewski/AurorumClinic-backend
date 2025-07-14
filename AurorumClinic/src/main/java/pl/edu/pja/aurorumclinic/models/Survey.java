@@ -27,6 +27,7 @@ public class Survey {
     @Min(1)
     @Max(5)
     @Column(name = "Grade")
+    @NotNull
     private int grade;
 
     @Column(name = "Sent_At", columnDefinition = "datetime2(2)")

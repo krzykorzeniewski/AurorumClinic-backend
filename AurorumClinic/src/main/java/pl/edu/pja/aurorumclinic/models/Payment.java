@@ -26,7 +26,7 @@ public class Payment {
     private Long id;
 
     @NotNull
-    @Column(name = "Amount")
+    @Column(name = "Amount", columnDefinition = "numeric(10,2)")
     private BigDecimal amount;
 
     @Column(name = "Placed_At", columnDefinition = "datetime2(2)")

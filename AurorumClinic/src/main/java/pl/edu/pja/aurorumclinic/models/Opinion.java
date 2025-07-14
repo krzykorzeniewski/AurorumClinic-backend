@@ -24,6 +24,7 @@ public class Opinion {
     @Min(1)
     @Max(5)
     @Column(name = "Rating")
+    @NotNull
     private int rating;
 
     @Column(name = "Comment", columnDefinition = "nvarchar(2000)")
@@ -39,7 +40,7 @@ public class Opinion {
     @NotNull
     private LocalDateTime createdAt;
 
-    @OneToOne
+    @OneToOne(mappedBy = "opinion")
     private Appointment appointment;
 
 }
