@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.codec.Utf8;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import pl.edu.pja.aurorumclinic.models.User;
 
 import javax.crypto.SecretKey;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -60,5 +62,12 @@ public class SecurityUtils {
                 .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(jwt);
+    }
+
+    public String createRefreshToken() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        return Encoders.BASE64.encode(bytes);
     }
 }
