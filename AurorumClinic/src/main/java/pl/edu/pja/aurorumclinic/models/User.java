@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,8 +24,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Table(name = "User_")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User implements UserDetails {
 
     @Id
@@ -50,7 +52,7 @@ public class User implements UserDetails {
     @NotNull
     private LocalDate birthdate;
 
-    @Column(name = "Email", columnDefinition = "nvarchar(100)")
+    @Column(name = "Email", columnDefinition = "nvarchar(100)", unique = true)
     @Email
     @Size(max = 100)
     @NotBlank
@@ -83,12 +85,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @NotNull
     private UserRole role;
-
-    @OneToOne(mappedBy = "user")
-    private Doctor doctor;
-
-    @OneToOne(mappedBy = "user")
-    private Patient patient;
 
     @OneToMany(mappedBy = "user")
     private List<Message> messages;

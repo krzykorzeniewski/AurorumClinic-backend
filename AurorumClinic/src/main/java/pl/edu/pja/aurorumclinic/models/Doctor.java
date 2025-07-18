@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -15,12 +16,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Doctor {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@SuperBuilder
+@PrimaryKeyJoinColumn(name = "PK_Doctor")
+public class Doctor extends User{
 
     @Column(name = "Description", columnDefinition = "nvarchar(500)")
     @Size(max = 500)
@@ -56,8 +54,4 @@ public class Doctor {
     @OneToMany(mappedBy = "doctor")
     private List<Schedule> schedules;
 
-    @JoinColumn(name = "PK_Doctor")
-    @OneToOne
-    @MapsId
-    private User user;
 }
