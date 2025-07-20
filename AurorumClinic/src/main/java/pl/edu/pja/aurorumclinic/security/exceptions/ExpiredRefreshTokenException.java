@@ -1,9 +1,11 @@
 package pl.edu.pja.aurorumclinic.security.exceptions;
 
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class ExpiredRefreshTokenException extends AuthenticationException {
-    public ExpiredRefreshTokenException(String message) {
-        super(message);
+@ResponseStatus(HttpStatus.UNAUTHORIZED)
+public class ExpiredRefreshTokenException extends RuntimeException {
+    public ExpiredRefreshTokenException(String msg) {
+        super(msg);
     }
 }

@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.users.services.PatientService;
 import pl.edu.pja.aurorumclinic.users.dtos.LoginPatientRequestDto;
 import pl.edu.pja.aurorumclinic.users.dtos.RefreshTokenRequestDto;
-import pl.edu.pja.aurorumclinic.users.dtos.TokenResponseDto;
 import pl.edu.pja.aurorumclinic.users.dtos.RegisterPatientRequestDto;
+import pl.edu.pja.aurorumclinic.users.dtos.TokenResponseDto;
+import pl.edu.pja.aurorumclinic.users.services.PatientService;
 
 
 @RestController
