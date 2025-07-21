@@ -8,15 +8,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import pl.edu.pja.aurorumclinic.security.exceptions.ErrorDto;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 @Component
@@ -49,21 +51,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtException instanceof ExpiredJwtException) {
                 response.setHeader("Token-expired", "true");
             }
-
-            ErrorDto error = createResponse(request);
-
+            ProblemDetail error = createResponse(request);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
             response.getWriter().write(new ObjectMapper().writeValueAsString(error));
         }
     }
 
-    private ErrorDto createResponse(HttpServletRequest request) {
-        return ErrorDto.builder()
-                .status(HttpServletResponse.SC_UNAUTHORIZED)
-                .error("Unauthorized")
-                .message("Invalid jwt")
-                .path(request.getRequestURI())
-                .build();
+    private ProblemDetail createResponse(HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        problemDetail.setTitle("Unauthorized");
+        problemDetail.setDetail("Authentication failed");
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+        return problemDetail;
     }
 }
