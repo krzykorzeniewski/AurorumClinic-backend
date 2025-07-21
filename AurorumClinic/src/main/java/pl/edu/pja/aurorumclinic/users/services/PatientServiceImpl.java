@@ -29,7 +29,10 @@ public class PatientServiceImpl implements PatientService {
     private final SecurityUtils securityUtils;
 
     @Override
-    public void registerPatient(RegisterPatientRequestDto requestDto) {
+    public void registerPatient(RegisterPatientRequestDto requestDto) throws Exception {
+        if (userRepository.findByEmail(requestDto.email()) != null) {
+            throw new Exception("Email already in use:" + requestDto.email());
+        }
         Patient patient = Patient.builder()
                 .name(requestDto.name())
                 .surname(requestDto.surname())
