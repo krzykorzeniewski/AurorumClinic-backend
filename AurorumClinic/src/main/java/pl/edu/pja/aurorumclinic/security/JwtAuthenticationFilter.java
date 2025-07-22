@@ -8,9 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ProblemDetail;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,8 +16,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.net.URI;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -51,18 +52,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtException instanceof ExpiredJwtException) {
                 response.setHeader("Token-expired", "true");
             }
-            ProblemDetail error = createResponse(request);
+            Map<String, Object> errorMessage = createResponse(request);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-            response.getWriter().write(new ObjectMapper().writeValueAsString(error));
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().write(new ObjectMapper().writeValueAsString(errorMessage));
         }
     }
 
-    private ProblemDetail createResponse(HttpServletRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        problemDetail.setTitle("Unauthorized");
-        problemDetail.setDetail("Authentication failed");
-        problemDetail.setInstance(URI.create(request.getRequestURI()));
-        return problemDetail;
+    private Map<String, Object> createResponse(HttpServletRequest request) {
+        Map<String, Object> errorAttributes = new LinkedHashMap<>();
+        errorAttributes.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        errorAttributes.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        errorAttributes.put("error", "Unauthorized");
+        errorAttributes.put("message", "Authentication failed");
+        errorAttributes.put("path", request.getRequestURI());
+        return errorAttributes;
     }
 }
