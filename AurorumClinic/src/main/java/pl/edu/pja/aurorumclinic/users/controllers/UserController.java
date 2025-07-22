@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
 import pl.edu.pja.aurorumclinic.users.services.UserService;
 
@@ -21,21 +20,13 @@ public class UserController {
 
     @PostMapping("/register-employee")
     public ResponseEntity<String> registerEmployee(@Valid @RequestBody RegisterEmployeeRequestDto requestDto) {
-        try {
-            userService.registerEmployee(requestDto);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        userService.registerEmployee(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/register-patient")
     public ResponseEntity<String> registerPatient(@Valid @RequestBody RegisterPatientRequestDto requestDto) {
-        try {
-            userService.registerPatient(requestDto);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
+        userService.registerPatient(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

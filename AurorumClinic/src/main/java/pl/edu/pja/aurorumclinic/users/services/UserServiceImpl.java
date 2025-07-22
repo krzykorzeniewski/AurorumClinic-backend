@@ -3,7 +3,6 @@ package pl.edu.pja.aurorumclinic.users.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.models.Patient;
@@ -12,6 +11,7 @@ import pl.edu.pja.aurorumclinic.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.security.SecurityUtils;
 import pl.edu.pja.aurorumclinic.security.exceptions.ExpiredRefreshTokenException;
 import pl.edu.pja.aurorumclinic.security.exceptions.RefreshTokenNotFoundException;
+import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
 
@@ -27,9 +27,9 @@ public class UserServiceImpl implements UserService{
     private final SecurityUtils securityUtils;
 
     @Override
-    public void registerEmployee(RegisterEmployeeRequestDto requestDto) throws Exception {
+    public User registerEmployee(RegisterEmployeeRequestDto requestDto) {
         if (userRepository.findByEmail(requestDto.email()) != null) {
-            throw new Exception("Email already in use:" + requestDto.email());
+            throw new EmailNotUniqueException("Email already in use:" + requestDto.email());
         }
         User employee = User.builder()
                 .name(requestDto.name())
@@ -42,12 +42,13 @@ public class UserServiceImpl implements UserService{
                 .phoneNumber(requestDto.phoneNumber())
                 .build();
         userRepository.save(employee);
+        return employee;
     }
 
     @Override
-    public void registerPatient(RegisterPatientRequestDto requestDto) throws Exception {
+    public Patient registerPatient(RegisterPatientRequestDto requestDto) {
         if (userRepository.findByEmail(requestDto.email()) != null) {
-            throw new Exception("Email already in use:" + requestDto.email());
+            throw new EmailNotUniqueException("Email already in use:" + requestDto.email());
         }
         Patient patient = Patient.builder()
                 .name(requestDto.name())
@@ -60,6 +61,7 @@ public class UserServiceImpl implements UserService{
                 .phoneNumber(requestDto.phoneNumber())
                 .build();
         userRepository.save(patient);
+        return patient;
     }
 
     @Override
@@ -69,10 +71,6 @@ public class UserServiceImpl implements UserService{
         ));
 
         User userFromDb = userRepository.findByEmail(requestDto.email());
-        if (userFromDb == null) {
-            throw new UsernameNotFoundException("Email not found: " + requestDto.email());
-        }
-
         String jwt = securityUtils.createJwt(userFromDb);
         String refreshToken = securityUtils.createRefreshToken();
 
@@ -90,11 +88,11 @@ public class UserServiceImpl implements UserService{
     public AccessTokenResponseDto refreshAccessToken(RefreshTokenRequestDto requestDto) {
         User userFromDb = userRepository.findByRefreshToken(requestDto.refreshToken());
         if (userFromDb == null) {
-            throw new RefreshTokenNotFoundException("Invalid refresh token!");
+            throw new RefreshTokenNotFoundException("Invalid refresh token");
         }
 
         if (userFromDb.getRefreshTokenExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ExpiredRefreshTokenException("Refresh token is expired!");
+            throw new ExpiredRefreshTokenException("Refresh token is expired");
         }
 
         String newJwt = securityUtils.createJwt(userFromDb);
