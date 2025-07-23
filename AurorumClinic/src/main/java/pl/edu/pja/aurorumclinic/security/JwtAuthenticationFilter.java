@@ -1,7 +1,5 @@
 package pl.edu.pja.aurorumclinic.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,13 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import pl.edu.pja.aurorumclinic.security.exceptions.InvalidAccessTokenException;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -32,7 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+                                    @NonNull FilterChain filterChain)
+            throws ServletException, IOException, AuthenticationException {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer")) {
             filterChain.doFilter(request, response);
@@ -46,14 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             emailFromJwt = securityUtils.getEmailFromJwt(jwt);
             roleFromJwt = securityUtils.getRoleFromJwt(jwt);
         } catch (JwtException jwtException) {
-            if (jwtException instanceof ExpiredJwtException) {
-                response.setHeader("Token-expired", "true");
-            }
-            Map<String, Object> errorMessage = createResponse(request);
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(new ObjectMapper().writeValueAsString(errorMessage));
-            return;
+            throw new InvalidAccessTokenException(jwtException.getLocalizedMessage());
         }
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
                 emailFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))
