@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.security.exceptions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -22,12 +23,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          AuthenticationException authException) throws IOException {
         Map<String, Object> errorAttributes = new LinkedHashMap<>();
         errorAttributes.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        errorAttributes.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        errorAttributes.put("status", HttpStatus.UNAUTHORIZED.value());
         errorAttributes.put("error", "Unauthorized");
         errorAttributes.put("message", "Authentication failed");
         errorAttributes.put("path", request.getRequestURI());
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(new ObjectMapper().writeValueAsString(errorAttributes));
     }

@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.security.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -22,12 +23,12 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                        AccessDeniedException accessDeniedException) throws IOException {
         Map<String, Object> errorAttributes = new LinkedHashMap<>();
         errorAttributes.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        errorAttributes.put("status", HttpServletResponse.SC_FORBIDDEN);
+        errorAttributes.put("status", HttpStatus.FORBIDDEN.value());
         errorAttributes.put("error", "Access Denied");
         errorAttributes.put("message", "You do not have permission to access this resource");
         errorAttributes.put("path", request.getRequestURI());
 
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(new ObjectMapper().writeValueAsString(errorAttributes));
     }

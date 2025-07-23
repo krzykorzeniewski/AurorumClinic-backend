@@ -8,9 +8,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,32 +39,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String emailFromJwt;
-        String roleFromJwt;
+        String emailFromJwt = null;
+        String roleFromJwt = null;
         try {
             String jwt = authHeader.substring(7);
             emailFromJwt = securityUtils.getEmailFromJwt(jwt);
             roleFromJwt = securityUtils.getRoleFromJwt(jwt);
-        JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
-                emailFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))
-        );
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        filterChain.doFilter(request, response);
         } catch (JwtException jwtException) {
             if (jwtException instanceof ExpiredJwtException) {
                 response.setHeader("Token-expired", "true");
             }
             Map<String, Object> errorMessage = createResponse(request);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.getWriter().write(new ObjectMapper().writeValueAsString(errorMessage));
+            return;
         }
+        JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
+                emailFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))
+        );
+        SecurityContext newContext = SecurityContextHolder.createEmptyContext();
+        newContext.setAuthentication(authenticationToken);
+        SecurityContextHolder.setContext(newContext);
+        filterChain.doFilter(request, response);
     }
 
     private Map<String, Object> createResponse(HttpServletRequest request) {
         Map<String, Object> errorAttributes = new LinkedHashMap<>();
         errorAttributes.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        errorAttributes.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        errorAttributes.put("status", HttpStatus.UNAUTHORIZED.value());
         errorAttributes.put("error", "Unauthorized");
         errorAttributes.put("message", "Authentication failed");
         errorAttributes.put("path", request.getRequestURI());
