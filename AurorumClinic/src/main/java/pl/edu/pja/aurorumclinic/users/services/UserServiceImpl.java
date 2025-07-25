@@ -1,5 +1,7 @@
 package pl.edu.pja.aurorumclinic.users.services;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +12,7 @@ import pl.edu.pja.aurorumclinic.models.User;
 import pl.edu.pja.aurorumclinic.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.security.SecurityUtils;
 import pl.edu.pja.aurorumclinic.security.exceptions.ExpiredRefreshTokenException;
+import pl.edu.pja.aurorumclinic.security.exceptions.InvalidAccessTokenException;
 import pl.edu.pja.aurorumclinic.security.exceptions.RefreshTokenNotFoundException;
 import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
@@ -86,6 +89,17 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public AccessTokenResponseDto refreshAccessToken(RefreshTokenRequestDto requestDto) {
+        String jwt = requestDto.accessToken();
+        try {
+            securityUtils.validateJwt(jwt);
+        } catch (JwtException jwtException) {
+            if (jwtException instanceof ExpiredJwtException) {
+                System.out.println("token expired");
+            } else {
+                throw new InvalidAccessTokenException(jwtException.getMessage());
+            }
+        }
+
         User userFromDb = userRepository.findByRefreshToken(requestDto.refreshToken());
         if (userFromDb == null) {
             throw new RefreshTokenNotFoundException("Invalid refresh token");

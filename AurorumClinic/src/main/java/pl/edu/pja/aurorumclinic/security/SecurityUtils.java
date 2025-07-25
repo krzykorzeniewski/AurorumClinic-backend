@@ -55,7 +55,7 @@ public class SecurityUtils {
         return claims.getPayload().get("role", String.class);
     }
 
-    private Jws<Claims> validateJwt(String jwt) {
+    public Jws<Claims> validateJwt(String jwt) {
         return Jwts.parser()
                 .requireIssuer(issuer)
                 .clockSkewSeconds(120)
