@@ -25,7 +25,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         errorAttributes.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         errorAttributes.put("status", HttpStatus.UNAUTHORIZED.value());
         errorAttributes.put("error", "Unauthorized");
-        errorAttributes.put("message", authException.getMessage());
         errorAttributes.put("path", request.getRequestURI());
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());

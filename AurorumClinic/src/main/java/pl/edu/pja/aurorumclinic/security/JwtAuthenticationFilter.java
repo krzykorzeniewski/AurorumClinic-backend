@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.security;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -46,6 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             emailFromJwt = securityUtils.getEmailFromJwt(jwt);
             roleFromJwt = securityUtils.getRoleFromJwt(jwt);
         } catch (JwtException jwtException) {
+            if (jwtException instanceof ExpiredJwtException) {
+                response.setHeader("Token-expired", "true");
+            }
             throw new InvalidAccessTokenException(jwtException.getLocalizedMessage());
         }
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
@@ -57,13 +61,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private Map<String, Object> createResponse(HttpServletRequest request) {
-        Map<String, Object> errorAttributes = new LinkedHashMap<>();
-        errorAttributes.put("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-        errorAttributes.put("status", HttpStatus.UNAUTHORIZED.value());
-        errorAttributes.put("error", "Unauthorized");
-        errorAttributes.put("message", "Authentication failed");
-        errorAttributes.put("path", request.getRequestURI());
-        return errorAttributes;
-    }
 }
