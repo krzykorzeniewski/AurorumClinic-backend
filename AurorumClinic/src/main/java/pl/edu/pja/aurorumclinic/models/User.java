@@ -66,10 +66,6 @@ public class User implements UserDetails {
     @NotBlank
     private String phoneNumber;
 
-    @Column(name = "Salt", columnDefinition = "nvarchar(20)")
-    @Size(min = 20, max = 20)
-    private String salt;
-
     @Column(name = "Two_Factor_Authentication", columnDefinition = "bit")
     private boolean twoFactorAuth;
 
