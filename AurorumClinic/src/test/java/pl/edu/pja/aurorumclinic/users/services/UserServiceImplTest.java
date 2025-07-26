@@ -1,5 +1,7 @@
 package pl.edu.pja.aurorumclinic.users.services;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import pl.edu.pja.aurorumclinic.models.User;
 import pl.edu.pja.aurorumclinic.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.security.SecurityUtils;
 import pl.edu.pja.aurorumclinic.security.exceptions.ExpiredRefreshTokenException;
+import pl.edu.pja.aurorumclinic.security.exceptions.InvalidAccessTokenException;
 import pl.edu.pja.aurorumclinic.security.exceptions.RefreshTokenNotFoundException;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
@@ -68,7 +71,10 @@ class UserServiceImplTest {
         authentication = new UsernamePasswordAuthenticationToken(
                 "kowalski@pm.me", null, List.of(new SimpleGrantedAuthority(UserRole.PATIENT.name()))
         );
-        refreshTokenRequestDto = new RefreshTokenRequestDto("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=");
+        refreshTokenRequestDto = new RefreshTokenRequestDto("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOi" +
+                "JodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
+                "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok",
+                "m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=");
     }
 
     @AfterEach
@@ -154,5 +160,24 @@ class UserServiceImplTest {
                 "eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
                 "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok", accessTokenResponseDto.accessToken());
         assertEquals("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=", accessTokenResponseDto.refreshToken());
+    }
+
+    @Test
+    void refreshAccessTokenShouldThrowExceptionWhenAccessTokenIsInvalid() {
+        when(securityUtils.validateJwt(refreshTokenRequestDto.accessToken())).thenThrow(SignatureException.class);
+        assertThrowsExactly(InvalidAccessTokenException.class, () ->
+                userService.refreshAccessToken(refreshTokenRequestDto));
+    }
+
+    @Test
+    void refreshAccessTokenShouldNotThrowExceptionWhenAccessTokenIsExpired() {
+        when(securityUtils.validateJwt(refreshTokenRequestDto.accessToken())).thenThrow(ExpiredJwtException.class);
+        testUser.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
+        when(userRepository.findByRefreshToken("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=")).thenReturn(testUser);
+        when(securityUtils.createJwt(testUser)).thenReturn("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
+                "eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
+                "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok");
+        when(securityUtils.createRefreshToken()).thenReturn("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=");
+        assertDoesNotThrow(() -> userService.refreshAccessToken(refreshTokenRequestDto));
     }
 }
