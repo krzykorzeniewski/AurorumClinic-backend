@@ -6,22 +6,27 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import pl.edu.pja.aurorumclinic.models.enums.UserRole;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Table(name = "User_")
-public class User {
+@Inheritance(strategy = InheritanceType.JOINED)
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,7 +51,7 @@ public class User {
     @NotNull
     private LocalDate birthdate;
 
-    @Column(name = "Email", columnDefinition = "nvarchar(100)")
+    @Column(name = "Email", columnDefinition = "nvarchar(100)", unique = true)
     @Email
     @Size(max = 100)
     @NotBlank
@@ -61,15 +66,11 @@ public class User {
     @NotBlank
     private String phoneNumber;
 
-    @Column(name = "Salt", columnDefinition = "nvarchar(20)")
-    @Size(min = 20, max = 20)
-    private String salt;
-
     @Column(name = "Two_Factor_Authentication", columnDefinition = "bit")
     private boolean twoFactorAuth;
 
-    @Column(name = "Refresh_Token")
-    @Size(min = 20, max = 20)
+    @Column(name = "Refresh_Token", columnDefinition = "nvarchar(200)")
+    @Size(max = 200)
     private String refreshToken;
 
     @Column(name = "Refresh_Token_Expiry_Date", columnDefinition = "datetime2(5)")
@@ -80,13 +81,16 @@ public class User {
     @NotNull
     private UserRole role;
 
-    @OneToOne(mappedBy = "user")
-    private Doctor doctor;
-
-    @OneToOne(mappedBy = "user")
-    private Patient patient;
-
     @OneToMany(mappedBy = "user")
     private List<Message> messages;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
 }

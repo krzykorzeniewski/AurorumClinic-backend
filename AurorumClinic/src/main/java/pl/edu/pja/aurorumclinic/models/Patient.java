@@ -1,10 +1,8 @@
 package pl.edu.pja.aurorumclinic.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -12,12 +10,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Patient {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@SuperBuilder
+@PrimaryKeyJoinColumn(name = "PK_User")
+public class Patient extends User{
 
     @Column(name = "Newsletter", columnDefinition = "bit")
     private boolean newsletter;
@@ -27,10 +22,5 @@ public class Patient {
 
     @OneToMany(mappedBy = "patient")
     private List<Appointment> appointments;
-
-    @JoinColumn(name = "PK_Patient")
-    @OneToOne
-    @MapsId
-    private User user;
 
 }
