@@ -10,7 +10,7 @@ public interface UserService {
 
     User registerEmployee(RegisterEmployeeRequestDto requestDto);
     Patient registerPatient(RegisterPatientRequestDto requestDto);
-    AccessTokenResponseDto loginUser(LoginUserRequestDto requestDto);
-    AccessTokenResponseDto refreshAccessToken(RefreshTokenRequestDto requestDto);
+    AccessTokenDto loginUser(LoginUserRequestDto requestDto);
+    AccessTokenDto refreshAccessToken(RefreshTokenRequestDto requestDto);
 
 }

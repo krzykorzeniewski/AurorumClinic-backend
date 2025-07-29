@@ -2,12 +2,8 @@ package pl.edu.pja.aurorumclinic.users.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
 import pl.edu.pja.aurorumclinic.users.services.UserService;
 
@@ -31,15 +27,37 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AccessTokenResponseDto> loginUser(@Valid @RequestBody LoginUserRequestDto requestDto) {
-        AccessTokenResponseDto responseDto = userService.loginUser(requestDto);
-        return ResponseEntity.ok(responseDto);
+    public ResponseEntity<AccessTokenDto> loginUser(@Valid @RequestBody LoginUserRequestDto requestDto) {
+        AccessTokenDto responseDto = userService.loginUser(requestDto);
+        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .build();
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AccessTokenResponseDto> refreshAccessToken(@Valid @RequestBody RefreshTokenRequestDto requestDto) {
-        AccessTokenResponseDto responseDto = userService.refreshAccessToken(requestDto);
-        return ResponseEntity.ok(responseDto);
+    public ResponseEntity<Void> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
+                                                   @CookieValue("Refresh-Token") String refreshToken) {
+        @Valid RefreshTokenRequestDto requestDto = new RefreshTokenRequestDto(accessToken, refreshToken);
+        AccessTokenDto responseDto = userService.refreshAccessToken(requestDto);
+        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .build();
     }
 
 }
