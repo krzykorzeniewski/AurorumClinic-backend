@@ -61,8 +61,8 @@ public class User implements UserDetails {
     @Size(max = 200)
     private String password;
 
-    @Column(name = "Phone_Number", columnDefinition = "nvarchar(11)")
-    @Size(max = 11)
+    @Column(name = "Phone_Number", columnDefinition = "nvarchar(9)")
+    @Size(min = 9, max = 9)
     @NotBlank
     private String phoneNumber;
 
