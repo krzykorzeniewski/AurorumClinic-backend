@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.users.dtos.GetPatientResponseDto;
 import pl.edu.pja.aurorumclinic.users.dtos.PatchPatientRequestDto;
+import pl.edu.pja.aurorumclinic.users.dtos.PutPatientRequestDto;
 import pl.edu.pja.aurorumclinic.users.services.PatientService;
 
 @RestController
@@ -26,8 +27,10 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePatient() {
-        return null;
+    public ResponseEntity<?> updatePatient(@PathVariable Long id,
+                                           @Valid @RequestBody PutPatientRequestDto requestDto) {
+        GetPatientResponseDto responseDto = patientService.updatePatient(id, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @PatchMapping("/{id}")
