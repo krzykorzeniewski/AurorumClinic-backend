@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.models;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import pl.edu.pja.aurorumclinic.models.enums.CommunicationPreference;
 
 import java.util.List;
 
@@ -17,8 +18,9 @@ public class Patient extends User{
     @Column(name = "Newsletter", columnDefinition = "bit")
     private boolean newsletter;
 
-    @Column(name = "Communication_Preferences", columnDefinition = "bit")
-    private boolean communicationPreferences;
+    @Column(name = "Communication_Preferences", length = 50, columnDefinition = "nvarchar(50)")
+    @Enumerated(value = EnumType.STRING)
+    private CommunicationPreference communicationPreferences;
 
     @OneToMany(mappedBy = "patient")
     private List<Appointment> appointments;
