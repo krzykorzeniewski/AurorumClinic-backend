@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,10 +21,10 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.edu.pja.aurorumclinic.models.User;
+import pl.edu.pja.aurorumclinic.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.security.exceptions.CustomAuthenticationEntryPoint;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -46,6 +47,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/users/**", "/error",
                                 "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/patients/**").hasAuthority(UserRole.PATIENT.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/patients/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
+                                UserRole.ADMIN.name())
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

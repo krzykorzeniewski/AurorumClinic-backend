@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.models.Patient;
 import pl.edu.pja.aurorumclinic.models.User;
+import pl.edu.pja.aurorumclinic.models.enums.CommunicationPreference;
 import pl.edu.pja.aurorumclinic.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.security.SecurityUtils;
 import pl.edu.pja.aurorumclinic.security.exceptions.ExpiredRefreshTokenException;
@@ -59,6 +60,7 @@ public class UserServiceImpl implements UserService{
                 .email(requestDto.email())
                 .password(passwordEncoder.encode(requestDto.password()))
                 .role(UserRole.PATIENT)
+                .communicationPreferences(CommunicationPreference.EMAIL)
                 .birthdate(requestDto.birthDate())
                 .pesel(requestDto.pesel())
                 .phoneNumber(requestDto.phoneNumber())
