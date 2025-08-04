@@ -26,6 +26,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/register-doctor")
+    public ResponseEntity<String> registerDoctor(@Valid @RequestBody RegisterDoctorRequestDto requestDto) {
+        userService.registerDoctor(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @PostMapping("/login")
     public ResponseEntity<AccessTokenDto> loginUser(@Valid @RequestBody LoginUserRequestDto requestDto) {
         AccessTokenDto responseDto = userService.loginUser(requestDto);

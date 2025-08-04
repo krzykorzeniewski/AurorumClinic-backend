@@ -46,6 +46,7 @@ public class Doctor extends User{
 
     @Column(name = "PWZ_Number", columnDefinition = "nvarchar(7)")
     @Size(min = 7, max = 7)
+    @NotBlank
     private String pwzNumber;
 
     @OneToMany(mappedBy = "doctor")

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.edu.pja.aurorumclinic.models.Doctor;
 import pl.edu.pja.aurorumclinic.models.Patient;
 import pl.edu.pja.aurorumclinic.models.User;
 import pl.edu.pja.aurorumclinic.models.enums.CommunicationPreference;
@@ -19,6 +20,7 @@ import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Service
@@ -40,7 +42,7 @@ public class UserServiceImpl implements UserService{
                 .surname(requestDto.surname())
                 .email(requestDto.email())
                 .password(passwordEncoder.encode(requestDto.password()))
-                .role(UserRole.valueOf(requestDto.role().toUpperCase()))
+                .role(UserRole.EMPLOYEE)
                 .birthdate(requestDto.birthDate())
                 .pesel(requestDto.pesel())
                 .phoneNumber(requestDto.phoneNumber())
@@ -67,6 +69,31 @@ public class UserServiceImpl implements UserService{
                 .build();
         userRepository.save(patient);
         return patient;
+    }
+
+    @Override
+    public Doctor registerDoctor(RegisterDoctorRequestDto requestDto) {
+        if (userRepository.findByEmail(requestDto.email()) != null) {
+            throw new EmailNotUniqueException("Email already in use:" + requestDto.email());
+        }
+        Doctor doctor = Doctor.builder()
+                .name(requestDto.name())
+                .surname(requestDto.surname())
+                .email(requestDto.email())
+                .password(passwordEncoder.encode(requestDto.password()))
+                .role(UserRole.DOCTOR)
+                .birthdate(requestDto.birthDate())
+                .pesel(requestDto.pesel())
+                .phoneNumber(requestDto.phoneNumber())
+                .description(requestDto.description())
+                .specialization(requestDto.specialization())
+                .profilePicture(requestDto.profilePicture().getBytes(StandardCharsets.UTF_8))
+                .education(requestDto.education())
+                .experience(requestDto.experience())
+                .pwzNumber(requestDto.pwzNumber())
+                .build();
+        userRepository.save(doctor);
+        return doctor;
     }
 
     @Override
