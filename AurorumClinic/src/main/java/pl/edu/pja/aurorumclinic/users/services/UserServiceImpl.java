@@ -87,7 +87,6 @@ public class UserServiceImpl implements UserService{
                 .phoneNumber(requestDto.phoneNumber())
                 .description(requestDto.description())
                 .specialization(requestDto.specialization())
-                .profilePicture(requestDto.profilePicture().getBytes(StandardCharsets.UTF_8))
                 .education(requestDto.education())
                 .experience(requestDto.experience())
                 .pwzNumber(requestDto.pwzNumber())

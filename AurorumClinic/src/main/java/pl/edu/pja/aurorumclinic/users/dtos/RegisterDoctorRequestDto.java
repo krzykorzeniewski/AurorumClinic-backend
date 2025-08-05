@@ -16,7 +16,6 @@ public record RegisterDoctorRequestDto(@NotBlank @Size(max = 50) String name,
                                        @NotBlank @Size(max = 9) String phoneNumber,
                                        @NotBlank @Size(max = 100) String description,
                                        @NotBlank @Size(max = 100) String specialization,
-                                       @NotNull String profilePicture,
                                        @NotBlank @Size(max = 100) String education,
                                        @NotBlank @Size(max = 100) String experience,
                                        @NotBlank @Size(min = 7, max = 7) String pwzNumber) {

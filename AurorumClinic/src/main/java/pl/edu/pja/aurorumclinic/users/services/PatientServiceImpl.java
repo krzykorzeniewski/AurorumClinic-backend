@@ -85,6 +85,7 @@ public class PatientServiceImpl implements PatientService{
                 .surname(patient.getSurname())
                 .pesel(patient.getPesel())
                 .birthDate(patient.getBirthdate())
+                .phoneNumber(patient.getPhoneNumber())
                 .email(patient.getEmail())
                 .twoFactorAuth(patient.isTwoFactorAuth())
                 .newsletter(patient.isNewsletter())
