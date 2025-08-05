@@ -110,6 +110,7 @@ public class UserServiceImpl implements UserService{
         userRepository.save(userFromDb);
 
         return AccessTokenDto.builder()
+                .userId(userFromDb.getId())
                 .accessToken(jwt)
                 .refreshToken(refreshToken)
                 .build();
@@ -145,6 +146,7 @@ public class UserServiceImpl implements UserService{
         userRepository.save(userFromDb);
 
         return AccessTokenDto.builder()
+                .userId(userFromDb.getId())
                 .accessToken(newJwt)
                 .refreshToken(newRefreshToken)
                 .build();

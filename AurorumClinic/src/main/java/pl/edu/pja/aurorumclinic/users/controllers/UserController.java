@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import pl.edu.pja.aurorumclinic.shared.EmailService;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
 import pl.edu.pja.aurorumclinic.users.services.UserService;
 
@@ -13,6 +14,7 @@ import pl.edu.pja.aurorumclinic.users.services.UserService;
 public class UserController {
 
     private final UserService userService;
+    private final EmailService emailService;
 
     @PostMapping("/register-employee")
     public ResponseEntity<String> registerEmployee(@Valid @RequestBody RegisterEmployeeRequestDto requestDto) {
@@ -33,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AccessTokenDto> loginUser(@Valid @RequestBody LoginUserRequestDto requestDto) {
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequestDto requestDto) {
         AccessTokenDto responseDto = userService.loginUser(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
@@ -43,13 +45,13 @@ public class UserController {
                 .path("/")
                 .httpOnly(true)
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .build();
+                .body(new UserIdResponseDto(responseDto.userId()));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<Void> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
+    public ResponseEntity<?> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
                                                    @CookieValue("Refresh-Token") String refreshToken) {
         @Valid RefreshTokenRequestDto requestDto = new RefreshTokenRequestDto(accessToken, refreshToken);
         AccessTokenDto responseDto = userService.refreshAccessToken(requestDto);
@@ -61,9 +63,9 @@ public class UserController {
                 .path("/")
                 .httpOnly(true)
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .build();
+                .body(new UserIdResponseDto(responseDto.userId()));
     }
 
 }
