@@ -14,5 +14,6 @@ public interface UserService {
     Doctor registerDoctor(RegisterDoctorRequestDto requestDto);
     AccessTokenDto loginUser(LoginUserRequestDto requestDto);
     AccessTokenDto refreshAccessToken(RefreshTokenRequestDto requestDto);
+    void verifyUserEmail(String token);
 
 }

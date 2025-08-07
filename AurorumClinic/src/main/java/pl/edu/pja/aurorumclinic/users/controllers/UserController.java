@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.shared.EmailService;
+import pl.edu.pja.aurorumclinic.models.User;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
 import pl.edu.pja.aurorumclinic.users.services.UserService;
 
@@ -14,7 +14,6 @@ import pl.edu.pja.aurorumclinic.users.services.UserService;
 public class UserController {
 
     private final UserService userService;
-    private final EmailService emailService;
 
     @PostMapping("/register-employee")
     public ResponseEntity<String> registerEmployee(@Valid @RequestBody RegisterEmployeeRequestDto requestDto) {
@@ -32,6 +31,12 @@ public class UserController {
     public ResponseEntity<String> registerDoctor(@Valid @RequestBody RegisterDoctorRequestDto requestDto) {
         userService.registerDoctor(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
+        userService.verifyUserEmail(token);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/login")
