@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.users.services;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,9 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final SecurityUtils securityUtils;
     private final EmailService emailService;
+
+    @Value("${mail.verification-link}")
+    private String mailVerificationLink;
 
     @Override
     public User registerEmployee(RegisterEmployeeRequestDto requestDto) {
@@ -184,7 +188,7 @@ public class UserServiceImpl implements UserService{
         user.setEmailVerificationExpiryDate(LocalDateTime.now().plusMinutes(30));
         userRepository.save(user);
 
-        String verificationLink = "http://localhost:8080/api/users/verify-email?token=" + token;
+        String verificationLink = mailVerificationLink + token;
 
         emailService.sendEmail(
                 "support@aurorumclinic.pl",
