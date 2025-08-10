@@ -2,10 +2,8 @@ package pl.edu.pja.aurorumclinic.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -30,9 +28,8 @@ public class Doctor extends User{
     @NotBlank
     private String specialization;
 
-    @Column(name = "Profile_Picture", columnDefinition = "varbinary(max)")
-    @NotNull
-    private byte[] profilePicture;
+    @Column(name = "Profile_Picture", columnDefinition = "nvarchar(max)")
+    private String profilePicture;
 
     @Column(name = "Education", columnDefinition = "nvarchar(100)")
     @Size(max = 100)
@@ -46,6 +43,7 @@ public class Doctor extends User{
 
     @Column(name = "PWZ_Number", columnDefinition = "nvarchar(7)")
     @Size(min = 7, max = 7)
+    @NotBlank
     private String pwzNumber;
 
     @OneToMany(mappedBy = "doctor")

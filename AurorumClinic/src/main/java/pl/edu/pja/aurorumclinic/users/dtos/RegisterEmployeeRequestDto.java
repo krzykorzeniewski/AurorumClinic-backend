@@ -13,6 +13,5 @@ public record RegisterEmployeeRequestDto(@NotBlank @Size(max = 50) String name,
                                          @NotNull LocalDate birthDate,
                                          @NotBlank @Email @Size(max = 100) String email,
                                          @NotBlank @Size(max = 200) String password,
-                                         @NotBlank @Size(max = 9) String phoneNumber,
-                                         @NotBlank @Size(max = 50) String role) {
+                                         @NotBlank @Size(max = 9) String phoneNumber) {
 }

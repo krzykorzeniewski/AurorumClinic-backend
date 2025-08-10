@@ -3,10 +3,12 @@ package pl.edu.pja.aurorumclinic.users.services;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.edu.pja.aurorumclinic.models.Doctor;
 import pl.edu.pja.aurorumclinic.models.Patient;
 import pl.edu.pja.aurorumclinic.models.User;
 import pl.edu.pja.aurorumclinic.models.enums.CommunicationPreference;
@@ -15,11 +17,15 @@ import pl.edu.pja.aurorumclinic.security.SecurityUtils;
 import pl.edu.pja.aurorumclinic.security.exceptions.ExpiredRefreshTokenException;
 import pl.edu.pja.aurorumclinic.security.exceptions.InvalidAccessTokenException;
 import pl.edu.pja.aurorumclinic.security.exceptions.RefreshTokenNotFoundException;
+import pl.edu.pja.aurorumclinic.shared.EmailService;
 import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
+import pl.edu.pja.aurorumclinic.users.shared.EmailVerificationTokenNotFoundException;
+import pl.edu.pja.aurorumclinic.users.shared.UserEmailNotVerifiedException;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +35,10 @@ public class UserServiceImpl implements UserService{
     private final AuthenticationProvider authenticationProvider;
     private final PasswordEncoder passwordEncoder;
     private final SecurityUtils securityUtils;
+    private final EmailService emailService;
+
+    @Value("${mail.verification-link}")
+    private String mailVerificationLink;
 
     @Override
     public User registerEmployee(RegisterEmployeeRequestDto requestDto) {
@@ -40,12 +50,13 @@ public class UserServiceImpl implements UserService{
                 .surname(requestDto.surname())
                 .email(requestDto.email())
                 .password(passwordEncoder.encode(requestDto.password()))
-                .role(UserRole.valueOf(requestDto.role().toUpperCase()))
+                .role(UserRole.EMPLOYEE)
                 .birthdate(requestDto.birthDate())
                 .pesel(requestDto.pesel())
                 .phoneNumber(requestDto.phoneNumber())
                 .build();
         userRepository.save(employee);
+        sendVerificationEmail(employee);
         return employee;
     }
 
@@ -66,7 +77,33 @@ public class UserServiceImpl implements UserService{
                 .phoneNumber(requestDto.phoneNumber())
                 .build();
         userRepository.save(patient);
+        sendVerificationEmail(patient);
         return patient;
+    }
+
+    @Override
+    public Doctor registerDoctor(RegisterDoctorRequestDto requestDto) {
+        if (userRepository.findByEmail(requestDto.email()) != null) {
+            throw new EmailNotUniqueException("Email already in use:" + requestDto.email());
+        }
+        Doctor doctor = Doctor.builder()
+                .name(requestDto.name())
+                .surname(requestDto.surname())
+                .email(requestDto.email())
+                .password(passwordEncoder.encode(requestDto.password()))
+                .role(UserRole.DOCTOR)
+                .birthdate(requestDto.birthDate())
+                .pesel(requestDto.pesel())
+                .phoneNumber(requestDto.phoneNumber())
+                .description(requestDto.description())
+                .specialization(requestDto.specialization())
+                .education(requestDto.education())
+                .experience(requestDto.experience())
+                .pwzNumber(requestDto.pwzNumber())
+                .build();
+        userRepository.save(doctor);
+        sendVerificationEmail(doctor);
+        return doctor;
     }
 
     @Override
@@ -76,6 +113,10 @@ public class UserServiceImpl implements UserService{
         ));
 
         User userFromDb = userRepository.findByEmail(requestDto.email());
+        if (!userFromDb.isEmailVerified()) {
+            throw new UserEmailNotVerifiedException("Account is not verified");
+        }
+
         String jwt = securityUtils.createJwt(userFromDb);
         String refreshToken = securityUtils.createRefreshToken();
 
@@ -84,6 +125,7 @@ public class UserServiceImpl implements UserService{
         userRepository.save(userFromDb);
 
         return AccessTokenDto.builder()
+                .userId(userFromDb.getId())
                 .accessToken(jwt)
                 .refreshToken(refreshToken)
                 .build();
@@ -119,9 +161,41 @@ public class UserServiceImpl implements UserService{
         userRepository.save(userFromDb);
 
         return AccessTokenDto.builder()
+                .userId(userFromDb.getId())
                 .accessToken(newJwt)
                 .refreshToken(newRefreshToken)
                 .build();
+    }
+
+    @Override
+    public void verifyUserEmail(String token) {
+        User userFromDb = userRepository.findByEmailVerificationToken(token);
+        if (userFromDb == null) {
+            throw new EmailVerificationTokenNotFoundException("Invalid verification token");
+        }
+        if (userFromDb.getEmailVerificationExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ExpiredRefreshTokenException("Verification token is expired");
+        }
+        userFromDb.setEmailVerified(true);
+        userFromDb.setEmailVerificationToken(null);
+        userFromDb.setEmailVerificationExpiryDate(null);
+        userRepository.save(userFromDb);
+    }
+
+    private void sendVerificationEmail(User user) {
+        String token = UUID.randomUUID().toString();
+        user.setEmailVerificationToken(token);
+        user.setEmailVerificationExpiryDate(LocalDateTime.now().plusMinutes(30));
+        userRepository.save(user);
+
+        String verificationLink = mailVerificationLink + token;
+
+        emailService.sendEmail(
+                "support@aurorumclinic.pl",
+                user.getEmail(),
+                "Weryfikacja konta",
+                "Naciśnij link aby zweryfikować adres email: " + verificationLink
+        );
     }
 
 }

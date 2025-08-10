@@ -62,8 +62,7 @@ class UserServiceImplTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         registerEmployeeRequestDto = new RegisterEmployeeRequestDto("Jan", "Kowalski",
-                "00000000000", LocalDate.now(), "kowalski@pm.me", "abc123", "123123123",
-                "DOCTOR");
+                "00000000000", LocalDate.now(), "kowalski@pm.me", "abc123", "123123123");
         registerPatientRequestDto = new RegisterPatientRequestDto("Jan", "Kowalski",
                 "00000000000", LocalDate.now(), "kowalski@pm.me", "abc123", "123123123");
         loginUserRequestDto = new LoginUserRequestDto("kowalski@pm.me", "abc123");
@@ -95,7 +94,6 @@ class UserServiceImplTest {
         assertNotNull(user);
         assertEquals(registerEmployeeRequestDto.name(), user.getName());
         assertEquals(registerEmployeeRequestDto.email(), user.getEmail());
-        assertEquals(registerEmployeeRequestDto.role(), user.getRole().name());
     }
 
     @Test

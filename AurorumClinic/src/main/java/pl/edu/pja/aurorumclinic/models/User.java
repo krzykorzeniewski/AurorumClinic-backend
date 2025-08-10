@@ -84,6 +84,15 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Message> messages;
 
+    @Column(name = "Email_Verified", columnDefinition = "bit")
+    private boolean emailVerified = false;
+
+    @Column(name = "Email_Verification_Token", columnDefinition = "nvarchar(100)")
+    private String emailVerificationToken;
+
+    @Column(name = "Email_Verification_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime emailVerificationExpiryDate;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

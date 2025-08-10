@@ -11,6 +11,7 @@ public record GetPatientResponseDto(Long id,
                                     String pesel,
                                     LocalDate birthDate,
                                     String email,
+                                    String phoneNumber,
                                     boolean twoFactorAuth,
                                     boolean newsletter,
                                     String communicationPreferences) {
