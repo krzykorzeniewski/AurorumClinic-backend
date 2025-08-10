@@ -93,6 +93,12 @@ public class User implements UserDetails {
     @Column(name = "Email_Verification_Expiry_Date", columnDefinition = "datetime2(5)")
     private LocalDateTime emailVerificationExpiryDate;
 
+    @Column(name = "Password_Reset_Token", columnDefinition = "nvarchar(100)")
+    private String passwordResetToken;
+
+    @Column(name = "Password_Reset_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime passwordResetExpiryDate;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

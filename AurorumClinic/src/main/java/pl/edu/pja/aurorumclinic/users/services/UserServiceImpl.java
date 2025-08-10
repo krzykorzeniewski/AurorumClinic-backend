@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.users.services;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.io.Encoders;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -22,10 +23,11 @@ import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
 import pl.edu.pja.aurorumclinic.users.shared.EmailVerificationTokenNotFoundException;
+import pl.edu.pja.aurorumclinic.users.shared.ResourceNotFoundException;
 import pl.edu.pja.aurorumclinic.users.shared.UserEmailNotVerifiedException;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +41,9 @@ public class UserServiceImpl implements UserService{
 
     @Value("${mail.verification-link}")
     private String mailVerificationLink;
+
+    @Value("${mail.frontend.password-reset-link}")
+    private String resetPasswordLink;
 
     @Override
     public User registerEmployee(RegisterEmployeeRequestDto requestDto) {
@@ -182,8 +187,54 @@ public class UserServiceImpl implements UserService{
         userRepository.save(userFromDb);
     }
 
+    @Override
+    public void sendResetPasswordEmail(ForgetPasswordRequestDto requestDto) {
+        User userFromDb = userRepository.findByEmail(requestDto.email());
+        if (userFromDb == null) {
+            throw new ResourceNotFoundException("User with email:" + requestDto.email() + " does not exist");
+        }
+        if (!userFromDb.isEmailVerified()) {
+            throw new UserEmailNotVerifiedException("User email is not verified");
+        }
+
+        byte[] bytes = new byte[16];
+        SecureRandom rng = new SecureRandom();
+        rng.nextBytes(bytes);
+        String token = Encoders.BASE64.encode(bytes);
+        userFromDb.setPasswordResetToken(token);
+        userFromDb.setPasswordResetExpiryDate(LocalDateTime.now().plusMinutes(15));
+        userRepository.save(userFromDb);
+
+        String verificationLink = resetPasswordLink + token;
+        emailService.sendEmail(
+                "support@aurorumclinic.pl",
+                userFromDb.getEmail(),
+                "Ustaw nowe hasło",
+                "Naciśnij link aby zresetować hasło: " + verificationLink
+        );
+
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequestDto requestDto, String token) {
+        User userFromDb = userRepository.findByPasswordResetToken(token);
+        if (userFromDb == null) {
+            throw new ResourceNotFoundException("Invalid password reset token");
+        }
+        if (userFromDb.getPasswordResetExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ExpiredRefreshTokenException("Reset password token is expired");
+        }
+        userFromDb.setPassword(passwordEncoder.encode(requestDto.password()));
+        userFromDb.setPasswordResetToken(null);
+        userFromDb.setPasswordResetExpiryDate(null);
+        userRepository.save(userFromDb);
+    }
+
     private void sendVerificationEmail(User user) {
-        String token = UUID.randomUUID().toString();
+        byte[] bytes = new byte[16];
+        SecureRandom rng = new SecureRandom();
+        rng.nextBytes(bytes);
+        String token = Encoders.BASE64.encode(bytes);
         user.setEmailVerificationToken(token);
         user.setEmailVerificationExpiryDate(LocalDateTime.now().plusMinutes(30));
         userRepository.save(user);
