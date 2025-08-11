@@ -191,10 +191,10 @@ public class UserServiceImpl implements UserService{
     public void sendResetPasswordEmail(ForgetPasswordRequestDto requestDto) {
         User userFromDb = userRepository.findByEmail(requestDto.email());
         if (userFromDb == null) {
-            throw new ResourceNotFoundException("User with email:" + requestDto.email() + " does not exist");
+            return;
         }
         if (!userFromDb.isEmailVerified()) {
-            throw new UserEmailNotVerifiedException("User email is not verified");
+            return;
         }
 
         byte[] bytes = new byte[16];
@@ -212,12 +212,11 @@ public class UserServiceImpl implements UserService{
                 "Ustaw nowe hasło",
                 "Naciśnij link aby zresetować hasło: " + verificationLink
         );
-
     }
 
     @Override
-    public void resetPassword(ResetPasswordRequestDto requestDto, String token) {
-        User userFromDb = userRepository.findByPasswordResetToken(token);
+    public void resetPassword(ResetPasswordRequestDto requestDto) {
+        User userFromDb = userRepository.findByPasswordResetToken(requestDto.token());
         if (userFromDb == null) {
             throw new ResourceNotFoundException("Invalid password reset token");
         }

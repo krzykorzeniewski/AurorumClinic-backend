@@ -17,5 +17,5 @@ public interface UserService {
     AccessTokenDto refreshAccessToken(RefreshTokenRequestDto requestDto);
     void verifyUserEmail(String token);
     void sendResetPasswordEmail(ForgetPasswordRequestDto requestDto);
-    void resetPassword(ResetPasswordRequestDto requestDto, String token);
+    void resetPassword(ResetPasswordRequestDto requestDto);
 }

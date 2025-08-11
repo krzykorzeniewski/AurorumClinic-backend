@@ -41,13 +41,12 @@ public class UserController {
     @PostMapping("/forget-password")
     public ResponseEntity<?> verifyUserEmailAndSendResetPasswordEmail(@Valid @RequestBody ForgetPasswordRequestDto requestDto) {
         userService.sendResetPasswordEmail(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).body("Reset password email has been sent if the account is valid");
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam("token") String token,
-                                           @Valid @RequestBody ResetPasswordRequestDto requestDto) {
-        userService.resetPassword(requestDto, token);
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequestDto requestDto) {
+        userService.resetPassword(requestDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
