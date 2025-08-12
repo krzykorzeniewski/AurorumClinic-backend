@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/api/users/logout").authenticated()
                         .requestMatchers("/api/users/**", "/error",
                                 "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/patients/**").hasAuthority(UserRole.PATIENT.name())

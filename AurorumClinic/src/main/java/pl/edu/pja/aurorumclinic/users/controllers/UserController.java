@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.models.User;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
 import pl.edu.pja.aurorumclinic.users.services.UserService;
 
@@ -39,9 +38,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PostMapping("/forget-password")
+    public ResponseEntity<?> verifyUserEmailAndSendResetPasswordEmail(@Valid @RequestBody ForgetPasswordRequestDto requestDto) {
+        userService.sendResetPasswordEmail(requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body("Reset password email has been sent if the account is valid");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequestDto requestDto) {
+        userService.resetPassword(requestDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequestDto requestDto) {
-        AccessTokenDto responseDto = userService.loginUser(requestDto);
+        AccessTokenResponseDto responseDto = userService.loginUser(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -59,7 +70,7 @@ public class UserController {
     public ResponseEntity<?> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
                                                    @CookieValue("Refresh-Token") String refreshToken) {
         @Valid RefreshTokenRequestDto requestDto = new RefreshTokenRequestDto(accessToken, refreshToken);
-        AccessTokenDto responseDto = userService.refreshAccessToken(requestDto);
+        AccessTokenResponseDto responseDto = userService.refreshAccessToken(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -71,6 +82,23 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
                 .body(new UserIdResponseDto(responseDto.userId()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser() {
+        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", "")
+                .path("/")
+                .httpOnly(true)
+                .maxAge(0)
+                .build();
+        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", "")
+                .path("/")
+                .httpOnly(true)
+                .maxAge(0)
+                .build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .build();
     }
 
 }
