@@ -1,6 +1,5 @@
 package pl.edu.pja.aurorumclinic.users.services;
 
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.models.Doctor;
 import pl.edu.pja.aurorumclinic.models.Patient;
@@ -13,8 +12,8 @@ public interface UserService {
     User registerEmployee(RegisterEmployeeRequestDto requestDto);
     Patient registerPatient(RegisterPatientRequestDto requestDto);
     Doctor registerDoctor(RegisterDoctorRequestDto requestDto);
-    AccessTokenDto loginUser(LoginUserRequestDto requestDto);
-    AccessTokenDto refreshAccessToken(RefreshTokenRequestDto requestDto);
+    AccessTokenResponseDto loginUser(LoginUserRequestDto requestDto);
+    AccessTokenResponseDto refreshAccessToken(RefreshTokenRequestDto requestDto);
     void verifyUserEmail(String token);
     void sendResetPasswordEmail(ForgetPasswordRequestDto requestDto);
     void resetPassword(ResetPasswordRequestDto requestDto);

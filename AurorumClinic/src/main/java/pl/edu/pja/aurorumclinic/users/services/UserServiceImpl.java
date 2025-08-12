@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public AccessTokenDto loginUser(LoginUserRequestDto requestDto) {
+    public AccessTokenResponseDto loginUser(LoginUserRequestDto requestDto) {
         authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
                 requestDto.email(), requestDto.password()
         ));
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService{
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
         userRepository.save(userFromDb);
 
-        return AccessTokenDto.builder()
+        return AccessTokenResponseDto.builder()
                 .userId(userFromDb.getId())
                 .accessToken(jwt)
                 .refreshToken(refreshToken)
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public AccessTokenDto refreshAccessToken(RefreshTokenRequestDto requestDto) {
+    public AccessTokenResponseDto refreshAccessToken(RefreshTokenRequestDto requestDto) {
         String jwt = requestDto.accessToken();
         try {
             securityUtils.validateJwt(jwt);
@@ -165,7 +165,7 @@ public class UserServiceImpl implements UserService{
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
         userRepository.save(userFromDb);
 
-        return AccessTokenDto.builder()
+        return AccessTokenResponseDto.builder()
                 .userId(userFromDb.getId())
                 .accessToken(newJwt)
                 .refreshToken(newRefreshToken)

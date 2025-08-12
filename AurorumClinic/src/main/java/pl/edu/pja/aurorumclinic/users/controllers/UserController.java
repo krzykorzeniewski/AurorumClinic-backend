@@ -52,7 +52,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequestDto requestDto) {
-        AccessTokenDto responseDto = userService.loginUser(requestDto);
+        AccessTokenResponseDto responseDto = userService.loginUser(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -70,7 +70,7 @@ public class UserController {
     public ResponseEntity<?> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
                                                    @CookieValue("Refresh-Token") String refreshToken) {
         @Valid RefreshTokenRequestDto requestDto = new RefreshTokenRequestDto(accessToken, refreshToken);
-        AccessTokenDto responseDto = userService.refreshAccessToken(requestDto);
+        AccessTokenResponseDto responseDto = userService.refreshAccessToken(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
