@@ -99,6 +99,13 @@ public class User implements UserDetails {
     @Column(name = "Password_Reset_Expiry_Date", columnDefinition = "datetime2(5)")
     private LocalDateTime passwordResetExpiryDate;
 
+    @Column(name = "Two_Factor_Auth_Token", columnDefinition = "nvarchar(6)")
+    @Size(min = 6, max = 6)
+    private String twoFactorAuthToken;
+
+    @Column(name = "Two_Factor_Auth_Token_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime twoFactorAuthExpiryDate;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

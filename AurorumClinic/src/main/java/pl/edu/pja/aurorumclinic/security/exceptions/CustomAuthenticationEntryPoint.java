@@ -27,6 +27,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         errorAttributes.put("error", "Unauthorized");
         errorAttributes.put("path", request.getRequestURI());
 
+        // odpowiedzi dla ok i error +- to samo
+
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(new ObjectMapper().writeValueAsString(errorAttributes));

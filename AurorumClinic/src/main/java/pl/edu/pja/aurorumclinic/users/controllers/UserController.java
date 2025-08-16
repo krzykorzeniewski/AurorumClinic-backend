@@ -38,7 +38,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/forget-password")
+    @PostMapping("/forget-password") //sprawdzic zabezpiecznenia przeciwko enumeracji
     public ResponseEntity<?> verifyUserEmailAndSendResetPasswordEmail(@Valid @RequestBody ForgetPasswordRequestDto requestDto) {
         userService.sendResetPasswordEmail(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body("Reset password email has been sent if the account is valid");
@@ -52,7 +52,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequestDto requestDto) {
-        AccessTokenResponseDto responseDto = userService.loginUser(requestDto);
+        AccessTokenDto responseDto = userService.loginUser(requestDto);
+        if (responseDto.twoFactorAuth()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(UserIdResponseDto.builder()
+                            .userId(responseDto.userId())
+                            .twoFactorAuth(responseDto.twoFactorAuth())
+                            .build());
+        }
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -63,14 +70,14 @@ public class UserController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(new UserIdResponseDto(responseDto.userId()));
+                .body(new UserIdResponseDto(responseDto.userId(), false));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
                                                    @CookieValue("Refresh-Token") String refreshToken) {
         @Valid RefreshTokenRequestDto requestDto = new RefreshTokenRequestDto(accessToken, refreshToken);
-        AccessTokenResponseDto responseDto = userService.refreshAccessToken(requestDto);
+        AccessTokenDto responseDto = userService.refreshAccessToken(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -81,7 +88,23 @@ public class UserController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(new UserIdResponseDto(responseDto.userId()));
+                .body(new UserIdResponseDto(responseDto.userId(), false));
+    }
+
+    @PostMapping("/verify-2fa")
+    public ResponseEntity<?> loginUserWith2fa(@Valid @RequestBody TwoFactorAuthLoginRequestDto requestDto) {
+        AccessTokenDto responseDto = userService.loginUserWithTwoFactorAuth(requestDto);
+        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .body(new UserIdResponseDto(responseDto.userId(), true));
     }
 
     @PostMapping("/logout")

@@ -43,7 +43,7 @@ public class PatientServiceImpl implements PatientService{
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
                 () -> new ResourceNotFoundException("Patient with id: " + patientId + " does not exist")
         );
-        if (patientRepository.findByEmail(requestDto.email()) != null) {
+        if (patientRepository.findByEmail(requestDto.email()) != patientFromDb) {
             throw new EmailNotUniqueException("Email already taken: " + requestDto.email());
         }
         patientFromDb.setPhoneNumber(requestDto.phoneNumber());

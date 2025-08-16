@@ -6,6 +6,7 @@ import io.jsonwebtoken.io.Encoders;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import pl.edu.pja.aurorumclinic.security.exceptions.ExpiredRefreshTokenException
 import pl.edu.pja.aurorumclinic.security.exceptions.InvalidAccessTokenException;
 import pl.edu.pja.aurorumclinic.security.exceptions.RefreshTokenNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.EmailService;
+import pl.edu.pja.aurorumclinic.shared.SmsService;
 import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
 import pl.edu.pja.aurorumclinic.users.dtos.*;
@@ -38,12 +40,16 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final SecurityUtils securityUtils;
     private final EmailService emailService;
+    private final SmsService smsService;
 
     @Value("${mail.verification-link}")
     private String mailVerificationLink;
 
     @Value("${mail.frontend.password-reset-link}")
     private String resetPasswordLink;
+
+    @Value("${twilio.trial_number}")
+    private String fromPhoneNumber;
 
     @Override
     public User registerEmployee(RegisterEmployeeRequestDto requestDto) {
@@ -112,7 +118,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public AccessTokenResponseDto loginUser(LoginUserRequestDto requestDto) {
+    public AccessTokenDto loginUser(LoginUserRequestDto requestDto) {
         authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
                 requestDto.email(), requestDto.password()
         ));
@@ -122,6 +128,19 @@ public class UserServiceImpl implements UserService{
             throw new UserEmailNotVerifiedException("Account is not verified");
         }
 
+        if (userFromDb.isTwoFactorAuth()) {
+            String otp = securityUtils.createOtp();
+            smsService.sendSms("+48"+userFromDb.getPhoneNumber(), fromPhoneNumber,
+                    "Kod logowania do Aurorum Clinic : " + otp);
+            userFromDb.setTwoFactorAuthToken(otp); //czy to hashowac?
+            userFromDb.setTwoFactorAuthExpiryDate(LocalDateTime.now().plusMinutes(10));
+            userRepository.save(userFromDb);
+            return AccessTokenDto.builder()
+                    .userId(userFromDb.getId())
+                    .twoFactorAuth(userFromDb.isTwoFactorAuth())
+                    .build();
+        }
+
         String jwt = securityUtils.createJwt(userFromDb);
         String refreshToken = securityUtils.createRefreshToken();
 
@@ -129,7 +148,7 @@ public class UserServiceImpl implements UserService{
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
         userRepository.save(userFromDb);
 
-        return AccessTokenResponseDto.builder()
+        return AccessTokenDto.builder()
                 .userId(userFromDb.getId())
                 .accessToken(jwt)
                 .refreshToken(refreshToken)
@@ -137,7 +156,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public AccessTokenResponseDto refreshAccessToken(RefreshTokenRequestDto requestDto) {
+    public AccessTokenDto refreshAccessToken(RefreshTokenRequestDto requestDto) {
         String jwt = requestDto.accessToken();
         try {
             securityUtils.validateJwt(jwt);
@@ -165,7 +184,7 @@ public class UserServiceImpl implements UserService{
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
         userRepository.save(userFromDb);
 
-        return AccessTokenResponseDto.builder()
+        return AccessTokenDto.builder()
                 .userId(userFromDb.getId())
                 .accessToken(newJwt)
                 .refreshToken(newRefreshToken)
@@ -208,7 +227,7 @@ public class UserServiceImpl implements UserService{
         String verificationLink = resetPasswordLink + token;
         emailService.sendEmail(
                 "support@aurorumclinic.pl",
-                userFromDb.getEmail(),
+                userFromDb.getEmail(), //hashowac
                 "Ustaw nowe hasło",
                 "Naciśnij link aby zresetować hasło: " + verificationLink
         );
@@ -227,6 +246,31 @@ public class UserServiceImpl implements UserService{
         userFromDb.setPasswordResetToken(null);
         userFromDb.setPasswordResetExpiryDate(null);
         userRepository.save(userFromDb);
+    }
+
+    @Override
+    public AccessTokenDto loginUserWithTwoFactorAuth(TwoFactorAuthLoginRequestDto requestDto) {
+        User userFromDb = userRepository.findByTwoFactorAuthToken(requestDto.code());
+        if (userFromDb == null) {
+            throw new BadCredentialsException("Invalid 2fa token");
+        }
+        if (userFromDb.getTwoFactorAuthExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ExpiredRefreshTokenException("Expired 2fa token");
+        }
+        userFromDb.setTwoFactorAuthToken(null);
+        userFromDb.setTwoFactorAuthExpiryDate(null);
+        String newJwt = securityUtils.createJwt(userFromDb);
+        String newRefreshToken = securityUtils.createRefreshToken();
+
+        userFromDb.setRefreshToken(newRefreshToken);
+        userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
+        userRepository.save(userFromDb);
+
+        return AccessTokenDto.builder()
+                .userId(userFromDb.getId())
+                .accessToken(newJwt)
+                .refreshToken(newRefreshToken)
+                .build();
     }
 
     private void sendVerificationEmail(User user) {
