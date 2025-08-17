@@ -24,20 +24,20 @@ public class Survey {
     @Column(name = "PK_Survey")
     private Long id;
 
-    @Min(1)
-    @Max(5)
+    @Min(value = 1, message = "Minimum value for this field is 1")
+    @Max(value = 5, message = "Maximum value for this field is 5")
     @Column(name = "Grade")
-    @NotNull
+    @NotNull(message = "This field is required")
     private int grade;
 
     @Column(name = "Sent_At", columnDefinition = "datetime2(2)")
-    @NotNull
+    @NotNull(message = "This field is required")
     private LocalDateTime sentAt;
 
     @Column(name = "Completed_At", columnDefinition = "datetime2(2)")
     private LocalDateTime completedAt;
 
-    @Size(max = 300)
+    @Size(max = 300, message = "Maximum length for this field is 300 characters")
     @Column(name = "Comment", columnDefinition = "nvarchar(300)")
     private String comment;
 

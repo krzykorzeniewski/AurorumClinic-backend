@@ -74,4 +74,11 @@ public class SecurityUtils {
     public String createOtp() {
         return String.format("%06d",new SecureRandom().nextInt(999999));
     }
+
+    public String createRandomToken() {
+        byte[] bytes = new byte[16];
+        SecureRandom rng = new SecureRandom();
+        rng.nextBytes(bytes);
+        return Encoders.BASE64.encode(bytes);
+    }
 }

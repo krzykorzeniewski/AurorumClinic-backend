@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.models.Patient;
 import pl.edu.pja.aurorumclinic.users.PatientRepository;
-import pl.edu.pja.aurorumclinic.users.dtos.GetPatientResponseDto;
-import pl.edu.pja.aurorumclinic.users.dtos.PatchPatientRequestDto;
-import pl.edu.pja.aurorumclinic.users.dtos.PutPatientRequestDto;
+import pl.edu.pja.aurorumclinic.users.dtos.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.PatchPatientRequest;
+import pl.edu.pja.aurorumclinic.users.dtos.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.shared.ResourceNotFoundException;
 
@@ -20,26 +20,26 @@ public class PatientServiceImpl implements PatientService{
     private final PatientRepository patientRepository;
 
     @Override
-    public List<GetPatientResponseDto> getAllPatients() {
+    public List<GetPatientResponse> getAllPatients() {
         List<Patient> patientsFromDb = patientRepository.findAll();
-        List<GetPatientResponseDto> patientDtos = new ArrayList<>();
+        List<GetPatientResponse> patientDtos = new ArrayList<>();
         for (Patient patient : patientsFromDb) {
-            GetPatientResponseDto patientDto = mapPatientToGetResponseDto(patient);
+            GetPatientResponse patientDto = mapPatientToGetResponseDto(patient);
             patientDtos.add(patientDto);
         }
         return patientDtos;
     }
 
     @Override
-    public GetPatientResponseDto getPatientById(Long patientId) {
+    public GetPatientResponse getPatientById(Long patientId) {
         Patient patientFromDb = patientRepository.findById(patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient with id: " + patientId + " does not exist"));
-        GetPatientResponseDto patientDto = mapPatientToGetResponseDto(patientFromDb);
+        GetPatientResponse patientDto = mapPatientToGetResponseDto(patientFromDb);
         return patientDto;
     }
 
     @Override
-    public GetPatientResponseDto partiallyUpdatePatient(Long patientId, PatchPatientRequestDto requestDto) {
+    public GetPatientResponse partiallyUpdatePatient(Long patientId, PatchPatientRequest requestDto) {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
                 () -> new ResourceNotFoundException("Patient with id: " + patientId + " does not exist")
         );
@@ -52,12 +52,12 @@ public class PatientServiceImpl implements PatientService{
         patientFromDb.setNewsletter(requestDto.newsletter());
         patientFromDb.setTwoFactorAuth(requestDto.twoFactorAuth());
 
-        GetPatientResponseDto responseDto = mapPatientToGetResponseDto(patientRepository.save(patientFromDb));
+        GetPatientResponse responseDto = mapPatientToGetResponseDto(patientRepository.save(patientFromDb));
         return responseDto;
     }
 
     @Override
-    public GetPatientResponseDto updatePatient(Long patientId, PutPatientRequestDto requestDto) {
+    public GetPatientResponse updatePatient(Long patientId, PutPatientRequest requestDto) {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
                 () -> new ResourceNotFoundException("Patient with id: " + patientId + " does not exist")
         );
@@ -74,12 +74,12 @@ public class PatientServiceImpl implements PatientService{
         patientFromDb.setNewsletter(requestDto.newsletter());
         patientFromDb.setTwoFactorAuth(requestDto.twoFactorAuth());
 
-        GetPatientResponseDto responseDto = mapPatientToGetResponseDto(patientRepository.save(patientFromDb));
+        GetPatientResponse responseDto = mapPatientToGetResponseDto(patientRepository.save(patientFromDb));
         return responseDto;
     }
 
-    private GetPatientResponseDto mapPatientToGetResponseDto(Patient patient) {
-        return GetPatientResponseDto.builder()
+    private GetPatientResponse mapPatientToGetResponseDto(Patient patient) {
+        return GetPatientResponse.builder()
                 .id(patient.getId())
                 .name(patient.getName())
                 .surname(patient.getSurname())

@@ -21,23 +21,23 @@ public class Opinion {
     @Column(name = "PK_Opinion")
     private Long id;
 
-    @Min(1)
-    @Max(5)
+    @Min(value = 1, message = "Minimum value for this field is 1")
+    @Max(value = 5, message = "Maximum value for this field is 5")
     @Column(name = "Rating")
-    @NotNull
+    @NotNull(message = "This field is required")
     private int rating;
 
     @Column(name = "Comment", columnDefinition = "nvarchar(2000)")
-    @Size(max = 2000)
-    @NotBlank
+    @Size(max = 2000, message = "Maximum length for this field is 2000 characters")
+    @NotBlank(message = "This field is required")
     private String comment;
 
     @Column(name = "Answer", columnDefinition = "nvarchar(2000)")
-    @Size(max = 2000)
+    @Size(max = 2000, message = "Maximum length for this field is 2000 characters")
     private String answer;
 
     @Column(name = "Created_At", columnDefinition = "datetime2(2)")
-    @NotNull
+    @NotNull(message = "This field is required")
     private LocalDateTime createdAt;
 
     @OneToOne(mappedBy = "opinion")
