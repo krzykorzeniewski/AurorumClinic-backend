@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.users.dtos.GetPatientResponse;
-import pl.edu.pja.aurorumclinic.users.dtos.PatchPatientRequest;
-import pl.edu.pja.aurorumclinic.users.dtos.PutPatientRequest;
+import pl.edu.pja.aurorumclinic.users.dtos.response.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.request.PatchPatientRequest;
+import pl.edu.pja.aurorumclinic.users.dtos.request.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.users.services.PatientService;
 
 @RestController

@@ -20,9 +20,12 @@ import pl.edu.pja.aurorumclinic.security.exceptions.InvalidAccessTokenException;
 import pl.edu.pja.aurorumclinic.security.exceptions.RefreshTokenNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.EmailService;
 import pl.edu.pja.aurorumclinic.shared.SmsService;
+import pl.edu.pja.aurorumclinic.users.dtos.request.*;
+import pl.edu.pja.aurorumclinic.users.dtos.response.LoginUserResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.response.RefreshAccessTokenResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.response.TwoFactorAuthLoginResponse;
 import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.UserRepository;
-import pl.edu.pja.aurorumclinic.users.dtos.*;
 import pl.edu.pja.aurorumclinic.users.shared.EmailVerificationTokenNotFoundException;
 import pl.edu.pja.aurorumclinic.users.shared.ResourceNotFoundException;
 import pl.edu.pja.aurorumclinic.users.shared.UserEmailNotVerifiedException;
@@ -116,7 +119,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public AccessToken loginUser(LoginUserRequest requestDto) {
+    public LoginUserResponse loginUser(LoginUserRequest requestDto) {
         authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
                 requestDto.email(), requestDto.password()
         ));
@@ -128,8 +131,10 @@ public class UserServiceImpl implements UserService{
 
         if (userFromDb.isTwoFactorAuth()) {
             sendOtpSms(userFromDb);
-            return AccessToken.builder()
+            return LoginUserResponse.builder()
                     .userId(userFromDb.getId())
+                    .accessToken(null)
+                    .refreshToken(null)
                     .twoFactorAuth(userFromDb.isTwoFactorAuth())
                     .build();
         }
@@ -141,15 +146,16 @@ public class UserServiceImpl implements UserService{
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
         userRepository.save(userFromDb);
 
-        return AccessToken.builder()
+        return LoginUserResponse.builder()
                 .userId(userFromDb.getId())
                 .accessToken(jwt)
                 .refreshToken(refreshToken)
+                .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .build();
     }
 
     @Override
-    public AccessToken refreshAccessToken(RefreshTokenRequest requestDto) {
+    public RefreshAccessTokenResponse refreshAccessToken(RefreshAccessTokenRequest requestDto) {
         String jwt = requestDto.accessToken();
         try {
             securityUtils.validateJwt(jwt);
@@ -177,7 +183,7 @@ public class UserServiceImpl implements UserService{
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
         userRepository.save(userFromDb);
 
-        return AccessToken.builder()
+        return RefreshAccessTokenResponse.builder()
                 .userId(userFromDb.getId())
                 .accessToken(newJwt)
                 .refreshToken(newRefreshToken)
@@ -239,7 +245,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public AccessToken loginUserWithTwoFactorAuth(TwoFactorAuthLoginRequest requestDto) {
+    public TwoFactorAuthLoginResponse loginUserWithTwoFactorAuth(TwoFactorAuthLoginRequest requestDto) {
         User userFromDb = userRepository.findByTwoFactorAuthToken(requestDto.code());
         if (userFromDb == null) {
             throw new BadCredentialsException("Invalid 2fa token");
@@ -256,10 +262,11 @@ public class UserServiceImpl implements UserService{
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
         userRepository.save(userFromDb);
 
-        return AccessToken.builder()
+        return TwoFactorAuthLoginResponse.builder()
                 .userId(userFromDb.getId())
                 .accessToken(newJwt)
                 .refreshToken(newRefreshToken)
+                .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .build();
     }
 

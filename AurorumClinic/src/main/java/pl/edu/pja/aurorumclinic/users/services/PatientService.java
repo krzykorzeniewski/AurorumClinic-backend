@@ -1,9 +1,9 @@
 package pl.edu.pja.aurorumclinic.users.services;
 
 import org.springframework.stereotype.Service;
-import pl.edu.pja.aurorumclinic.users.dtos.GetPatientResponse;
-import pl.edu.pja.aurorumclinic.users.dtos.PatchPatientRequest;
-import pl.edu.pja.aurorumclinic.users.dtos.PutPatientRequest;
+import pl.edu.pja.aurorumclinic.users.dtos.response.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.request.PatchPatientRequest;
+import pl.edu.pja.aurorumclinic.users.dtos.request.PutPatientRequest;
 
 import java.util.List;
 

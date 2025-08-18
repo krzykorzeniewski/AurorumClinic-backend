@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.users.dtos;
+package pl.edu.pja.aurorumclinic.users.dtos.response;
 
 import lombok.Builder;
 

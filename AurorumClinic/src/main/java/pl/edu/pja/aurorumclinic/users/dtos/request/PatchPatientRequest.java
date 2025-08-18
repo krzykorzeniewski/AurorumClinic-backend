@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.users.dtos;
+package pl.edu.pja.aurorumclinic.users.dtos.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

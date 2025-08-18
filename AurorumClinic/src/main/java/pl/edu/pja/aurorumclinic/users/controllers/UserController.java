@@ -4,7 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.users.dtos.*;
+
+import pl.edu.pja.aurorumclinic.users.dtos.request.*;
+import pl.edu.pja.aurorumclinic.users.dtos.response.LoginUserResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.response.RefreshAccessTokenResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.response.TwoFactorAuthLoginResponse;
 import pl.edu.pja.aurorumclinic.users.services.UserService;
 
 @RestController
@@ -58,13 +62,10 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequest requestDto) {
-        AccessToken responseDto = userService.loginUser(requestDto);
+        LoginUserResponse responseDto = userService.loginUser(requestDto);
         if (responseDto.twoFactorAuth()) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(UserIdResponse.builder()
-                            .userId(responseDto.userId())
-                            .twoFactorAuth(responseDto.twoFactorAuth())
-                            .build());
+                    .body(responseDto);
         }
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
@@ -76,14 +77,14 @@ public class UserController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(new UserIdResponse(responseDto.userId(), false));
+                .body(responseDto);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
                                                    @CookieValue("Refresh-Token") String refreshToken) {
-        @Valid RefreshTokenRequest requestDto = new RefreshTokenRequest(accessToken, refreshToken);
-        AccessToken responseDto = userService.refreshAccessToken(requestDto);
+        @Valid RefreshAccessTokenRequest requestDto = new RefreshAccessTokenRequest(accessToken, refreshToken);
+        RefreshAccessTokenResponse responseDto = userService.refreshAccessToken(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -94,12 +95,12 @@ public class UserController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(new UserIdResponse(responseDto.userId(), false));
+                .body(responseDto);
     }
 
     @PostMapping("/login-2fa")
     public ResponseEntity<?> loginUserWith2fa(@Valid @RequestBody TwoFactorAuthLoginRequest requestDto) {
-        AccessToken responseDto = userService.loginUserWithTwoFactorAuth(requestDto);
+        TwoFactorAuthLoginResponse responseDto = userService.loginUserWithTwoFactorAuth(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -110,7 +111,7 @@ public class UserController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(new UserIdResponse(responseDto.userId(), true));
+                .body(responseDto);
     }
 
     @PostMapping("/2fa-token")

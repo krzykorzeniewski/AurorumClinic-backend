@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.models.Patient;
 import pl.edu.pja.aurorumclinic.users.PatientRepository;
-import pl.edu.pja.aurorumclinic.users.dtos.GetPatientResponse;
-import pl.edu.pja.aurorumclinic.users.dtos.PatchPatientRequest;
-import pl.edu.pja.aurorumclinic.users.dtos.PutPatientRequest;
+import pl.edu.pja.aurorumclinic.users.dtos.response.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.request.PatchPatientRequest;
+import pl.edu.pja.aurorumclinic.users.dtos.request.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.users.shared.EmailNotUniqueException;
 import pl.edu.pja.aurorumclinic.users.shared.ResourceNotFoundException;
 

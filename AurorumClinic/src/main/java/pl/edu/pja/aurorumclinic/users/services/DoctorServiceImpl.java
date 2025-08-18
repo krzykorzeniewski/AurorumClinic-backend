@@ -6,7 +6,7 @@ import pl.edu.pja.aurorumclinic.models.Appointment;
 import pl.edu.pja.aurorumclinic.models.Doctor;
 import pl.edu.pja.aurorumclinic.models.Opinion;
 import pl.edu.pja.aurorumclinic.users.DoctorRepository;
-import pl.edu.pja.aurorumclinic.users.dtos.GetDoctorResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.response.GetDoctorResponse;
 
 import java.util.ArrayList;
 import java.util.List;
