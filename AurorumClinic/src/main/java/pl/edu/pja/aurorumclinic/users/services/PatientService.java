@@ -1,18 +1,18 @@
 package pl.edu.pja.aurorumclinic.users.services;
 
 import org.springframework.stereotype.Service;
-import pl.edu.pja.aurorumclinic.users.dtos.GetPatientResponseDto;
-import pl.edu.pja.aurorumclinic.users.dtos.PatchPatientRequestDto;
-import pl.edu.pja.aurorumclinic.users.dtos.PutPatientRequestDto;
+import pl.edu.pja.aurorumclinic.users.dtos.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.users.dtos.PatchPatientRequest;
+import pl.edu.pja.aurorumclinic.users.dtos.PutPatientRequest;
 
 import java.util.List;
 
 @Service
 public interface PatientService {
 
-    List<GetPatientResponseDto> getAllPatients();
-    GetPatientResponseDto getPatientById(Long patientId);
-    GetPatientResponseDto partiallyUpdatePatient(Long patientId, PatchPatientRequestDto requestDto);
-    GetPatientResponseDto updatePatient(Long patientId, PutPatientRequestDto requestDto);
+    List<GetPatientResponse> getAllPatients();
+    GetPatientResponse getPatientById(Long patientId);
+    GetPatientResponse partiallyUpdatePatient(Long patientId, PatchPatientRequest requestDto);
+    GetPatientResponse updatePatient(Long patientId, PutPatientRequest requestDto);
 
 }

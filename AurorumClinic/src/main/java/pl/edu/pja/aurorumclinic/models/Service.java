@@ -22,24 +22,24 @@ public class Service {
     @Column(name = "PK_Service")
     private Long id;
 
-    @Size(max = 150)
-    @NotBlank
+    @Size(max = 150, message = "Maximum length for this field is 150 characters")
+    @NotBlank(message = "This field is required")
     @Column(name = "Name")
     private String name;
 
     @Column(name = "Duration")
-    @Min(1)
-    @Max(180)
-    @NotNull
+    @Min(value = 1, message = "Minimum value for this field is 1")
+    @Max(value = 180, message = "Maximum value for this field is 180")
+    @NotNull(message = "This field is required")
     private int duration;
 
-    @NotNull
+    @NotNull(message = "This field is required")
     @Column(name = "Price", columnDefinition = "numeric(10,2)")
     private BigDecimal price;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "Maximum length for this field is 500 characters")
     @Column(name = "Description", columnDefinition = "nvarchar(500)")
-    @NotBlank
+    @NotBlank(message = "This field is required")
     private String description;
 
     @OneToMany(mappedBy = "service")

@@ -23,15 +23,15 @@ public class Schedule {
     private Long id;
 
     @Column(name = "Date")
-    @NotNull
+    @NotNull(message = "This field is required")
     private LocalDate date;
 
     @Column(name = "Started_At", columnDefinition = "datetime2(2)")
-    @NotNull
+    @NotNull(message = "This field is required")
     private LocalDateTime startedAt;
 
     @Column(name = "Finished_At", columnDefinition = "datetime2(2)")
-    @NotNull
+    @NotNull(message = "This field is required")
     private LocalDateTime finishedAt;
 
     @ManyToOne

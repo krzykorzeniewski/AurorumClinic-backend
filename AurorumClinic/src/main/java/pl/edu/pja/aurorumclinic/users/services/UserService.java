@@ -9,12 +9,15 @@ import pl.edu.pja.aurorumclinic.users.dtos.*;
 @Service
 public interface UserService {
 
-    User registerEmployee(RegisterEmployeeRequestDto requestDto);
-    Patient registerPatient(RegisterPatientRequestDto requestDto);
-    Doctor registerDoctor(RegisterDoctorRequestDto requestDto);
-    AccessTokenResponseDto loginUser(LoginUserRequestDto requestDto);
-    AccessTokenResponseDto refreshAccessToken(RefreshTokenRequestDto requestDto);
+    User registerEmployee(RegisterEmployeeRequest requestDto);
+    Patient registerPatient(RegisterPatientRequest requestDto);
+    Doctor registerDoctor(RegisterDoctorRequest requestDto);
+    AccessToken loginUser(LoginUserRequest requestDto);
+    AccessToken refreshAccessToken(RefreshTokenRequest requestDto);
     void verifyUserEmail(String token);
-    void sendResetPasswordEmail(ForgetPasswordRequestDto requestDto);
-    void resetPassword(ResetPasswordRequestDto requestDto);
+    void sendResetPasswordEmail(PasswordResetTokenRequest requestDto);
+    void resetPassword(ResetPasswordRequest requestDto);
+    AccessToken loginUserWithTwoFactorAuth(TwoFactorAuthLoginRequest requestDto);
+    void sendVerifyUserAccountEmail(VerifyEmailTokenRequest verifyEmailTokenRequest);
+    void send2faToken(TwoFactorAuthTokenRequest twoFactorAuthTokenRequest);
 }

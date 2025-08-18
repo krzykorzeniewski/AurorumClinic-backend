@@ -25,21 +25,21 @@ public class Payment {
     @Column(name = "PK_Payment")
     private Long id;
 
-    @NotNull
+    @NotNull(message = "This field is required")
     @Column(name = "Amount", columnDefinition = "numeric(10,2)")
     private BigDecimal amount;
 
     @Column(name = "Placed_At", columnDefinition = "datetime2(2)")
-    @NotNull
+    @NotNull(message = "This field is required")
     private LocalDateTime placedAt;
 
     @Enumerated(value = EnumType.STRING)
-    @NotNull
+    @NotNull(message = "This field is required")
     @Column(name = "Method", length = 50, columnDefinition = "nvarchar(50)")
     private PaymentMethod method;
 
     @Enumerated(value = EnumType.STRING)
-    @NotNull
+    @NotNull(message = "This field is required")
     @Column(name = "Status", length = 50, columnDefinition = "nvarchar(50)")
     private PaymentStatus status;
 

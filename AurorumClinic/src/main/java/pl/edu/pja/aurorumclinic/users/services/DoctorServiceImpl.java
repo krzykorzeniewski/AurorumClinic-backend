@@ -6,7 +6,7 @@ import pl.edu.pja.aurorumclinic.models.Appointment;
 import pl.edu.pja.aurorumclinic.models.Doctor;
 import pl.edu.pja.aurorumclinic.models.Opinion;
 import pl.edu.pja.aurorumclinic.users.DoctorRepository;
-import pl.edu.pja.aurorumclinic.users.dtos.GetDoctorResponseDto;
+import pl.edu.pja.aurorumclinic.users.dtos.GetDoctorResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +19,11 @@ public class DoctorServiceImpl implements DoctorService {
     private final DoctorRepository doctorRepository;
 
     @Override
-    public List<GetDoctorResponseDto> getAllDoctors() {
+    public List<GetDoctorResponse> getAllDoctors() {
         List<Doctor> doctorsFromDb = doctorRepository.findAll();
-        List<GetDoctorResponseDto> doctorsToReturn = new ArrayList<>();
+        List<GetDoctorResponse> doctorsToReturn = new ArrayList<>();
         for (Doctor doctor : doctorsFromDb) {
-            GetDoctorResponseDto responseDto = GetDoctorResponseDto.builder()
+            GetDoctorResponse responseDto = GetDoctorResponse.builder()
                     .id(doctor.getId())
                     .name(doctor.getName())
                     .surname(doctor.getSurname())

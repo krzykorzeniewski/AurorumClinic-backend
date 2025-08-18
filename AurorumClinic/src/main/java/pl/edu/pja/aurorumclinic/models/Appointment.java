@@ -26,21 +26,21 @@ public class Appointment {
     private Long id;
 
     @Column(name = "Started_At", columnDefinition = "datetime2(2)")
-    @NotNull
+    @NotNull(message = "This field is required")
     private LocalDateTime startedAt;
 
     @Column(name = "Finished_At", columnDefinition = "datetime2(2)")
-    @NotNull
+    @NotNull(message = "This field is required")
     private LocalDateTime finishedAt;
 
     @Column(name = "Status", length = 50, columnDefinition = "nvarchar(50)")
     @Enumerated(value = EnumType.STRING)
-    @NotNull
+    @NotNull(message = "This field is required")
     private AppointmentStatus status;
 
     @Column(name = "Description", columnDefinition = "nvarchar(500)")
-    @Size(max = 500)
-    @NotBlank
+    @Size(max = 500, message = "Maximum length for this field is 500 characters")
+    @NotBlank(message = "This field is required")
     private String description;
 
     @OneToOne(mappedBy = "appointment")

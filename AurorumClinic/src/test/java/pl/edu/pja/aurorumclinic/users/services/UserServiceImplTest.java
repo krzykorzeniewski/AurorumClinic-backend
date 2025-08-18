@@ -48,10 +48,10 @@ class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    RegisterEmployeeRequestDto registerEmployeeRequestDto;
-    RegisterPatientRequestDto registerPatientRequestDto;
-    LoginUserRequestDto loginUserRequestDto;
-    RefreshTokenRequestDto refreshTokenRequestDto;
+    RegisterEmployeeRequest registerEmployeeRequest;
+    RegisterPatientRequest registerPatientRequest;
+    LoginUserRequest loginUserRequest;
+    RefreshTokenRequest refreshTokenRequest;
     Authentication authentication;
     User testUser;
 
@@ -61,16 +61,16 @@ class UserServiceImplTest {
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
-        registerEmployeeRequestDto = new RegisterEmployeeRequestDto("Jan", "Kowalski",
+        registerEmployeeRequest = new RegisterEmployeeRequest("Jan", "Kowalski",
                 "00000000000", LocalDate.now(), "kowalski@pm.me", "abc123", "123123123");
-        registerPatientRequestDto = new RegisterPatientRequestDto("Jan", "Kowalski",
+        registerPatientRequest = new RegisterPatientRequest("Jan", "Kowalski",
                 "00000000000", LocalDate.now(), "kowalski@pm.me", "abc123", "123123123");
-        loginUserRequestDto = new LoginUserRequestDto("kowalski@pm.me", "abc123");
+        loginUserRequest = new LoginUserRequest("kowalski@pm.me", "abc123");
         testUser = new User();
         authentication = new UsernamePasswordAuthenticationToken(
                 "kowalski@pm.me", null, List.of(new SimpleGrantedAuthority(UserRole.PATIENT.name()))
         );
-        refreshTokenRequestDto = new RefreshTokenRequestDto("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOi" +
+        refreshTokenRequest = new RefreshTokenRequest("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOi" +
                 "JodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
                 "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok",
                 "m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=");
@@ -83,32 +83,32 @@ class UserServiceImplTest {
 
     @Test
     void registerEmployeeShouldThrowExceptionWhenEmailExistsInDb() {
-        when(userRepository.findByEmail(registerEmployeeRequestDto.email())).thenReturn(testUser);
-        assertThrowsExactly(EmailNotUniqueException.class, () -> userService.registerEmployee(registerEmployeeRequestDto));
+        when(userRepository.findByEmail(registerEmployeeRequest.email())).thenReturn(testUser);
+        assertThrowsExactly(EmailNotUniqueException.class, () -> userService.registerEmployee(registerEmployeeRequest));
     }
 
     @Test
     void registerEmployeeShouldReturnUserObjectWithProperlyPopulatedFields() throws EmailNotUniqueException {
-        when(userRepository.findByEmail(registerEmployeeRequestDto.email())).thenReturn(null);
-        User user = userService.registerEmployee(registerEmployeeRequestDto);
+        when(userRepository.findByEmail(registerEmployeeRequest.email())).thenReturn(null);
+        User user = userService.registerEmployee(registerEmployeeRequest);
         assertNotNull(user);
-        assertEquals(registerEmployeeRequestDto.name(), user.getName());
-        assertEquals(registerEmployeeRequestDto.email(), user.getEmail());
+        assertEquals(registerEmployeeRequest.name(), user.getName());
+        assertEquals(registerEmployeeRequest.email(), user.getEmail());
     }
 
     @Test
     void registerPatientShouldThrowExceptionWhenEmailExistsInDb() {
-        when(userRepository.findByEmail(registerPatientRequestDto.email())).thenReturn(testUser);
-        assertThrowsExactly(EmailNotUniqueException.class, () -> userService.registerPatient(registerPatientRequestDto));
+        when(userRepository.findByEmail(registerPatientRequest.email())).thenReturn(testUser);
+        assertThrowsExactly(EmailNotUniqueException.class, () -> userService.registerPatient(registerPatientRequest));
     }
 
     @Test
     void registerPatientShouldReturnPatientObjectWithProperlyPopulatedFields() throws EmailNotUniqueException {
-        when(userRepository.findByEmail(registerPatientRequestDto.email())).thenReturn(null);
-        Patient patient = userService.registerPatient(registerPatientRequestDto);
+        when(userRepository.findByEmail(registerPatientRequest.email())).thenReturn(null);
+        Patient patient = userService.registerPatient(registerPatientRequest);
         assertNotNull(patient);
-        assertEquals(registerPatientRequestDto.name(), patient.getName());
-        assertEquals(registerPatientRequestDto.email(), patient.getEmail());
+        assertEquals(registerPatientRequest.name(), patient.getName());
+        assertEquals(registerPatientRequest.email(), patient.getEmail());
         assertEquals(UserRole.PATIENT.name(), patient.getRole().name());
     }
 
@@ -116,24 +116,24 @@ class UserServiceImplTest {
     void loginUserShouldReturnValidAccessTokenAndRefreshToken() {
         when(authenticationProvider.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
-        when(userRepository.findByEmail(loginUserRequestDto.email())).thenReturn(testUser);
+        when(userRepository.findByEmail(loginUserRequest.email())).thenReturn(testUser);
         when(securityUtils.createJwt(testUser)).thenReturn("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
                 "eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
                 "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok");
         when(securityUtils.createRefreshToken()).thenReturn("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=");
-        AccessTokenResponseDto accessTokenResponseDto = userService.loginUser(loginUserRequestDto);
-        assertNotNull(accessTokenResponseDto);
+        AccessToken accessToken = userService.loginUser(loginUserRequest);
+        assertNotNull(accessToken);
         assertEquals("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
                 "eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
-                "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok", accessTokenResponseDto.accessToken());
-        assertEquals("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=", accessTokenResponseDto.refreshToken());
+                "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok", accessToken.accessToken());
+        assertEquals("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=", accessToken.refreshToken());
     }
 
     @Test
     void refreshAccessTokenShouldThrowExceptionWhenRefreshTokenIsNotFoundInDb() {
         when(userRepository.findByRefreshToken("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=")).thenReturn(null);
         assertThrowsExactly(RefreshTokenNotFoundException.class, () ->
-                userService.refreshAccessToken(refreshTokenRequestDto));
+                userService.refreshAccessToken(refreshTokenRequest));
     }
 
     @Test
@@ -141,7 +141,7 @@ class UserServiceImplTest {
         testUser.setRefreshTokenExpiryDate(LocalDateTime.now().minusDays(1));
         when(userRepository.findByRefreshToken("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=")).thenReturn(testUser);
         assertThrowsExactly(ExpiredRefreshTokenException.class, () ->
-                userService.refreshAccessToken(refreshTokenRequestDto));
+                userService.refreshAccessToken(refreshTokenRequest));
     }
 
     @Test
@@ -152,30 +152,30 @@ class UserServiceImplTest {
                 "eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
                 "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok");
         when(securityUtils.createRefreshToken()).thenReturn("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=");
-        AccessTokenResponseDto accessTokenResponseDto = userService.refreshAccessToken(refreshTokenRequestDto);
-        assertNotNull(accessTokenResponseDto);
+        AccessToken accessToken = userService.refreshAccessToken(refreshTokenRequest);
+        assertNotNull(accessToken);
         assertEquals("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
                 "eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
-                "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok", accessTokenResponseDto.accessToken());
-        assertEquals("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=", accessTokenResponseDto.refreshToken());
+                "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok", accessToken.accessToken());
+        assertEquals("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=", accessToken.refreshToken());
     }
 
     @Test
     void refreshAccessTokenShouldThrowExceptionWhenAccessTokenIsInvalid() {
-        when(securityUtils.validateJwt(refreshTokenRequestDto.accessToken())).thenThrow(SignatureException.class);
+        when(securityUtils.validateJwt(refreshTokenRequest.accessToken())).thenThrow(SignatureException.class);
         assertThrowsExactly(InvalidAccessTokenException.class, () ->
-                userService.refreshAccessToken(refreshTokenRequestDto));
+                userService.refreshAccessToken(refreshTokenRequest));
     }
 
     @Test
     void refreshAccessTokenShouldNotThrowExceptionWhenAccessTokenIsExpired() {
-        when(securityUtils.validateJwt(refreshTokenRequestDto.accessToken())).thenThrow(ExpiredJwtException.class);
+        when(securityUtils.validateJwt(refreshTokenRequest.accessToken())).thenThrow(ExpiredJwtException.class);
         testUser.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
         when(userRepository.findByRefreshToken("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=")).thenReturn(testUser);
         when(securityUtils.createJwt(testUser)).thenReturn("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
                 "eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiJtcsOzekBnbWFpbC5jb20iLCJyb2xlIjoiRE9DVE9SIiwiZXhwIjoxNzUzMTg4MTc3fQ." +
                 "X2v1TpferkkGSFFmZ9-HukSpwXbpMUpYvAuP2g-m_Ok");
         when(securityUtils.createRefreshToken()).thenReturn("m5hYLz2lEzAuU+Guir7SwkD7IfZTF0AzjPXRtfLCkE8=");
-        assertDoesNotThrow(() -> userService.refreshAccessToken(refreshTokenRequestDto));
+        assertDoesNotThrow(() -> userService.refreshAccessToken(refreshTokenRequest));
     }
 }
