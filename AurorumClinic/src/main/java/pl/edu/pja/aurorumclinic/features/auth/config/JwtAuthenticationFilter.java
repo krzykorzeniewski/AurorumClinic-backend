@@ -15,8 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
+import pl.edu.pja.aurorumclinic.features.auth.ApiAuthException;
 import pl.edu.pja.aurorumclinic.features.auth.SecurityUtils;
-import pl.edu.pja.aurorumclinic.features.auth.exceptions.InvalidAccessTokenException;
+import pl.edu.pja.aurorumclinic.shared.ApiException;
 
 import java.io.IOException;
 import java.util.*;
@@ -49,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtException instanceof ExpiredJwtException) {
                 response.setHeader("Token-expired", "true");
             }
-            throw new InvalidAccessTokenException(jwtException.getLocalizedMessage());
+            throw new ApiAuthException("Invalid access token", "accessToken");
         }
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
                 emailFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))

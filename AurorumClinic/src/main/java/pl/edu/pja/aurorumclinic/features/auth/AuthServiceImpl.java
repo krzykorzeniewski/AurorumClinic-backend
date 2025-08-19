@@ -5,17 +5,10 @@ import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.edu.pja.aurorumclinic.features.auth.exceptions.ExpiredRefreshTokenException;
-import pl.edu.pja.aurorumclinic.features.auth.exceptions.InvalidAccessTokenException;
-import pl.edu.pja.aurorumclinic.features.auth.exceptions.RefreshTokenNotFoundException;
-import pl.edu.pja.aurorumclinic.features.users.exceptions.EmailNotUniqueException;
-import pl.edu.pja.aurorumclinic.features.users.exceptions.EmailVerificationTokenNotFoundException;
-import pl.edu.pja.aurorumclinic.features.users.exceptions.ResourceNotFoundException;
-import pl.edu.pja.aurorumclinic.features.users.exceptions.UserEmailNotVerifiedException;
+import pl.edu.pja.aurorumclinic.shared.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
@@ -52,7 +45,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public User registerEmployee(RegisterEmployeeRequest requestDto) {
         if (userRepository.findByEmail(requestDto.email()) != null) {
-            throw new EmailNotUniqueException("Email already in use:" + requestDto.email());
+            throw new ApiException("Email already in use", "email");
         }
         User employee = User.builder()
                 .name(requestDto.name())
@@ -72,7 +65,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public Patient registerPatient(RegisterPatientRequest requestDto) {
         if (userRepository.findByEmail(requestDto.email()) != null) {
-            throw new EmailNotUniqueException("Email already in use:" + requestDto.email());
+            throw new ApiException("Email already in use", "email");
         }
         Patient patient = Patient.builder()
                 .name(requestDto.name())
@@ -93,7 +86,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public Doctor registerDoctor(RegisterDoctorRequest requestDto) {
         if (userRepository.findByEmail(requestDto.email()) != null) {
-            throw new EmailNotUniqueException("Email already in use:" + requestDto.email());
+            throw new ApiException("Email already in use", "email");
         }
         Doctor doctor = Doctor.builder()
                 .name(requestDto.name())
@@ -123,7 +116,7 @@ public class AuthServiceImpl implements AuthService{
 
         User userFromDb = userRepository.findByEmail(requestDto.email());
         if (!userFromDb.isEmailVerified()) {
-            throw new UserEmailNotVerifiedException("Account is not verified");
+            throw new ApiAuthException("Email is not verified", "email");
         }
 
         if (userFromDb.isTwoFactorAuth()) {
@@ -160,17 +153,17 @@ public class AuthServiceImpl implements AuthService{
             if (jwtException instanceof ExpiredJwtException) {
                 System.out.println("token expired");
             } else {
-                throw new InvalidAccessTokenException(jwtException.getMessage());
+                throw new ApiAuthException(jwtException.getMessage(), "accessToken");
             }
         }
 
         User userFromDb = userRepository.findByRefreshToken(requestDto.refreshToken());
         if (userFromDb == null) {
-            throw new RefreshTokenNotFoundException("Invalid refresh token");
+            throw new ApiAuthException("Refresh token is invalid", "refreshToken");
         }
 
         if (userFromDb.getRefreshTokenExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ExpiredRefreshTokenException("Refresh token is expired");
+            throw new ApiAuthException("Refresh token is expired", "refreshToken");
         }
 
         String newJwt = securityUtils.createJwt(userFromDb);
@@ -191,10 +184,10 @@ public class AuthServiceImpl implements AuthService{
     public void verifyUserEmail(String token) {
         User userFromDb = userRepository.findByEmailVerificationToken(token);
         if (userFromDb == null) {
-            throw new EmailVerificationTokenNotFoundException("Invalid verification token");
+            throw new ApiAuthException("Verification token is invalid", "token");
         }
         if (userFromDb.getEmailVerificationExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ExpiredRefreshTokenException("Verification token is expired");
+            throw new ApiAuthException("Verification token is expired", "token");
         }
         userFromDb.setEmailVerified(true);
         userFromDb.setEmailVerificationToken(null);
@@ -230,10 +223,10 @@ public class AuthServiceImpl implements AuthService{
     public void resetPassword(ResetPasswordRequest requestDto) {
         User userFromDb = userRepository.findByPasswordResetToken(requestDto.token());
         if (userFromDb == null) {
-            throw new ResourceNotFoundException("Invalid password reset token");
+            throw new ApiAuthException("Token is invalid", "token");
         }
         if (userFromDb.getPasswordResetExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ExpiredRefreshTokenException("Reset password token is expired");
+            throw new ApiAuthException("Token is expired", "token");
         }
         userFromDb.setPassword(passwordEncoder.encode(requestDto.password()));
         userFromDb.setPasswordResetToken(null);
@@ -245,10 +238,10 @@ public class AuthServiceImpl implements AuthService{
     public TwoFactorAuthLoginResponse loginUserWithTwoFactorAuth(TwoFactorAuthLoginRequest requestDto) {
         User userFromDb = userRepository.findByTwoFactorAuthToken(requestDto.code());
         if (userFromDb == null) {
-            throw new BadCredentialsException("Invalid 2fa token");
+            throw new ApiAuthException("Code is invalid", "code");
         }
         if (userFromDb.getTwoFactorAuthExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ExpiredRefreshTokenException("Expired 2fa token");
+            throw new ApiAuthException("Code is expired", "code");
         }
         userFromDb.setTwoFactorAuthToken(null);
         userFromDb.setTwoFactorAuthExpiryDate(null);
@@ -271,7 +264,7 @@ public class AuthServiceImpl implements AuthService{
     public void sendVerifyUserAccountEmail(VerifyEmailTokenRequest verifyEmailTokenRequest) {
         User userFromDb = userRepository.findByEmail(verifyEmailTokenRequest.email());
         if (userFromDb == null) {
-            throw new ResourceNotFoundException("User with email does not exist:" + verifyEmailTokenRequest.email());
+            throw new ApiAuthException("Email not found", "email");
         }
         sendVerificationEmail(userFromDb);
     }
@@ -280,10 +273,10 @@ public class AuthServiceImpl implements AuthService{
     public void send2faToken(TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
         User userFromDb = userRepository.findByEmail(twoFactorAuthTokenRequest.email());
         if (userFromDb == null) {
-            throw new ResourceNotFoundException("User with email does not exist:" + twoFactorAuthTokenRequest.email());
+            throw new ApiAuthException("Email not found", "email");
         }
         if (!userFromDb.isTwoFactorAuth()) {
-            throw new IllegalArgumentException("User has 2fa disabled: " + twoFactorAuthTokenRequest.email());
+            throw new ApiAuthException("Given email has 2fa disabled", "email");
         }
         sendOtpSms(userFromDb);
     }

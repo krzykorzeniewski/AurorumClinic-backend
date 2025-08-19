@@ -6,6 +6,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.request.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.response.*;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -41,27 +42,27 @@ public class AuthController {
     @GetMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
         authService.verifyUserEmail(token);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reset-password-token")
     public ResponseEntity<?> getResetPasswordToken(@Valid @RequestBody PasswordResetTokenRequest requestDto) {
         authService.sendResetPasswordEmail(requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body("Reset password email has been sent if the account is valid");
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest requestDto) {
         authService.resetPassword(requestDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequest requestDto) {
         LoginUserResponse responseDto = authService.loginUser(requestDto);
         if (responseDto.twoFactorAuth()) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(responseDto);
+            return ResponseEntity.ok()
+                    .body(ApiResponse.success(responseDto));
         }
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
@@ -71,9 +72,9 @@ public class AuthController {
                 .path("/")
                 .httpOnly(true)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(responseDto);
+                .body(ApiResponse.success(responseDto));
     }
 
     @PostMapping("/refresh")
@@ -89,9 +90,9 @@ public class AuthController {
                 .path("/")
                 .httpOnly(true)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(responseDto);
+                .body(ApiResponse.success(responseDto));
     }
 
     @PostMapping("/login-2fa")
@@ -105,9 +106,9 @@ public class AuthController {
                 .path("/")
                 .httpOnly(true)
                 .build();
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(responseDto);
+                .body(ApiResponse.success(responseDto));
     }
 
     @PostMapping("/2fa-token")
@@ -128,7 +129,7 @@ public class AuthController {
                 .httpOnly(true)
                 .maxAge(0)
                 .build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
                 .build();
     }

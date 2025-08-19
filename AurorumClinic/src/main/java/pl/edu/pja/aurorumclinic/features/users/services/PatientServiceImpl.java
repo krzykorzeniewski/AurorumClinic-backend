@@ -5,9 +5,8 @@ import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.features.users.dtos.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PutPatientRequest;
-import pl.edu.pja.aurorumclinic.features.users.exceptions.EmailNotUniqueException;
-import pl.edu.pja.aurorumclinic.features.users.exceptions.ResourceNotFoundException;
 import pl.edu.pja.aurorumclinic.features.users.repositories.PatientRepository;
+import pl.edu.pja.aurorumclinic.shared.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public GetPatientResponse getPatientById(Long patientId) {
         Patient patientFromDb = patientRepository.findById(patientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Patient with id: " + patientId + " does not exist"));
+                .orElseThrow(() -> new ApiException("Id not found", "id"));
         GetPatientResponse patientDto = mapPatientToGetResponseDto(patientFromDb);
         return patientDto;
     }
@@ -41,10 +40,10 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public GetPatientResponse partiallyUpdatePatient(Long patientId, PatchPatientRequest requestDto) {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
-                () -> new ResourceNotFoundException("Patient with id: " + patientId + " does not exist")
+                () -> new ApiException("Id not found", "id")
         );
         if (patientRepository.findByEmail(requestDto.email()) != patientFromDb) {
-            throw new EmailNotUniqueException("Email already taken: " + requestDto.email());
+            throw new ApiException("Email already in use", "email");
         }
         patientFromDb.setPhoneNumber(requestDto.phoneNumber());
         patientFromDb.setEmail(requestDto.email());
@@ -59,10 +58,10 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public GetPatientResponse updatePatient(Long patientId, PutPatientRequest requestDto) {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
-                () -> new ResourceNotFoundException("Patient with id: " + patientId + " does not exist")
+                () -> new ApiException("Id not found", "id")
         );
         if (patientRepository.findByEmail(requestDto.email()) != null) {
-            throw new EmailNotUniqueException("Email already taken: " + requestDto.email());
+            throw new ApiException("Email already in use", "email");
         }
         patientFromDb.setName(requestDto.name());
         patientFromDb.setSurname(requestDto.surname());
