@@ -8,6 +8,7 @@ import pl.edu.pja.aurorumclinic.features.users.dtos.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.services.PatientService;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -18,26 +19,26 @@ public class PatientController {
 
     @GetMapping("")
     public ResponseEntity<?> getAllPatients() {
-        return ResponseEntity.ok(patientService.getAllPatients());
+        return ResponseEntity.ok(ApiResponse.success(patientService.getAllPatients()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GetPatientResponse> getPatientById(@PathVariable Long id) {
-        return ResponseEntity.ok(patientService.getPatientById(id));
+    public ResponseEntity<?> getPatientById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(patientService.getPatientById(id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePatient(@PathVariable Long id,
                                            @Valid @RequestBody PutPatientRequest requestDto) {
         GetPatientResponse responseDto = patientService.updatePatient(id, requestDto);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> partiallyUpdatePatient(@PathVariable Long id,
                                                     @Valid @RequestBody PatchPatientRequest requestDto) {
         GetPatientResponse responseDto = patientService.partiallyUpdatePatient(id, requestDto);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
 

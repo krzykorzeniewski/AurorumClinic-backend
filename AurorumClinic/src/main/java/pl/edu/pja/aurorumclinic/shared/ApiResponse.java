@@ -1,7 +1,6 @@
 package pl.edu.pja.aurorumclinic.shared;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +9,8 @@ import lombok.NoArgsConstructor;
 public class ApiResponse<T> {
 
     private String status;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

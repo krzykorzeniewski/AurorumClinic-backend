@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.users.services.DoctorService;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 
 @RestController
@@ -15,7 +16,7 @@ public class DoctorController {
 
     @GetMapping("")
     public ResponseEntity<?> getAllDoctors() {
-        return ResponseEntity.ok(doctorService.getAllDoctors());
+        return ResponseEntity.ok(ApiResponse.success(doctorService.getAllDoctors()));
     }
 
 }
