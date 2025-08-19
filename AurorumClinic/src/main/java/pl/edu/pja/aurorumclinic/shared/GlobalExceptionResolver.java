@@ -27,8 +27,14 @@ public class GlobalExceptionResolver {
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiResponse<?> handleBadCredentials(BadCredentialsException ex) {
+    public ApiResponse<?> handleBadCredentialsException(BadCredentialsException ex) {
         return ApiResponse.fail(Map.of("credentials", "Invalid email or password"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiResponse<?> handleException(Exception ex) {
+        return ApiResponse.error("Internal server error");
     }
 
 }

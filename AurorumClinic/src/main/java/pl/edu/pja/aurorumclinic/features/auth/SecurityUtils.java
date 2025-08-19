@@ -79,6 +79,6 @@ public class SecurityUtils {
         byte[] bytes = new byte[16];
         SecureRandom rng = new SecureRandom();
         rng.nextBytes(bytes);
-        return Encoders.BASE64.encode(bytes);
+        return Encoders.BASE64URL.encode(bytes);
     }
 }
