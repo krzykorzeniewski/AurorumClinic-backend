@@ -1,0 +1,84 @@
+package pl.edu.pja.aurorumclinic.features.auth;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Encoders;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.codec.Utf8;
+import org.springframework.stereotype.Component;
+import pl.edu.pja.aurorumclinic.shared.data.models.User;
+
+import javax.crypto.SecretKey;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
+@Component
+public class SecurityUtils {
+
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Value("${jwt.issuer}")
+    private String issuer;
+
+    public String createJwt(User user) {
+        return Jwts.builder()
+                .header()
+                    .type("JWT")
+                .and()
+                .claims()
+                    .issuer(issuer)
+                    .subject(user.getUsername())
+                    .add("role", user.getRole().name())
+                    .expiration(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
+                .and()
+                .signWith(getSecretKey())
+                .compact();
+    }
+
+    private SecretKey getSecretKey() {
+        byte[] bytes = Utf8.encode(secret);
+        return Keys.hmacShaKeyFor(bytes);
+    }
+
+    public String getEmailFromJwt(String jwt) {
+        Jws<Claims> claims = validateJwt(jwt);
+        return claims.getPayload().getSubject();
+    }
+
+    public String getRoleFromJwt(String jwt) {
+        Jws<Claims> claims = validateJwt(jwt);
+        return claims.getPayload().get("role", String.class);
+    }
+
+    public Jws<Claims> validateJwt(String jwt) {
+        return Jwts.parser()
+                .requireIssuer(issuer)
+                .clockSkewSeconds(120)
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(jwt);
+    }
+
+    public String createRefreshToken() {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+        return Encoders.BASE64.encode(bytes);
+    }
+
+    public String createOtp() {
+        return String.format("%06d",new SecureRandom().nextInt(999999));
+    }
+
+    public String createRandomToken() {
+        byte[] bytes = new byte[16];
+        SecureRandom rng = new SecureRandom();
+        rng.nextBytes(bytes);
+        return Encoders.BASE64URL.encode(bytes);
+    }
+}
