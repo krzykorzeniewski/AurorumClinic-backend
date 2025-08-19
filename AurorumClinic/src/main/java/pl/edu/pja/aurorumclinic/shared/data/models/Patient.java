@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -24,5 +25,8 @@ public class Patient extends User{
 
     @OneToMany(mappedBy = "patient")
     private List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "patient")
+    private Set<PatientNewsletterEntry> patientNewsletterEntries;
 
 }
