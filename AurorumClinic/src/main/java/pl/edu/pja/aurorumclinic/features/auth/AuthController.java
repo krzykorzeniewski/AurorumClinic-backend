@@ -16,45 +16,45 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register-employee")
-    public ResponseEntity<String> registerEmployee(@Valid @RequestBody RegisterEmployeeRequest requestDto) {
+    public ResponseEntity<?> registerEmployee(@Valid @RequestBody RegisterEmployeeRequest requestDto) {
         authService.registerEmployee(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
     }
 
     @PostMapping("/register-patient")
-    public ResponseEntity<String> registerPatient(@Valid @RequestBody RegisterPatientRequest requestDto) {
+    public ResponseEntity<?> registerPatient(@Valid @RequestBody RegisterPatientRequest requestDto) {
         authService.registerPatient(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
     }
 
     @PostMapping("/register-doctor")
-    public ResponseEntity<String> registerDoctor(@Valid @RequestBody RegisterDoctorRequest requestDto) {
+    public ResponseEntity<?> registerDoctor(@Valid @RequestBody RegisterDoctorRequest requestDto) {
         authService.registerDoctor(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
     }
 
     @PostMapping("/verify-email-token")
     public ResponseEntity<?> getVerifyEmailToken(@Valid @RequestBody VerifyEmailTokenRequest requestDto) {
         authService.sendVerifyUserAccountEmail(requestDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
         authService.verifyUserEmail(token);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/reset-password-token")
     public ResponseEntity<?> getResetPasswordToken(@Valid @RequestBody PasswordResetTokenRequest requestDto) {
         authService.sendResetPasswordEmail(requestDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest requestDto) {
         authService.resetPassword(requestDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/login")
@@ -114,7 +114,7 @@ public class AuthController {
     @PostMapping("/2fa-token")
     public ResponseEntity<?> get2faToken(@Valid @RequestBody TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
         authService.send2faToken(twoFactorAuthTokenRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/logout")
@@ -129,9 +129,10 @@ public class AuthController {
                 .httpOnly(true)
                 .maxAge(0)
                 .build();
-        return ResponseEntity.ok()
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .build();
+                .body(ApiResponse.success(null));
     }
 
 }
