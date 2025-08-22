@@ -47,7 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/api/users/logout").authenticated()
                         .requestMatchers("/api/users/**", "/error", "/api/auth/**",
-                                "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico").permitAll()
+                                "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico",
+                                "/api/newsletter/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/patients/**").hasAnyAuthority(UserRole.PATIENT.name())
                         .requestMatchers(HttpMethod.PUT, "/api/patients/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
                                 UserRole.ADMIN.name())
