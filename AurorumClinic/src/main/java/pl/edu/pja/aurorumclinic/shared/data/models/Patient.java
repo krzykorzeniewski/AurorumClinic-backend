@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data

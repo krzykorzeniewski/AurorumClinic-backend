@@ -5,6 +5,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import pl.edu.pja.aurorumclinic.features.auth.ApiAuthException;
 
 import java.util.Map;
@@ -35,6 +36,12 @@ public class GlobalExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleException(Exception ex) {
         return ApiResponse.error("Internal server error");
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse<?> handleNoResourceFoundException() {
+        return ApiResponse.fail(null);
     }
 
 }

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.features.users.dtos.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PutPatientRequest;
-import pl.edu.pja.aurorumclinic.features.users.repositories.PatientRepository;
+import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
