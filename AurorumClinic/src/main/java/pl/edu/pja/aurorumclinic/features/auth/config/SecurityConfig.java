@@ -45,7 +45,6 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/auth/logout").authenticated()
-                        .requestMatchers("/api/users/logout").authenticated()
                         .requestMatchers("/api/users/**", "/error", "/api/auth/**",
                                 "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico",
                                 "/api/newsletter/**").permitAll()
