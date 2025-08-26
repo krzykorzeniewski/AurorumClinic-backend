@@ -17,7 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 import pl.edu.pja.aurorumclinic.features.auth.ApiAuthException;
 import pl.edu.pja.aurorumclinic.features.auth.SecurityUtils;
-import pl.edu.pja.aurorumclinic.shared.ApiException;
 
 import java.io.IOException;
 import java.util.*;

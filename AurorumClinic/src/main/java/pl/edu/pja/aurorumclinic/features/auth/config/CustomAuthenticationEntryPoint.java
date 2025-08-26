@@ -27,14 +27,14 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        String field = "";
-        String message = "";
-
+        ApiResponse<?> apiResponse = null;
         if (authException instanceof ApiAuthException) {
-            message = authException.getMessage();
-            field = "accessToken";
+            String message = authException.getMessage();
+            String field = "accessToken";
+            apiResponse = ApiResponse.fail(Map.of(field, message));
+        } else {
+            apiResponse = ApiResponse.fail(null);
         }
-        ApiResponse<?> apiResponse = ApiResponse.fail(Map.of(field, message));
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));

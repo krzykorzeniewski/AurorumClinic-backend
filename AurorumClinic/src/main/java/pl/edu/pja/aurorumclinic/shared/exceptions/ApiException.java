@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.shared;
+package pl.edu.pja.aurorumclinic.shared.exceptions;
 
 import lombok.Getter;
 
