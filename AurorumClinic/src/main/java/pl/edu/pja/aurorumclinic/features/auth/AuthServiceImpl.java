@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
@@ -24,6 +26,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
@@ -110,11 +113,11 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public LoginUserResponse loginUser(LoginUserRequest requestDto) {
-        authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
+        Authentication authentication = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
                 requestDto.email(), requestDto.password()
         ));
 
-        User userFromDb = userRepository.findByEmail(requestDto.email());
+        User userFromDb = (User) authentication.getPrincipal();
         if (!userFromDb.isEmailVerified()) {
             throw new ApiAuthException("Email is not verified", "email");
         }
