@@ -1,12 +1,14 @@
 package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.features.users.dtos.GetDoctorResponse;
 import pl.edu.pja.aurorumclinic.features.users.repositories.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,10 @@ import java.util.Objects;
 public class DoctorServiceImpl implements DoctorService {
 
     private final DoctorRepository doctorRepository;
+    private final S3Client s3Client;
+
+    @Value("${cloud.aws.bucket.name}")
+    private String s3BucketName;
 
     @Override
     public List<GetDoctorResponse> getAllDoctors() {
