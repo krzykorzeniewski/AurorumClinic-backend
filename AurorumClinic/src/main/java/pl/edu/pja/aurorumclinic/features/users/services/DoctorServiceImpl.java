@@ -3,13 +3,15 @@ package pl.edu.pja.aurorumclinic.features.users.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import pl.edu.pja.aurorumclinic.features.users.dtos.GetDoctorResponse;
 import pl.edu.pja.aurorumclinic.features.users.repositories.DoctorRepository;
+import pl.edu.pja.aurorumclinic.shared.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
-import software.amazon.awssdk.services.s3.S3Client;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,13 +21,10 @@ import java.util.Objects;
 public class DoctorServiceImpl implements DoctorService {
 
     private final DoctorRepository doctorRepository;
-    private final S3Client s3Client;
-
-    @Value("${cloud.aws.bucket.name}")
-    private String s3BucketName;
+    private final ObjectStorageService objectStorageService;
 
     @Override
-    public List<GetDoctorResponse> getAllDoctors() {
+    public List<GetDoctorResponse> getAllDoctors() throws IOException {
         List<Doctor> doctorsFromDb = doctorRepository.findAll();
         List<GetDoctorResponse> doctorsToReturn = new ArrayList<>();
         for (Doctor doctor : doctorsFromDb) {
@@ -39,7 +38,7 @@ public class DoctorServiceImpl implements DoctorService {
                     .email(doctor.getEmail())
                     .description(doctor.getDescription())
                     .specialization(doctor.getSpecialization())
-                    .profilePicture(doctor.getProfilePicture())
+                    .profilePicture(objectStorageService.generateSignedUrl(doctor.getProfilePicture()))
                     .education(doctor.getEducation())
                     .experience(doctor.getExperience())
                     .pwzNumber(doctor.getPwzNumber())
@@ -55,5 +54,15 @@ public class DoctorServiceImpl implements DoctorService {
             doctorsToReturn.add(responseDto);
         }
         return doctorsToReturn;
+    }
+
+    @Override
+    public void uploadProfilePicture(MultipartFile image, Long doctorId) throws IOException {
+        Doctor doctorFromDb = doctorRepository.findById(doctorId).orElseThrow(
+                () -> new ApiException("Id not found", "id")
+        );
+        String imagePath = objectStorageService.uploadObject(image);
+        doctorFromDb.setProfilePicture(imagePath);
+        doctorRepository.save(doctorFromDb);
     }
 }
