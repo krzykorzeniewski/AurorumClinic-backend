@@ -1,15 +1,14 @@
 package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.edu.pja.aurorumclinic.features.users.dtos.GetDoctorResponse;
 import pl.edu.pja.aurorumclinic.features.users.repositories.DoctorRepository;
-import pl.edu.pja.aurorumclinic.shared.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public void uploadProfilePicture(MultipartFile image, Long doctorId) throws IOException {
         Doctor doctorFromDb = doctorRepository.findById(doctorId).orElseThrow(
-                () -> new ApiException("Id not found", "id")
+                () -> new ApiNotFoundException("Id not found", "id")
         );
         String imagePath = objectStorageService.uploadObject(image);
         doctorFromDb.setProfilePicture(imagePath);

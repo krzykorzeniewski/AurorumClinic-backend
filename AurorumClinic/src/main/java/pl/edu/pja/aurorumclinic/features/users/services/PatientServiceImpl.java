@@ -6,8 +6,9 @@ import pl.edu.pja.aurorumclinic.features.users.dtos.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
-import pl.edu.pja.aurorumclinic.shared.ApiException;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public GetPatientResponse getPatientById(Long patientId) {
         Patient patientFromDb = patientRepository.findById(patientId)
-                .orElseThrow(() -> new ApiException("Id not found", "id"));
+                .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));
         GetPatientResponse patientDto = mapPatientToGetResponseDto(patientFromDb);
         return patientDto;
     }
@@ -40,7 +41,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public GetPatientResponse partiallyUpdatePatient(Long patientId, PatchPatientRequest requestDto) {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
-                () -> new ApiException("Id not found", "id")
+                () -> new ApiNotFoundException("Id not found", "id")
         );
         if (patientRepository.findByEmail(requestDto.email()) != patientFromDb) {
             throw new ApiException("Email already in use", "email");
@@ -58,7 +59,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public GetPatientResponse updatePatient(Long patientId, PutPatientRequest requestDto) {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
-                () -> new ApiException("Id not found", "id")
+                () -> new ApiNotFoundException("Id not found", "id")
         );
         if (patientRepository.findByEmail(requestDto.email()) != null) {
             throw new ApiException("Email already in use", "email");

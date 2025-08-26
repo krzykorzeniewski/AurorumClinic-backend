@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import pl.edu.pja.aurorumclinic.features.auth.ApiAuthException;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.util.Map;
 
@@ -17,6 +19,12 @@ public class GlobalExceptionResolver {
     @ExceptionHandler(ApiException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleApiException(ApiException ex) {
+        return ApiResponse.fail(Map.of(ex.getField(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(ApiNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse<?> handleApiNotFoundException(ApiException ex) {
         return ApiResponse.fail(Map.of(ex.getField(), ex.getMessage()));
     }
 

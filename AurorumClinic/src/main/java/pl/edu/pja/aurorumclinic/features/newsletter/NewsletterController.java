@@ -6,10 +6,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.shared.ApiException;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 @RestController
 @RequestMapping("/api/newsletter")
@@ -22,7 +23,7 @@ public class NewsletterController {
     public ResponseEntity<?> subscribe(@RequestBody SubscribeRequest subscribeRequest) {
         Patient patientFromDb = patientRepository.findByEmail(subscribeRequest.email());
         if (patientFromDb == null) {
-            throw new ApiException("Email not found", "email");
+            throw new ApiNotFoundException("Email not found", "email");
         }
         if (patientFromDb.isNewsletter()) {
             throw new ApiException("Email is already subscribed to newsletter", "email");
@@ -36,7 +37,7 @@ public class NewsletterController {
     public ResponseEntity<?> unsubscribe(@RequestBody UnsubscribeRequest unsubscribeRequest) {
         Patient patientFromDb = patientRepository.findByEmail(unsubscribeRequest.email());
         if (patientFromDb == null) {
-            throw new ApiException("Email not found", "email");
+            throw new ApiNotFoundException("Email not found", "email");
         }
         if (!patientFromDb.isNewsletter()) {
             throw new ApiException("Email is not subscribed to newsletter", "email");
