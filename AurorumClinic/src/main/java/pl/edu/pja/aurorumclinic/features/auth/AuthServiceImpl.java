@@ -129,6 +129,7 @@ public class AuthServiceImpl implements AuthService{
                     .accessToken(null)
                     .refreshToken(null)
                     .twoFactorAuth(userFromDb.isTwoFactorAuth())
+                    .role(userFromDb.getRole())
                     .build();
         }
 
@@ -144,6 +145,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(jwt)
                 .refreshToken(refreshToken)
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
+                .role(userFromDb.getRole())
                 .build();
     }
 
@@ -260,6 +262,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(newJwt)
                 .refreshToken(newRefreshToken)
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
+                .role(userFromDb.getRole())
                 .build();
     }
 
