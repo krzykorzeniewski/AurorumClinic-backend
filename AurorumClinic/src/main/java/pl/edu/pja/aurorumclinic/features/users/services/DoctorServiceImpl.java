@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.edu.pja.aurorumclinic.features.users.dtos.GetDoctorResponse;
-import pl.edu.pja.aurorumclinic.features.users.repositories.DoctorRepository;
+import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;

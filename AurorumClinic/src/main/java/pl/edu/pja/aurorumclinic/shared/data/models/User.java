@@ -105,7 +105,7 @@ public class User implements UserDetails {
     @Size(min = 6, max = 6, message = "Required length for this field is 6 characters")
     private String twoFactorAuthToken;
 
-    @Column(name = "Two_Factor_Auth_Token_Expiry_Date", columnDefinition = "datetime2(5)")
+    @Column(name = "Two_Factor_Auth_Expiry_Date", columnDefinition = "datetime2(5)")
     private LocalDateTime twoFactorAuthExpiryDate;
 
     @Override
