@@ -42,8 +42,7 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain refreshAccessTokenAndLoginSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .securityMatcher("/api/auth/refresh")
-                .securityMatcher("/api/auth/login")
+                .securityMatcher("/api/auth/refresh", "/api/auth/login")
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint))
