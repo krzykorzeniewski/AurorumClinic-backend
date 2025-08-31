@@ -40,9 +40,10 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain refreshAccessTokenSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain refreshAccessTokenAndLoginSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .securityMatcher("/api/auth/refresh")
+                .securityMatcher("/api/auth/login")
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint))

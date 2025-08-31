@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.edu.pja.aurorumclinic.features.auth.dtos.response.GetBasicUserInfoResponse;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
@@ -285,6 +286,20 @@ public class AuthServiceImpl implements AuthService{
             throw new ApiAuthException("Given email has 2fa disabled", "email");
         }
         sendOtpSms(userFromDb);
+    }
+
+    @Override
+    public GetBasicUserInfoResponse getBasicUserInfo(String accessToken) {
+        String email = securityUtils.getEmailFromJwt(accessToken);
+        User userFromDb = userRepository.findByEmail(email);
+        if (userFromDb == null) {
+            throw new ApiAuthException("Email not found", "email");
+        }
+        return GetBasicUserInfoResponse.builder()
+                .userId(userFromDb.getId())
+                .twoFactorAuth(userFromDb.isTwoFactorAuth())
+                .role(userFromDb.getRole())
+                .build();
     }
 
     private void sendVerificationEmail(User user) {
