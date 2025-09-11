@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.shared;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -50,6 +51,12 @@ public class GlobalExceptionResolver {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<?> handleNoResourceFoundException() {
         return ApiResponse.fail(null);
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiResponse<?> handleMissingRequestCookieException(MissingRequestCookieException ex) {
+        return ApiResponse.fail(Map.of("cookie", ex.getCookieName() + " is missing"));
     }
 
 }
