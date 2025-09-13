@@ -24,7 +24,7 @@ public class Service {
 
     @Size(max = 150, message = "Maximum length for this field is 150 characters")
     @NotBlank(message = "This field is required")
-    @Column(name = "Name")
+    @Column(name = "Name", unique = true, columnDefinition = "nvarchar(150)")
     private String name;
 
     @Column(name = "Duration")
