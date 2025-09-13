@@ -10,16 +10,11 @@ import java.time.LocalDateTime;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     @Query("""
-            select
-                  case when
-                  (s.startedAt between :startedAt and :finishedAt) or
-                  (s.finishedAt between :startedAt and :finishedAt) or
-                  (s.startedAt < :startedAt and s.finishedAt > :finishedAt) or
-                  (s.startedAt > :startedAt and s.finishedAt < :finishedAt)
-                  then true
-                  else false
-                  end
-            from Schedule s where s.doctor.id = :doctorId
+            select case when count(s) > 0 then true else false end
+                from Schedule s
+                where s.doctor.id = :doctorId
+                  and s.startedAt < :finishedAt
+                  and s.finishedAt > :startedAt
             """)
     boolean scheduleExistsInIntervalForDoctor(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId);
 
