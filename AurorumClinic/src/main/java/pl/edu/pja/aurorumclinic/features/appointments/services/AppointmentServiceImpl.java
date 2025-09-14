@@ -15,6 +15,8 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 
+import java.time.LocalDateTime;
+
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService{
@@ -80,6 +82,9 @@ public class AppointmentServiceImpl implements AppointmentService{
         Guest guestFromDb = guestRepository.findByAppointmentDeleteToken(token);
         if (guestFromDb == null) {
             throw new ApiNotFoundException("Token not found", "token");
+        }
+        if (guestFromDb.getAppointment().getStartedAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException("Appointment has already started", "token");
         }
         guestRepository.delete(guestFromDb);
     }
