@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.newsletter;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class NewsletterController {
     private final PatientRepository patientRepository;
 
     @PostMapping("/subscribe")
-    public ResponseEntity<?> subscribe(@RequestBody SubscribeRequest subscribeRequest) {
+    public ResponseEntity<?> subscribe(@RequestBody @Valid SubscribeRequest subscribeRequest) {
         Patient patientFromDb = patientRepository.findByEmail(subscribeRequest.email());
         if (patientFromDb == null) {
             throw new ApiNotFoundException("Email not found", "email");
@@ -34,7 +35,7 @@ public class NewsletterController {
     }
 
     @PostMapping("/unsubscribe")
-    public ResponseEntity<?> unsubscribe(@RequestBody UnsubscribeRequest unsubscribeRequest) {
+    public ResponseEntity<?> unsubscribe(@RequestBody @Valid UnsubscribeRequest unsubscribeRequest) {
         Patient patientFromDb = patientRepository.findByEmail(unsubscribeRequest.email());
         if (patientFromDb == null) {
             throw new ApiNotFoundException("Email not found", "email");
