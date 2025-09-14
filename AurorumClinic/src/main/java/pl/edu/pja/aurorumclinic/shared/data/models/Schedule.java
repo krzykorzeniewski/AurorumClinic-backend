@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,10 +20,6 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PK_Schedule")
     private Long id;
-
-    @Column(name = "Date")
-    @NotNull(message = "This field is required")
-    private LocalDate date;
 
     @Column(name = "Started_At", columnDefinition = "datetime2(2)")
     @NotNull(message = "This field is required")

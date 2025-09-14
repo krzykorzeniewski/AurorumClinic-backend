@@ -135,4 +135,9 @@ public class AuthController {
                 .body(ApiResponse.success(null));
     }
 
+    @GetMapping("/basic-info")
+    public ResponseEntity<?> getBasicUserInfo(@CookieValue("Access-Token") String accessToken) {
+        return ResponseEntity.ok(ApiResponse.success(authService.getBasicUserInfo(accessToken)));
+    }
+
 }
