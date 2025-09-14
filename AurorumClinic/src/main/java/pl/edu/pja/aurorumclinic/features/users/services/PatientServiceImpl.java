@@ -1,6 +1,8 @@
 package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.features.users.dtos.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.PatchPatientRequest;
@@ -12,6 +14,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +79,19 @@ public class PatientServiceImpl implements PatientService {
 
         GetPatientResponse responseDto = mapPatientToGetResponseDto(patientRepository.save(patientFromDb));
         return responseDto;
+    }
+
+    @Override
+    public void deletePatient(Long id, Authentication authentication) {
+        Patient patientFromDb = patientRepository.findById(id).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        System.out.println(patientFromDb.getEmail());
+        System.out.println(authentication.getPrincipal());
+        if (!Objects.equals(authentication.getPrincipal(), patientFromDb.getEmail())) {
+            throw new ApiException("Id does not correspond to the user's id", "id");
+        }
+        patientRepository.delete(patientFromDb);
     }
 
     private GetPatientResponse mapPatientToGetResponseDto(Patient patient) {
