@@ -20,7 +20,7 @@
 //import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 //import pl.edu.pja.aurorumclinic.shared.data.models.User;
 //import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
-//import pl.edu.pja.aurorumclinic.features.auth.SecurityUtils;
+//import pl.edu.pja.aurorumclinic.shared.SecurityUtils;
 //import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 //
 //import java.time.LocalDate;

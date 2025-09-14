@@ -7,7 +7,7 @@ import pl.edu.pja.aurorumclinic.features.appointments.dtos.CreateAppointmentUnre
 import pl.edu.pja.aurorumclinic.features.appointments.repositories.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.repositories.GuestRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.repositories.ServiceRepository;
-import pl.edu.pja.aurorumclinic.features.auth.SecurityUtils;
+import pl.edu.pja.aurorumclinic.shared.SecurityUtils;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
