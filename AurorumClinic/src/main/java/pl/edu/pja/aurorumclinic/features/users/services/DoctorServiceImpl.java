@@ -9,6 +9,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
+import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.io.IOException;
 import java.util.ArrayList;

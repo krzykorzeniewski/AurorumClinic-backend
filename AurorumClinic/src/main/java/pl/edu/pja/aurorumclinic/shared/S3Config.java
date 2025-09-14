@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users;
+package pl.edu.pja.aurorumclinic.shared;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

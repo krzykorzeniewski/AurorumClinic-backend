@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.services;
+package pl.edu.pja.aurorumclinic.shared.services;
 
 import org.springframework.web.multipart.MultipartFile;
 
