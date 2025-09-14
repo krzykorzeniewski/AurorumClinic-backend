@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.shared;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -57,6 +58,12 @@ public class GlobalExceptionResolver {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleMissingRequestCookieException(MissingRequestCookieException ex) {
         return ApiResponse.fail(Map.of("cookie", ex.getCookieName() + " is missing"));
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiResponse<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+        return ApiResponse.fail(Map.of("role", "Access is denied"));
     }
 
 }
