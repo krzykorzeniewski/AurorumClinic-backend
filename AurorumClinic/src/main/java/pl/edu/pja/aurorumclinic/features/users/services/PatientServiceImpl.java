@@ -86,8 +86,6 @@ public class PatientServiceImpl implements PatientService {
         Patient patientFromDb = patientRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        System.out.println(patientFromDb.getEmail());
-        System.out.println(authentication.getPrincipal());
         if (!Objects.equals(authentication.getPrincipal(), patientFromDb.getEmail())) {
             throw new ApiException("Id does not correspond to the user's id", "id");
         }
