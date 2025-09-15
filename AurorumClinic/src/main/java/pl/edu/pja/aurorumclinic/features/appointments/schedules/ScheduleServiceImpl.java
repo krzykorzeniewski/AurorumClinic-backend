@@ -1,10 +1,9 @@
-package pl.edu.pja.aurorumclinic.features.appointments.services;
+package pl.edu.pja.aurorumclinic.features.appointments.schedules;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import pl.edu.pja.aurorumclinic.features.appointments.dtos.CreateScheduleRequest;
-import pl.edu.pja.aurorumclinic.features.appointments.repositories.ScheduleRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
@@ -13,7 +12,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-public class ScheduleServiceImpl implements ScheduleService{
+public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final DoctorRepository doctorRepository;

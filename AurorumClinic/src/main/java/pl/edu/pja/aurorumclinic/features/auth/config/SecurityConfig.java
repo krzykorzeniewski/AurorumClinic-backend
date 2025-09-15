@@ -67,7 +67,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/api/users/**", "/error", "/api/auth/**",
                                 "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico",
-                                "/api/newsletter/**", "/api/appointments/unregistered-user").permitAll()
+                                "/api/newsletter/**", "/api/appointments/unregistered").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/patients/**").hasAnyAuthority(UserRole.PATIENT.name())
                         .requestMatchers(HttpMethod.DELETE, "/api/patients/**").hasAuthority(UserRole.PATIENT.name())
                         .requestMatchers(HttpMethod.PUT, "/api/patients/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
