@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 import pl.edu.pja.aurorumclinic.features.auth.ApiAuthException;
-import pl.edu.pja.aurorumclinic.shared.SecurityUtils;
+import pl.edu.pja.aurorumclinic.features.auth.JwtUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -25,7 +25,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final SecurityUtils securityUtils;
+    private final JwtUtils jwtUtils;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -43,8 +43,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String emailFromJwt;
         String roleFromJwt;
         try {
-            emailFromJwt = securityUtils.getEmailFromJwt(jwt);
-            roleFromJwt = securityUtils.getRoleFromJwt(jwt);
+            emailFromJwt = jwtUtils.getEmailFromJwt(jwt);
+            roleFromJwt = jwtUtils.getRoleFromJwt(jwt);
         } catch (JwtException jwtException) {
             if (jwtException instanceof ExpiredJwtException) {
                 response.setHeader("Token-expired", "true");
