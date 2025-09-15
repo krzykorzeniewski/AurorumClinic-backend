@@ -125,7 +125,7 @@ public class AuthServiceImpl implements AuthService{
         }
 
         if (userFromDb.isTwoFactorAuth()) {
-            sendOtpSms(userFromDb);
+            send2faSms(userFromDb);
             return LoginUserResponse.builder()
                     .userId(userFromDb.getId())
                     .accessToken(null)
@@ -286,7 +286,7 @@ public class AuthServiceImpl implements AuthService{
         if (!userFromDb.isTwoFactorAuth()) {
             throw new ApiAuthException("Given email has 2fa disabled", "email");
         }
-        sendOtpSms(userFromDb);
+        send2faSms(userFromDb);
     }
 
     @Override
@@ -301,6 +301,29 @@ public class AuthServiceImpl implements AuthService{
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .build();
+    }
+
+    @Override
+    public void sendVerifyPhoneNumberMessage(VerifyPhoneNumberTokenRequest requestDto) {
+        User userFromDb = userRepository.findByPhoneNumber(requestDto.phoneNumber());
+        if (userFromDb == null) {
+            throw new ApiAuthException("Phone number not found", "phoneNumber");
+        }
+        sendOtpSms(userFromDb);
+    }
+
+    @Override
+    public void verifyPhoneNumber(VerifyPhoneNumberRequest requestDto) {
+        User userFromDb = userRepository.findByPhoneNumberVerificationToken(requestDto.phoneNumberVerificationToken());
+        if (userFromDb == null) {
+            throw new ApiAuthException("Phone number verification token not found", "phoneNumberVerificationToken");
+        }
+        if (userFromDb.getPhoneNumberVerificationExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ApiAuthException("Otp is expired", "phoneNumberVerificationToken");
+        }
+        userFromDb.setPhoneNumberVerificationToken(null);
+        userFromDb.setPhoneNumberVerificationExpiryDate(null);
+        userFromDb.setPhoneNumberVerified(true);
     }
 
     private void sendVerificationEmail(User user) {
@@ -319,7 +342,7 @@ public class AuthServiceImpl implements AuthService{
         );
     }
 
-    private void sendOtpSms(User user) {
+    private void send2faSms(User user) {
         String otp = securityUtils.createOtp();
         user.setTwoFactorAuthToken(otp);
         user.setTwoFactorAuthExpiryDate(LocalDateTime.now().plusMinutes(10));
@@ -327,6 +350,16 @@ public class AuthServiceImpl implements AuthService{
 
         smsService.sendSms("+48"+user.getPhoneNumber(), fromPhoneNumber,
                 "Kod logowania do Aurorum Clinic : " + otp);
+    }
+
+    private void sendOtpSms(User user) {
+        String otp = securityUtils.createOtp();
+        user.setPhoneNumberVerificationToken(otp);
+        user.setPhoneNumberVerificationExpiryDate(LocalDateTime.now().plusMinutes(10));
+//        userRepository.save(user);
+
+        smsService.sendSms("+48"+user.getPhoneNumber(), fromPhoneNumber,
+                "Kod weryfikacyjny numeru telefonu w Aurorum Clinic : " + otp);
     }
 
 }

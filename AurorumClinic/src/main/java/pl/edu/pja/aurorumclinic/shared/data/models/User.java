@@ -61,7 +61,7 @@ public class User implements UserDetails {
     @Size(max = 200, message = "Maximum length for this field is 200 characters")
     private String password;
 
-    @Column(name = "Phone_Number", columnDefinition = "nvarchar(9)")
+    @Column(name = "Phone_Number", columnDefinition = "nvarchar(9)", unique = true)
     @Size(min = 9, max = 9, message = "Required length for this field is 9 characters")
     @NotBlank(message = "This field is required")
     private String phoneNumber;
@@ -89,6 +89,13 @@ public class User implements UserDetails {
 
     @Column(name = "Phone_Number_Verified", columnDefinition = "bit")
     private boolean phoneNumberVerified = false;
+
+    @Column(name = "Phone_Number_Verification_Token", columnDefinition = "nvarchar(6)")
+    @Size(max = 6, message = "Maximum length for this field is 6 characters")
+    private String phoneNumberVerificationToken;
+
+    @Column(name = "Phone_Number_Verification_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime phoneNumberVerificationExpiryDate;
 
     @Column(name = "Email_Verification_Token", columnDefinition = "nvarchar(100)")
     @Size(max = 100, message = "Maximum length for this field is 100 characters")

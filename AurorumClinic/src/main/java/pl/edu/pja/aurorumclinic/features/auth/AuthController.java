@@ -46,8 +46,14 @@ public class AuthController {
     }
 
     @PostMapping("/verify-phone-number-token")
-    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberRequest requestDto) {
-        authSerivce.sendVerifyPhoneNumberMessage(requestDto);
+    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberTokenRequest requestDto) {
+        authService.sendVerifyPhoneNumberMessage(requestDto);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/verify-phone-number")
+    public ResponseEntity<?> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto) {
+        authService.verifyPhoneNumber(requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

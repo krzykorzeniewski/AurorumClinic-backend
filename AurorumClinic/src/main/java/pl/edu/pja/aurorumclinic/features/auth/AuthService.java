@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.auth;
 
+import jakarta.validation.Valid;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.response.GetBasicUserInfoResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
@@ -20,4 +21,6 @@ public interface AuthService {
     void sendVerifyUserAccountEmail(VerifyEmailTokenRequest verifyEmailTokenRequest);
     void send2faToken(TwoFactorAuthTokenRequest twoFactorAuthTokenRequest);
     GetBasicUserInfoResponse getBasicUserInfo(String accessToken);
+    void sendVerifyPhoneNumberMessage(VerifyPhoneNumberTokenRequest requestDto);
+    void verifyPhoneNumber(VerifyPhoneNumberRequest requestDto);
 }
