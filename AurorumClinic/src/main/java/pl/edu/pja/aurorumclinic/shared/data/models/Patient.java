@@ -23,7 +23,7 @@ public class Patient extends User{
     @Enumerated(value = EnumType.STRING)
     private CommunicationPreference communicationPreferences;
 
-    @OneToMany(mappedBy = "patient")
+    @OneToMany(mappedBy = "patient", orphanRemoval = true)
     private List<Appointment> appointments;
 
 }

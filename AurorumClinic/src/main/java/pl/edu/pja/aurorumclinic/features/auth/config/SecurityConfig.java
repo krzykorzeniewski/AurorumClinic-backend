@@ -69,6 +69,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico",
                                 "/api/newsletter/**", "/api/appointments/unregistered-user").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/patients/**").hasAnyAuthority(UserRole.PATIENT.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/patients/**").hasAuthority(UserRole.PATIENT.name())
                         .requestMatchers(HttpMethod.PUT, "/api/patients/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
                                 UserRole.ADMIN.name())
                         .requestMatchers("/api/services").hasAuthority(UserRole.ADMIN.name())
