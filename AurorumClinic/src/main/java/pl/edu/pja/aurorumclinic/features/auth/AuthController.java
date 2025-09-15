@@ -45,6 +45,12 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @PostMapping("/verify-phone-number-token")
+    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberRequest requestDto) {
+        authSerivce.sendVerifyPhoneNumberMessage(requestDto);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
     @PostMapping("/reset-password-token")
     public ResponseEntity<?> getResetPasswordToken(@Valid @RequestBody PasswordResetTokenRequest requestDto) {
         authService.sendResetPasswordEmail(requestDto);

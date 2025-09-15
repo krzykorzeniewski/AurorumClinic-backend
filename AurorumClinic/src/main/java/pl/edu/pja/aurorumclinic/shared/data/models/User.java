@@ -87,6 +87,9 @@ public class User implements UserDetails {
     @Column(name = "Email_Verified", columnDefinition = "bit")
     private boolean emailVerified = false;
 
+    @Column(name = "Phone_Number_Verified", columnDefinition = "bit")
+    private boolean phoneNumberVerified = false;
+
     @Column(name = "Email_Verification_Token", columnDefinition = "nvarchar(100)")
     @Size(max = 100, message = "Maximum length for this field is 100 characters")
     private String emailVerificationToken;
