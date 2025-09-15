@@ -5,4 +5,5 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Guest;
 
 public interface GuestRepository extends JpaRepository<Guest, Long> {
     Guest findByAppointmentDeleteToken(String appointmentDeleteToken);
+    Guest findByAppointmentRescheduleToken(String appointmentRescheduleToken);
 }

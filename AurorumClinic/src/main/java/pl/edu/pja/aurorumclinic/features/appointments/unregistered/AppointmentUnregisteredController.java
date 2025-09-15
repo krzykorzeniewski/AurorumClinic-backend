@@ -21,8 +21,10 @@ public class AppointmentUnregisteredController {
     }
 
     @PutMapping("")
-    public ResponseEntity<?> updateAppointmentForUnregisteredUser() {
-        return null;
+    public ResponseEntity<?> updateAppointmentForUnregisteredUser(@RequestParam("token") String token,
+                                      @RequestBody @Valid RescheduleAppointmentUnregisteredRequest rescheduleRequest) {
+        appointmentUnregisteredService.rescheduleAppointmentForUnregisteredUser(token, rescheduleRequest);
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @DeleteMapping("")

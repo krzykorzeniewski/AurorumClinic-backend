@@ -3,7 +3,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.unregistered;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.appointments.clinicservices.ServiceRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.SecurityUtils;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
@@ -52,7 +52,7 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
         );
         Appointment appointment = Appointment.builder()
                 .doctor(doctorFromDb)
-                .service(createRequest.serviceId())
+                .service(serviceFromDb)
                 .startedAt(createRequest.startedAt())
                 .finishedAt(createRequest.startedAt().plusMinutes(serviceFromDb.getDuration()))
                 .status(AppointmentStatus.CREATED)
@@ -64,15 +64,19 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
             Appointment savedAppointment = appointmentRepository.save(appointment);
             savedGuest.setAppointment(savedAppointment);
 
-            String token = securityUtils.createRandomToken();
-            savedGuest.setAppointmentDeleteToken(token);
-            String link = deleteAppointmentLink + token;
+            String appointmentDeleteToken = securityUtils.createRandomToken();
+            savedGuest.setAppointmentDeleteToken(appointmentDeleteToken);
+            String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
+
+            String appointmentRescheduleToken = securityUtils.createRandomToken();
+            savedGuest.setAppointmentRescheduleToken(appointmentRescheduleToken);
+            String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
 
             emailService.sendEmail(
                     "support@aurorumclinic.pl", savedGuest.getEmail(),
                     "wizyta umówiona", "twoja wizyta została umówiona \n" +
-                            "aby ją odwołać naciśnij link: " + link + "\n");
-                            // TODO "aby ją przełożyć naciśnij link " + );
+                            "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
+                            "aby ją przełożyć naciśnij link: " + rescheduleLink);
         } else {
             throw new ApiException("Timeslot is not available", "appointment");
         }
@@ -89,5 +93,44 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
             throw new ApiException("Appointment has already started", "token");
         }
         guestRepository.delete(guestFromDb);
+    }
+
+    @Override
+    @Transactional
+    public void rescheduleAppointmentForUnregisteredUser(String token, RescheduleAppointmentUnregisteredRequest rescheduleRequest) {
+        Guest guestFromDb = guestRepository.findByAppointmentRescheduleToken(token);
+        if (guestFromDb == null) {
+            throw new ApiNotFoundException("Token not found", "token");
+        }
+        if (guestFromDb.getAppointment().getStartedAt().isBefore(LocalDateTime.now())) {
+            throw new ApiException("Appointment has already started", "token");
+        }
+        Appointment appointmentFromDb = guestFromDb.getAppointment();
+
+        System.out.println(appointmentFromDb.getStartedAt());
+        if (appointmentRepository.timeSlotExists(rescheduleRequest.startedAt(),
+                rescheduleRequest.startedAt().plusMinutes(appointmentFromDb.getService().getDuration()),
+                appointmentFromDb.getDoctor().getId(), appointmentFromDb.getService().getId())) {
+
+            appointmentFromDb.setStartedAt(rescheduleRequest.startedAt());
+            appointmentFromDb.setFinishedAt(rescheduleRequest.startedAt()
+                    .plusMinutes(appointmentFromDb.getService().getDuration()));
+
+            String appointmentDeleteToken = securityUtils.createRandomToken();
+            guestFromDb.setAppointmentDeleteToken(appointmentDeleteToken);
+            String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
+
+            String appointmentRescheduleToken = securityUtils.createRandomToken();
+            guestFromDb.setAppointmentRescheduleToken(appointmentRescheduleToken);
+            String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
+
+            emailService.sendEmail(
+                    "support@aurorumclinic.pl", guestFromDb.getEmail(),
+                    "wizyta przełożona", "twoja wizyta została przełożona \n" +
+                            "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
+                            "aby ją przełożyć naciśnij link: " + rescheduleLink);
+        } else {
+            throw new ApiException("Timeslot is not available", "appointment");
+        }
     }
 }
