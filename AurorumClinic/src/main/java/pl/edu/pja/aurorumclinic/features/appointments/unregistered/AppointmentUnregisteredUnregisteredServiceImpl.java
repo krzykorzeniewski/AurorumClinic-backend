@@ -106,8 +106,6 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
             throw new ApiException("Appointment has already started", "token");
         }
         Appointment appointmentFromDb = guestFromDb.getAppointment();
-
-        System.out.println(appointmentFromDb.getStartedAt());
         if (appointmentRepository.timeSlotExists(rescheduleRequest.startedAt(),
                 rescheduleRequest.startedAt().plusMinutes(appointmentFromDb.getService().getDuration()),
                 appointmentFromDb.getDoctor().getId(), appointmentFromDb.getService().getId())) {
