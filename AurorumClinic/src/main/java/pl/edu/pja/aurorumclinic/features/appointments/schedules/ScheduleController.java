@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.controllers;
+package pl.edu.pja.aurorumclinic.features.appointments.schedules;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -7,20 +7,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.appointments.dtos.CreateServiceRequest;
-import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceService;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
-@RequestMapping("/api/services")
+@RequestMapping("/api/schedules")
 @RequiredArgsConstructor
-public class ServiceController {
+public class ScheduleController {
 
-    private final ServiceService serviceService;
+    private final ScheduleService scheduleService;
 
     @PostMapping("")
-    public ResponseEntity<?> createService(@RequestBody @Valid CreateServiceRequest createServiceRequest) {
-        serviceService.createService(createServiceRequest);
+    public ResponseEntity<?> createSchedule(@RequestBody @Valid CreateScheduleRequest createScheduleRequest) {
+        scheduleService.createSchedule(createScheduleRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

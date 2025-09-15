@@ -1,9 +1,8 @@
-package pl.edu.pja.aurorumclinic.features.appointments.services;
+package pl.edu.pja.aurorumclinic.features.appointments.unregistered;
 
 import jakarta.validation.Valid;
-import pl.edu.pja.aurorumclinic.features.appointments.dtos.CreateAppointmentUnregisteredRequest;
 
-public interface AppointmentService {
+public interface AppointmentUnregisteredService {
     void createAppointmentForUnregisteredUser(@Valid CreateAppointmentUnregisteredRequest createRequest);
     void deleteAppointmentForUnregisteredUser(String token);
 }

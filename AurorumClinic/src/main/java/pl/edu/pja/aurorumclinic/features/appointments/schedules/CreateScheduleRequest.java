@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.dtos;
+package pl.edu.pja.aurorumclinic.features.appointments.schedules;
 
 import jakarta.validation.constraints.NotNull;
 

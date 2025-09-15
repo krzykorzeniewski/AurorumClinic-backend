@@ -76,7 +76,7 @@ public class SecurityUtils {
     }
 
     public String createRandomToken() {
-        byte[] bytes = new byte[16];
+        byte[] bytes = new byte[32];
         SecureRandom rng = new SecureRandom();
         rng.nextBytes(bytes);
         return Encoders.BASE64URL.encode(bytes);

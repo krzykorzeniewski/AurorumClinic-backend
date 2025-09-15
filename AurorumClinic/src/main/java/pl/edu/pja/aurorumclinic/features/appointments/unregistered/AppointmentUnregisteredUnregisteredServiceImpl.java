@@ -1,12 +1,10 @@
-package pl.edu.pja.aurorumclinic.features.appointments.services;
+package pl.edu.pja.aurorumclinic.features.appointments.unregistered;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.appointments.dtos.CreateAppointmentUnregisteredRequest;
-import pl.edu.pja.aurorumclinic.features.appointments.repositories.AppointmentRepository;
-import pl.edu.pja.aurorumclinic.features.appointments.repositories.GuestRepository;
-import pl.edu.pja.aurorumclinic.features.appointments.repositories.ServiceRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.clinicservices.ServiceRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.SecurityUtils;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.*;
@@ -19,7 +17,7 @@ import java.time.LocalDateTime;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
-public class AppointmentServiceImpl implements AppointmentService{
+public class AppointmentUnregisteredUnregisteredServiceImpl implements AppointmentUnregisteredService {
 
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
@@ -28,8 +26,11 @@ public class AppointmentServiceImpl implements AppointmentService{
     private final EmailService emailService;
     private final SecurityUtils securityUtils;
 
-    @Value("${mail.frontend.appointment-delete-link}")
+    @Value("${mail.frontend.appointment.unregistered-delete-link}")
     private String deleteAppointmentLink;
+
+    @Value("${mail.frontend.appointment.unregistered-reschedule-link}")
+    private String rescheduleAppointmentLink;
 
     @Override
     @Transactional
@@ -51,7 +52,7 @@ public class AppointmentServiceImpl implements AppointmentService{
         );
         Appointment appointment = Appointment.builder()
                 .doctor(doctorFromDb)
-                .service(serviceFromDb)
+                .service(createRequest.serviceId())
                 .startedAt(createRequest.startedAt())
                 .finishedAt(createRequest.startedAt().plusMinutes(serviceFromDb.getDuration()))
                 .status(AppointmentStatus.CREATED)
@@ -78,6 +79,7 @@ public class AppointmentServiceImpl implements AppointmentService{
     }
 
     @Override
+    @Transactional
     public void deleteAppointmentForUnregisteredUser(String token) {
         Guest guestFromDb = guestRepository.findByAppointmentDeleteToken(token);
         if (guestFromDb == null) {

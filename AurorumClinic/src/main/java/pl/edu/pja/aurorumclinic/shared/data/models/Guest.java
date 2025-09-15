@@ -58,6 +58,10 @@ public class Guest {
     @Size(max = 100, message = "Maximum length for this field is 100 characters")
     private String appointmentDeleteToken;
 
+    @Column(name = "Appointment_Reschedule_Token", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    private String appointmentRescheduleToken;
+
     @OneToOne(optional = false, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "FK_Appointment")
     private Appointment appointment;

@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.dtos;
+package pl.edu.pja.aurorumclinic.features.appointments.services;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Digits;

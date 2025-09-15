@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.dtos;
+package pl.edu.pja.aurorumclinic.features.appointments.unregistered;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
