@@ -188,8 +188,8 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public void verifyUserEmail(String token) {
-        User userFromDb = userRepository.findByEmailVerificationToken(token);
+    public void verifyUserEmail(VerifyEmailRequest requestDto) {
+        User userFromDb = userRepository.findByEmailVerificationToken(requestDto.token());
         if (userFromDb == null) {
             throw new ApiAuthException("Verification token is invalid", "token");
         }
@@ -314,12 +314,12 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public void verifyPhoneNumber(VerifyPhoneNumberRequest requestDto) {
-        User userFromDb = userRepository.findByPhoneNumberVerificationToken(requestDto.phoneNumberVerificationToken());
+        User userFromDb = userRepository.findByPhoneNumberVerificationToken(requestDto.token());
         if (userFromDb == null) {
-            throw new ApiAuthException("Phone number verification token is invalid", "phoneNumberVerificationToken");
+            throw new ApiAuthException("Phone number verification token is invalid", "token");
         }
         if (userFromDb.getPhoneNumberVerificationExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ApiAuthException("Otp is expired", "phoneNumberVerificationToken");
+            throw new ApiAuthException("Otp is expired", "token");
         }
         userFromDb.setPhoneNumberVerificationToken(null);
         userFromDb.setPhoneNumberVerificationExpiryDate(null);

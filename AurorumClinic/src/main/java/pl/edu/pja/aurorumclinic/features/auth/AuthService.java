@@ -14,7 +14,7 @@ public interface AuthService {
     Doctor registerDoctor(RegisterDoctorRequest requestDto);
     LoginUserResponse loginUser(LoginUserRequest requestDto);
     RefreshAccessTokenResponse refreshAccessToken(RefreshAccessTokenRequest requestDto);
-    void verifyUserEmail(String token);
+    void verifyUserEmail(VerifyEmailRequest requestDto);
     void sendResetPasswordEmail(PasswordResetTokenRequest requestDto);
     void resetPassword(ResetPasswordRequest requestDto);
     TwoFactorAuthLoginResponse loginUserWithTwoFactorAuth(TwoFactorAuthLoginRequest requestDto);

@@ -40,9 +40,9 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @GetMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
-        authService.verifyUserEmail(token);
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyEmailRequest requestDto) {
+        authService.verifyUserEmail(requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
