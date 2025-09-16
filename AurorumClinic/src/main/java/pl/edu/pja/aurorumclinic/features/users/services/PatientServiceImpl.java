@@ -2,11 +2,10 @@ package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import pl.edu.pja.aurorumclinic.features.users.dtos.GetPatientResponse;
-import pl.edu.pja.aurorumclinic.features.users.dtos.PatchPatientRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.PutPatientRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
@@ -86,9 +85,9 @@ public class PatientServiceImpl implements PatientService {
         Patient patientFromDb = patientRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        if (!Objects.equals(authentication.getPrincipal(), patientFromDb.getEmail())) {
-            throw new ApiException("Id does not correspond to the user's id", "id");
-        }
+//        if (!Objects.equals(authentication.getPrincipal(), patientFromDb.getEmail())) {
+//            throw new ApiException("Id does not correspond to the user's id", "id");
+//        }
         patientRepository.delete(patientFromDb);
     }
 

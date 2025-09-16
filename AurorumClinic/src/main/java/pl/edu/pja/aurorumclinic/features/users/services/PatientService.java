@@ -2,9 +2,11 @@ package pl.edu.pja.aurorumclinic.features.users.services;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import pl.edu.pja.aurorumclinic.features.users.dtos.GetPatientResponse;
-import pl.edu.pja.aurorumclinic.features.users.dtos.PatchPatientRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.PutPatientRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
 
 import java.util.List;
 

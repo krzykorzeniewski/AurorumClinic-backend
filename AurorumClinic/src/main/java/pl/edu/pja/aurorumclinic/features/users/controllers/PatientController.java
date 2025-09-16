@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.users.dtos.GetPatientResponse;
-import pl.edu.pja.aurorumclinic.features.users.dtos.PatchPatientRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.PutPatientRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.services.PatientService;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
