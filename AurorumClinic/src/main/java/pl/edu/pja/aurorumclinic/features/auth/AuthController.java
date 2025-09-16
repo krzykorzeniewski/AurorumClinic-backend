@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.auth;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.request.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.response.*;
@@ -148,8 +149,8 @@ public class AuthController {
     }
 
     @GetMapping("/basic-info")
-    public ResponseEntity<?> getBasicUserInfo(@CookieValue("Access-Token") String accessToken) {
-        return ResponseEntity.ok(ApiResponse.success(authService.getBasicUserInfo(accessToken)));
+    public ResponseEntity<?> getBasicUserInfo(Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.success(authService.getBasicUserInfo(authentication)));
     }
 
 }

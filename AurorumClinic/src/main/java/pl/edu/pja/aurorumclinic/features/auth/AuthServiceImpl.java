@@ -4,8 +4,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +30,6 @@ import java.time.LocalDateTime;
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
-    private final AuthenticationProvider authenticationProvider;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final EmailService emailService;
@@ -116,11 +113,13 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public LoginUserResponse loginUser(LoginUserRequest requestDto) {
-        Authentication authentication = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
-                requestDto.email(), requestDto.password()
-        ));
-
-        User userFromDb = (User) authentication.getPrincipal();
+        User userFromDb = userRepository.findByEmail(requestDto.email());
+        if (userFromDb == null) {
+            throw new ApiAuthException("Invalid credentials", "credentials");
+        }
+        if (!passwordEncoder.matches(requestDto.password(), userFromDb.getPassword())) {
+            throw new ApiAuthException("Invalid credentials", "credentials");
+        }
         if (!userFromDb.isEmailVerified()) {
             throw new ApiAuthException("Email is not verified", "email");
         }
@@ -131,6 +130,7 @@ public class AuthServiceImpl implements AuthService{
                     .userId(userFromDb.getId())
                     .accessToken(null)
                     .refreshToken(null)
+                    .email(userFromDb.getEmail())
                     .twoFactorAuth(userFromDb.isTwoFactorAuth())
                     .role(userFromDb.getRole())
                     .build();
@@ -141,12 +141,12 @@ public class AuthServiceImpl implements AuthService{
 
         userFromDb.setRefreshToken(refreshToken);
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
-        userRepository.save(userFromDb);
 
         return LoginUserResponse.builder()
                 .userId(userFromDb.getId())
                 .accessToken(jwt)
                 .refreshToken(refreshToken)
+                .email(userFromDb.getEmail())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .build();
@@ -179,7 +179,6 @@ public class AuthServiceImpl implements AuthService{
 
         userFromDb.setRefreshToken(newRefreshToken);
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
-        userRepository.save(userFromDb);
 
         return RefreshAccessTokenResponse.builder()
                 .userId(userFromDb.getId())
@@ -200,7 +199,6 @@ public class AuthServiceImpl implements AuthService{
         userFromDb.setEmailVerified(true);
         userFromDb.setEmailVerificationToken(null);
         userFromDb.setEmailVerificationExpiryDate(null);
-        userRepository.save(userFromDb);
     }
 
     @Override
@@ -216,7 +214,6 @@ public class AuthServiceImpl implements AuthService{
         String token = tokenUtils.createRandomToken();
         userFromDb.setPasswordResetToken(token);
         userFromDb.setPasswordResetExpiryDate(LocalDateTime.now().plusMinutes(15));
-        userRepository.save(userFromDb);
 
         String verificationLink = resetPasswordLink + token;
         emailService.sendEmail(
@@ -239,7 +236,6 @@ public class AuthServiceImpl implements AuthService{
         userFromDb.setPassword(passwordEncoder.encode(requestDto.password()));
         userFromDb.setPasswordResetToken(null);
         userFromDb.setPasswordResetExpiryDate(null);
-        userRepository.save(userFromDb);
     }
 
     @Override
@@ -258,7 +254,6 @@ public class AuthServiceImpl implements AuthService{
 
         userFromDb.setRefreshToken(newRefreshToken);
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
-        userRepository.save(userFromDb);
 
         return TwoFactorAuthLoginResponse.builder()
                 .userId(userFromDb.getId())
@@ -294,14 +289,15 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public GetBasicUserInfoResponse getBasicUserInfo(String accessToken) {
-        String email = jwtUtils.getEmailFromJwt(accessToken);
+    public GetBasicUserInfoResponse getBasicUserInfo(Authentication authentication) {
+        String email = (String) authentication.getPrincipal();
         User userFromDb = userRepository.findByEmail(email);
         if (userFromDb == null) {
             throw new ApiAuthException("Email not found", "email");
         }
         return GetBasicUserInfoResponse.builder()
                 .userId(userFromDb.getId())
+                .email(userFromDb.getEmail())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .build();
@@ -320,7 +316,7 @@ public class AuthServiceImpl implements AuthService{
     public void verifyPhoneNumber(VerifyPhoneNumberRequest requestDto) {
         User userFromDb = userRepository.findByPhoneNumberVerificationToken(requestDto.phoneNumberVerificationToken());
         if (userFromDb == null) {
-            throw new ApiAuthException("Phone number verification token not found", "phoneNumberVerificationToken");
+            throw new ApiAuthException("Phone number verification token is invalid", "phoneNumberVerificationToken");
         }
         if (userFromDb.getPhoneNumberVerificationExpiryDate().isBefore(LocalDateTime.now())) {
             throw new ApiAuthException("Otp is expired", "phoneNumberVerificationToken");
@@ -334,7 +330,6 @@ public class AuthServiceImpl implements AuthService{
         String token = tokenUtils.createRandomToken();
         user.setEmailVerificationToken(token);
         user.setEmailVerificationExpiryDate(LocalDateTime.now().plusMinutes(15));
-        userRepository.save(user);
 
         String verificationLink = mailVerificationLink + token;
 
@@ -349,8 +344,7 @@ public class AuthServiceImpl implements AuthService{
     private void send2faSms(User user) {
         String otp = tokenUtils.createOtp();
         user.setTwoFactorAuthToken(otp);
-        user.setTwoFactorAuthExpiryDate(LocalDateTime.now().plusMinutes(10));
-        userRepository.save(user);
+        user.setTwoFactorAuthExpiryDate(LocalDateTime.now().plusMinutes(5));
 
         smsService.sendSms("+48"+user.getPhoneNumber(), fromPhoneNumber,
                 "Kod logowania do Aurorum Clinic : " + otp);
@@ -359,7 +353,7 @@ public class AuthServiceImpl implements AuthService{
     private void sendOtpSms(User user) {
         String otp = tokenUtils.createOtp();
         user.setPhoneNumberVerificationToken(otp);
-        user.setPhoneNumberVerificationExpiryDate(LocalDateTime.now().plusMinutes(10));
+        user.setPhoneNumberVerificationExpiryDate(LocalDateTime.now().plusMinutes(5));
 
         smsService.sendSms("+48"+user.getPhoneNumber(), fromPhoneNumber,
                 "Kod weryfikacyjny numeru telefonu w Aurorum Clinic : " + otp);

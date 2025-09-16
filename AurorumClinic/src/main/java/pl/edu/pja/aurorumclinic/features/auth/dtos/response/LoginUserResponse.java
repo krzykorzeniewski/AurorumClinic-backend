@@ -12,6 +12,7 @@ public record LoginUserResponse(Long userId,
 
                                 @JsonIgnore
                                 String refreshToken,
+                                String email,
                                 boolean twoFactorAuth,
                                 UserRole role) {
 }

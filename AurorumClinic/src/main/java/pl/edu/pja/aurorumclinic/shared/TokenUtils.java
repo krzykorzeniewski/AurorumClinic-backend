@@ -12,7 +12,7 @@ public class TokenUtils {
         SecureRandom secureRandom = new SecureRandom();
         byte[] bytes = new byte[32];
         secureRandom.nextBytes(bytes);
-        return Encoders.BASE64.encode(bytes);
+        return Encoders.BASE64URL.encode(bytes);
     }
 
     public String createOtp() {
