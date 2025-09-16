@@ -148,9 +148,4 @@ public class AuthController {
                 .body(ApiResponse.success(null));
     }
 
-    @GetMapping("/basic-info")
-    public ResponseEntity<?> getBasicUserInfo(Authentication authentication) {
-        return ResponseEntity.ok(ApiResponse.success(authService.getBasicUserInfo(authentication)));
-    }
-
 }

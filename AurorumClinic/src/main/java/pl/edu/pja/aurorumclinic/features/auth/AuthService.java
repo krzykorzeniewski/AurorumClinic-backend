@@ -1,7 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.auth;
 
 import org.springframework.security.core.Authentication;
-import pl.edu.pja.aurorumclinic.features.auth.dtos.response.GetBasicUserInfoResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
@@ -20,7 +19,6 @@ public interface AuthService {
     TwoFactorAuthLoginResponse loginUserWithTwoFactorAuth(TwoFactorAuthLoginRequest requestDto);
     void sendVerifyUserAccountEmail(VerifyEmailTokenRequest verifyEmailTokenRequest);
     void send2faToken(TwoFactorAuthTokenRequest twoFactorAuthTokenRequest);
-    GetBasicUserInfoResponse getBasicUserInfo(Authentication authentication);
     void sendVerifyPhoneNumberMessage(VerifyPhoneNumberTokenRequest requestDto);
     void verifyPhoneNumber(VerifyPhoneNumberRequest requestDto);
 }

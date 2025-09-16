@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.features.auth.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 
 @Builder
 public record RefreshAccessTokenResponse(Long userId,
@@ -10,5 +11,8 @@ public record RefreshAccessTokenResponse(Long userId,
                                          String accessToken,
 
                                          @JsonIgnore
-                                         String refreshToken) {
+                                         String refreshToken,
+                                         String email,
+                                         boolean twoFactorAuth,
+                                         UserRole role) {
 }

@@ -73,7 +73,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/patients/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
                                 UserRole.ADMIN.name())
                         .requestMatchers("/api/services").hasAuthority(UserRole.ADMIN.name())
-                        .requestMatchers("/api/auth/basic-info").authenticated()
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/api/auth/verify-phone-number").authenticated()
                         .requestMatchers("/api/auth/verify-phone-number-token").authenticated()
