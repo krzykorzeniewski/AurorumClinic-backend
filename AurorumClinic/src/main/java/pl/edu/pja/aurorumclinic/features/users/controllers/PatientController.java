@@ -2,7 +2,6 @@ package pl.edu.pja.aurorumclinic.features.users.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +43,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> partiallyUpdatePatient(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<?> deleteAccount(@PathVariable Long id, Authentication authentication) {
         patientService.deletePatient(id, authentication);
         return ResponseEntity.ok(ApiResponse.success(null));
     }

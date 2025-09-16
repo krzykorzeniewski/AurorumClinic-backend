@@ -4,14 +4,12 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.response.GetBasicUserInfoResponse;
-import pl.edu.pja.aurorumclinic.shared.SecurityUtils;
+import pl.edu.pja.aurorumclinic.shared.TokenUtils;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
@@ -32,11 +30,11 @@ import java.time.LocalDateTime;
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
-    private final AuthenticationProvider authenticationProvider;
     private final PasswordEncoder passwordEncoder;
-    private final SecurityUtils securityUtils;
+    private final JwtUtils jwtUtils;
     private final EmailService emailService;
     private final SmsService smsService;
+    private final TokenUtils tokenUtils;
 
     @Value("${mail.verification-link}")
     private String mailVerificationLink;
@@ -115,37 +113,40 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public LoginUserResponse loginUser(LoginUserRequest requestDto) {
-        Authentication authentication = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(
-                requestDto.email(), requestDto.password()
-        ));
-
-        User userFromDb = (User) authentication.getPrincipal();
+        User userFromDb = userRepository.findByEmail(requestDto.email());
+        if (userFromDb == null) {
+            throw new ApiAuthException("Invalid credentials", "credentials");
+        }
+        if (!passwordEncoder.matches(requestDto.password(), userFromDb.getPassword())) {
+            throw new ApiAuthException("Invalid credentials", "credentials");
+        }
         if (!userFromDb.isEmailVerified()) {
             throw new ApiAuthException("Email is not verified", "email");
         }
 
         if (userFromDb.isTwoFactorAuth()) {
-            sendOtpSms(userFromDb);
+            send2faSms(userFromDb);
             return LoginUserResponse.builder()
                     .userId(userFromDb.getId())
                     .accessToken(null)
                     .refreshToken(null)
+                    .email(userFromDb.getEmail())
                     .twoFactorAuth(userFromDb.isTwoFactorAuth())
                     .role(userFromDb.getRole())
                     .build();
         }
 
-        String jwt = securityUtils.createJwt(userFromDb);
-        String refreshToken = securityUtils.createRefreshToken();
+        String jwt = jwtUtils.createJwt(userFromDb);
+        String refreshToken = tokenUtils.createRandomToken();
 
         userFromDb.setRefreshToken(refreshToken);
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
-        userRepository.save(userFromDb);
 
         return LoginUserResponse.builder()
                 .userId(userFromDb.getId())
                 .accessToken(jwt)
                 .refreshToken(refreshToken)
+                .email(userFromDb.getEmail())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .build();
@@ -155,7 +156,7 @@ public class AuthServiceImpl implements AuthService{
     public RefreshAccessTokenResponse refreshAccessToken(RefreshAccessTokenRequest requestDto) {
         String jwt = requestDto.accessToken();
         try {
-            securityUtils.validateJwt(jwt);
+            jwtUtils.validateJwt(jwt);
         } catch (JwtException jwtException) {
             if (jwtException instanceof ExpiredJwtException) {
                 System.out.println("token expired");
@@ -173,12 +174,11 @@ public class AuthServiceImpl implements AuthService{
             throw new ApiAuthException("Refresh token is expired", "refreshToken");
         }
 
-        String newJwt = securityUtils.createJwt(userFromDb);
-        String newRefreshToken = securityUtils.createRefreshToken();
+        String newJwt = jwtUtils.createJwt(userFromDb);
+        String newRefreshToken = tokenUtils.createRandomToken();
 
         userFromDb.setRefreshToken(newRefreshToken);
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
-        userRepository.save(userFromDb);
 
         return RefreshAccessTokenResponse.builder()
                 .userId(userFromDb.getId())
@@ -199,7 +199,6 @@ public class AuthServiceImpl implements AuthService{
         userFromDb.setEmailVerified(true);
         userFromDb.setEmailVerificationToken(null);
         userFromDb.setEmailVerificationExpiryDate(null);
-        userRepository.save(userFromDb);
     }
 
     @Override
@@ -212,10 +211,9 @@ public class AuthServiceImpl implements AuthService{
             return;
         }
 
-        String token = securityUtils.createRandomToken();
+        String token = tokenUtils.createRandomToken();
         userFromDb.setPasswordResetToken(token);
         userFromDb.setPasswordResetExpiryDate(LocalDateTime.now().plusMinutes(15));
-        userRepository.save(userFromDb);
 
         String verificationLink = resetPasswordLink + token;
         emailService.sendEmail(
@@ -238,7 +236,6 @@ public class AuthServiceImpl implements AuthService{
         userFromDb.setPassword(passwordEncoder.encode(requestDto.password()));
         userFromDb.setPasswordResetToken(null);
         userFromDb.setPasswordResetExpiryDate(null);
-        userRepository.save(userFromDb);
     }
 
     @Override
@@ -252,12 +249,11 @@ public class AuthServiceImpl implements AuthService{
         }
         userFromDb.setTwoFactorAuthToken(null);
         userFromDb.setTwoFactorAuthExpiryDate(null);
-        String newJwt = securityUtils.createJwt(userFromDb);
-        String newRefreshToken = securityUtils.createRefreshToken();
+        String newJwt = jwtUtils.createJwt(userFromDb);
+        String newRefreshToken = tokenUtils.createRandomToken();
 
         userFromDb.setRefreshToken(newRefreshToken);
         userFromDb.setRefreshTokenExpiryDate(LocalDateTime.now().plusDays(1));
-        userRepository.save(userFromDb);
 
         return TwoFactorAuthLoginResponse.builder()
                 .userId(userFromDb.getId())
@@ -283,31 +279,57 @@ public class AuthServiceImpl implements AuthService{
         if (userFromDb == null) {
             throw new ApiAuthException("Email not found", "email");
         }
+        if (!userFromDb.isPhoneNumberVerified()) {
+            throw new ApiAuthException("Phone number is not verified", "phoneNumber");
+        }
         if (!userFromDb.isTwoFactorAuth()) {
             throw new ApiAuthException("Given email has 2fa disabled", "email");
         }
-        sendOtpSms(userFromDb);
+        send2faSms(userFromDb);
     }
 
     @Override
-    public GetBasicUserInfoResponse getBasicUserInfo(String accessToken) {
-        String email = securityUtils.getEmailFromJwt(accessToken);
+    public GetBasicUserInfoResponse getBasicUserInfo(Authentication authentication) {
+        String email = (String) authentication.getPrincipal();
         User userFromDb = userRepository.findByEmail(email);
         if (userFromDb == null) {
             throw new ApiAuthException("Email not found", "email");
         }
         return GetBasicUserInfoResponse.builder()
                 .userId(userFromDb.getId())
+                .email(userFromDb.getEmail())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .build();
     }
 
+    @Override
+    public void sendVerifyPhoneNumberMessage(VerifyPhoneNumberTokenRequest requestDto) {
+        User userFromDb = userRepository.findByPhoneNumber(requestDto.phoneNumber());
+        if (userFromDb == null) {
+            throw new ApiAuthException("Phone number not found", "phoneNumber");
+        }
+        sendOtpSms(userFromDb);
+    }
+
+    @Override
+    public void verifyPhoneNumber(VerifyPhoneNumberRequest requestDto) {
+        User userFromDb = userRepository.findByPhoneNumberVerificationToken(requestDto.phoneNumberVerificationToken());
+        if (userFromDb == null) {
+            throw new ApiAuthException("Phone number verification token is invalid", "phoneNumberVerificationToken");
+        }
+        if (userFromDb.getPhoneNumberVerificationExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ApiAuthException("Otp is expired", "phoneNumberVerificationToken");
+        }
+        userFromDb.setPhoneNumberVerificationToken(null);
+        userFromDb.setPhoneNumberVerificationExpiryDate(null);
+        userFromDb.setPhoneNumberVerified(true);
+    }
+
     private void sendVerificationEmail(User user) {
-        String token = securityUtils.createRandomToken();
+        String token = tokenUtils.createRandomToken();
         user.setEmailVerificationToken(token);
         user.setEmailVerificationExpiryDate(LocalDateTime.now().plusMinutes(15));
-        userRepository.save(user);
 
         String verificationLink = mailVerificationLink + token;
 
@@ -319,14 +341,22 @@ public class AuthServiceImpl implements AuthService{
         );
     }
 
-    private void sendOtpSms(User user) {
-        String otp = securityUtils.createOtp();
+    private void send2faSms(User user) {
+        String otp = tokenUtils.createOtp();
         user.setTwoFactorAuthToken(otp);
-        user.setTwoFactorAuthExpiryDate(LocalDateTime.now().plusMinutes(10));
-        userRepository.save(user);
+        user.setTwoFactorAuthExpiryDate(LocalDateTime.now().plusMinutes(5));
 
         smsService.sendSms("+48"+user.getPhoneNumber(), fromPhoneNumber,
                 "Kod logowania do Aurorum Clinic : " + otp);
+    }
+
+    private void sendOtpSms(User user) {
+        String otp = tokenUtils.createOtp();
+        user.setPhoneNumberVerificationToken(otp);
+        user.setPhoneNumberVerificationExpiryDate(LocalDateTime.now().plusMinutes(5));
+
+        smsService.sendSms("+48"+user.getPhoneNumber(), fromPhoneNumber,
+                "Kod weryfikacyjny numeru telefonu w Aurorum Clinic : " + otp);
     }
 
 }

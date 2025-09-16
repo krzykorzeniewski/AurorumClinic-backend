@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.shared;
+package pl.edu.pja.aurorumclinic.features.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
-public class SecurityUtils {
+public class JwtUtils {
 
     @Value("${jwt.secret}")
     private String secret;
@@ -62,23 +62,5 @@ public class SecurityUtils {
                 .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(jwt);
-    }
-
-    public String createRefreshToken() {
-        SecureRandom secureRandom = new SecureRandom();
-        byte[] bytes = new byte[32];
-        secureRandom.nextBytes(bytes);
-        return Encoders.BASE64.encode(bytes);
-    }
-
-    public String createOtp() {
-        return String.format("%06d",new SecureRandom().nextInt(999999));
-    }
-
-    public String createRandomToken() {
-        byte[] bytes = new byte[32];
-        SecureRandom rng = new SecureRandom();
-        rng.nextBytes(bytes);
-        return Encoders.BASE64URL.encode(bytes);
     }
 }

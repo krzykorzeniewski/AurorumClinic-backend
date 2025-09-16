@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.auth;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.request.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.response.*;
@@ -42,6 +43,18 @@ public class AuthController {
     @GetMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
         authService.verifyUserEmail(token);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/verify-phone-number-token")
+    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberTokenRequest requestDto) {
+        authService.sendVerifyPhoneNumberMessage(requestDto);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/verify-phone-number")
+    public ResponseEntity<?> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto) {
+        authService.verifyPhoneNumber(requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -136,8 +149,8 @@ public class AuthController {
     }
 
     @GetMapping("/basic-info")
-    public ResponseEntity<?> getBasicUserInfo(@CookieValue("Access-Token") String accessToken) {
-        return ResponseEntity.ok(ApiResponse.success(authService.getBasicUserInfo(accessToken)));
+    public ResponseEntity<?> getBasicUserInfo(Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.success(authService.getBasicUserInfo(authentication)));
     }
 
 }

@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.shared;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -64,6 +65,15 @@ public class GlobalExceptionResolver {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
         return ApiResponse.fail(Map.of("role", "Access is denied"));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        String fieldAndMessage = ex.getDetailMessageArguments()[1].toString();
+        String field = fieldAndMessage.split(":")[0];
+        String message = fieldAndMessage.split(":")[1].trim();
+        return ApiResponse.fail(Map.of(field, message));
     }
 
 }
