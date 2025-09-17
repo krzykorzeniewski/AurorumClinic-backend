@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailTokenRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberTokenRequest;
 import pl.edu.pja.aurorumclinic.features.users.services.UserService;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
@@ -34,10 +35,18 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @PostMapping("/{id}/phone-number-update-token")
+    @PreAuthorize("#id == authentication.principal")
+    public ResponseEntity<?> updateUserPhoneNumberToken(@PathVariable Long id,
+                                                      @Valid @RequestBody UpdateUserPhoneNumberTokenRequest requestDto) {
+        userService.sendUpdateSms(id, requestDto);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
     @PutMapping("/{id}/phone-number")
     @PreAuthorize("#id == authentication.principal")
     public ResponseEntity<?> updateUserPhoneNumber(@PathVariable Long id,
-                                                      @Valid @RequestBody UpdateUserPhoneNumberRequest requestDto) {
+                                             @Valid @RequestBody UpdateUserPhoneNumberRequest requestDto) {
         userService.updateUserPhoneNumber(id, requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }

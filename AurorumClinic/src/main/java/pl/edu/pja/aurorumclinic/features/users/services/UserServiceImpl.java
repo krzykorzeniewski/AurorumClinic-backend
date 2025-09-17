@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailTokenRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberTokenRequest;
 import pl.edu.pja.aurorumclinic.shared.TokenUtils;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
@@ -40,7 +41,7 @@ public class UserServiceImpl implements UserService{
     public void sendUpdateEmail(Long id, UpdateUserEmailTokenRequest requestDto) {
         String newEmail = requestDto.email();
         User userFromDb = userRepository.findById(id).orElseThrow(
-                () -> new ApiException("Id not found", "id")
+                () -> new ApiNotFoundException("Id not found", "id")
         );
         if (userRepository.existsByEmail(newEmail)) {
             throw new ApiException("Email is already taken", "email");
@@ -62,16 +63,45 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void updateUserPhoneNumber(Long id, UpdateUserPhoneNumberRequest requestDto) {
+        User userFromDb = userRepository.findByIdAndPhoneNumberUpdateToken(id, requestDto.otp());
+        if (userFromDb == null) {
+            throw new ApiNotFoundException("User not found", "id, token");
+        }
+        if (userFromDb.getPhoneNumberUpdateExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ApiException("Token is expired", "token");
+        }
+        userFromDb.setPhoneNumber(userFromDb.getPendingPhoneNumber());
+        userFromDb.setPendingPhoneNumber(null);
+        userFromDb.setPhoneNumberUpdateToken(null);
+        userFromDb.setPhoneNumberUpdateExpiryDate(null);
+    }
+
+    @Override
+    public void sendUpdateSms(Long id, UpdateUserPhoneNumberTokenRequest requestDto) {
+        String newNumber = requestDto.phoneNumber();
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
+        if (userRepository.existsByPhoneNumber(newNumber)) {
+            throw new ApiException("Phone number is already taken", "phoneNumber");
+        }
+        if (!userFromDb.isPhoneNumberVerified()) {
+            throw new ApiException("User phone number is not verified", "user");
+        }
+        String otp = tokenUtils.createOtp();
+        userFromDb.setPendingPhoneNumber(newNumber);
+        userFromDb.setPhoneNumberUpdateToken(otp);
+        userFromDb.setPhoneNumberUpdateExpiryDate(LocalDateTime.now().plusMinutes(15));
+
+        smsService.sendSms("+48"+newNumber, fromPhoneNumber,
+                "Kod weryfikacyjny zmiany numeru telefonu w Aurorum Clinic : " + otp);
     }
 
     @Override
     public void updateUserEmail(Long id, UpdateUserEmailRequest requestDto) {
         User userFromDb = userRepository.findByIdAndEmailUpdateToken(id, requestDto.token());
         if (userFromDb == null) {
-            throw new ApiException("User not found", "id, token");
+            throw new ApiNotFoundException("User not found", "id, token");
         }
         if (userFromDb.getEmailUpdateExpiryDate().isBefore(LocalDateTime.now())) {
             throw new ApiException("Token is expired", "token");
