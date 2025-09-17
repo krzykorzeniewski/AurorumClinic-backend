@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.users.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
@@ -43,8 +44,9 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAccount(@PathVariable Long id, Authentication authentication) {
-        patientService.deletePatient(id, authentication);
+    @PreAuthorize("#id == authentication.principal")
+    public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
+        patientService.deletePatient(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

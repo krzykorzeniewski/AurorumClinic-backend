@@ -4,7 +4,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +34,7 @@ public class AuthServiceImpl implements AuthService{
     private final SmsService smsService;
     private final TokenUtils tokenUtils;
 
-    @Value("${mail.verification-link}")
+    @Value("${mail.frontend.verification-link}")
     private String mailVerificationLink;
 
     @Value("${mail.frontend.password-reset-link}")

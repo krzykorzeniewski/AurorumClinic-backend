@@ -118,6 +118,29 @@ public class User implements UserDetails {
     @Column(name = "Two_Factor_Auth_Expiry_Date", columnDefinition = "datetime2(5)")
     private LocalDateTime twoFactorAuthExpiryDate;
 
+    @Column(name = "Email_Update_Token", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    private String emailUpdateToken;
+
+    @Column(name = "Email_Update_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime emailUpdateExpiryDate;
+
+    @Column(name = "Phone_Number_Update_Token", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    private String phoneNumberUpdateToken;
+
+    @Column(name = "Phone_Number_Update_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime phoneNumberUpdateExpiryDate;
+
+    @Column(name = "Pending_Email", columnDefinition = "nvarchar(100)")
+    @Email(message = "Invalid email format")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    private String pendingEmail;
+
+    @Column(name = "Pending_Phone_Number", columnDefinition = "nvarchar(9)")
+    @Size(min = 9, max = 9, message = "Required length for this field is 9 characters")
+    private String pendingPhoneNumber;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -125,6 +148,6 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return String.valueOf(id);
     }
 }

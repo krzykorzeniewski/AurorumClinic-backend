@@ -3,7 +3,6 @@ package pl.edu.pja.aurorumclinic.features.auth;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.request.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.response.*;

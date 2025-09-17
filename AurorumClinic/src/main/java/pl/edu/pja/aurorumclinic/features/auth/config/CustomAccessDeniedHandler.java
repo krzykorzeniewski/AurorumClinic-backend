@@ -22,7 +22,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        ApiResponse<?> apiResponse = ApiResponse.fail(Map.of("role", "access is denied"));
+        ApiResponse<?> apiResponse = ApiResponse.fail(Map.of("authority", "access is denied"));
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));

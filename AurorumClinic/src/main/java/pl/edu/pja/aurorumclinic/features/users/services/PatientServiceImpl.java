@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.users.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
@@ -17,6 +18,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
@@ -81,13 +83,10 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public void deletePatient(Long id, Authentication authentication) {
+    public void deletePatient(Long id) {
         Patient patientFromDb = patientRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-//        if (!Objects.equals(authentication.getPrincipal(), patientFromDb.getEmail())) {
-//            throw new ApiException("Id does not correspond to the user's id", "id");
-//        }
         patientRepository.delete(patientFromDb);
     }
 

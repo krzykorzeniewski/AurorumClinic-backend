@@ -3,7 +3,6 @@ package pl.edu.pja.aurorumclinic.features.auth;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.codec.Utf8;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 
 import javax.crypto.SecretKey;
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -32,7 +30,7 @@ public class JwtUtils {
                 .and()
                 .claims()
                     .issuer(issuer)
-                    .subject(user.getUsername())
+                    .subject(String.valueOf(user.getId()))
                     .add("role", user.getRole().name())
                     .expiration(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
                 .and()
@@ -45,9 +43,9 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(bytes);
     }
 
-    public String getEmailFromJwt(String jwt) {
+    public Long getUserIdFromJwt(String jwt) {
         Jws<Claims> claims = validateJwt(jwt);
-        return claims.getPayload().getSubject();
+        return Long.valueOf(claims.getPayload().getSubject());
     }
 
     public String getRoleFromJwt(String jwt) {

@@ -40,10 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String emailFromJwt;
+        Long userIdFromJwt;
         String roleFromJwt;
         try {
-            emailFromJwt = jwtUtils.getEmailFromJwt(jwt);
+            userIdFromJwt = jwtUtils.getUserIdFromJwt(jwt);
             roleFromJwt = jwtUtils.getRoleFromJwt(jwt);
         } catch (JwtException jwtException) {
             if (jwtException instanceof ExpiredJwtException) {
@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new ApiAuthException("Invalid access token", "accessToken");
         }
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
-                emailFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))
+                userIdFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))
         );
         SecurityContext newContext = SecurityContextHolder.createEmptyContext();
         newContext.setAuthentication(authenticationToken);
