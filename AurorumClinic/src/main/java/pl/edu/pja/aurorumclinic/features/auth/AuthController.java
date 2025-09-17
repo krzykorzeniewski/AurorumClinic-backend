@@ -123,7 +123,7 @@ public class AuthController {
                 .body(ApiResponse.success(responseDto));
     }
 
-    @PostMapping("/2fa-token")
+    @PostMapping("/login-2fa-token")
     public ResponseEntity<?> get2faToken(@Valid @RequestBody TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
         authService.send2faToken(twoFactorAuthTokenRequest);
         return ResponseEntity.ok(ApiResponse.success(null));

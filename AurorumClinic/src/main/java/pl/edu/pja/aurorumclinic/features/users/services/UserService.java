@@ -1,10 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.users.services;
 
-import jakarta.validation.Valid;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailTokenRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberTokenRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.*;
 
 public interface UserService {
 
@@ -15,4 +11,8 @@ public interface UserService {
     void sendUpdateSms(Long id, UpdateUserPhoneNumberTokenRequest requestDto);
 
     void updateUserEmail(Long id, UpdateUserEmailRequest requestDto);
+
+    void send2faSms(Long id, UpdateUser2FATokenRequest requestDto);
+
+    void updateUser2fa(Long id, UpdateUser2FARequest requestDto);
 }

@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailTokenRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberTokenRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.*;
 import pl.edu.pja.aurorumclinic.features.users.services.UserService;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
@@ -18,6 +15,22 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping("/{id}/2fa-token")
+    @PreAuthorize("#id == authentication.principal")
+    public ResponseEntity<?> set2faToken(@PathVariable Long id,
+                                                  @Valid @RequestBody UpdateUser2FATokenRequest requestDto) {
+        userService.send2faSms(id, requestDto);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PutMapping("/{id}/2fa")
+    @PreAuthorize("#id == authentication.principal")
+    public ResponseEntity<?> setUser2fa(@PathVariable Long id,
+                                             @Valid @RequestBody UpdateUser2FARequest requestDto) {
+        userService.updateUser2fa(id, requestDto);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 
     @PostMapping("/{id}/email-update-token")
     @PreAuthorize("#id == authentication.principal")

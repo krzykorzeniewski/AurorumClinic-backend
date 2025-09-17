@@ -141,6 +141,13 @@ public class User implements UserDetails {
     @Size(min = 9, max = 9, message = "Required length for this field is 9 characters")
     private String pendingPhoneNumber;
 
+    @Column(name = "Two_Factor_Auth_Update_Token", columnDefinition = "nvarchar(6)")
+    @Size(max = 6, message = "Maximum length for this field is 6 characters")
+    private String twoFactorAuthUpdateToken;
+
+    @Column(name = "Two_Factor_Auth_Update_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime twoFactorAuthUpdateExpiryDate;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

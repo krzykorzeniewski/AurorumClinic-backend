@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserEmailTokenRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberRequest;
-import pl.edu.pja.aurorumclinic.features.users.dtos.request.UpdateUserPhoneNumberTokenRequest;
+import pl.edu.pja.aurorumclinic.features.users.dtos.request.*;
 import pl.edu.pja.aurorumclinic.shared.TokenUtils;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
@@ -17,6 +14,7 @@ import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -86,7 +84,7 @@ public class UserServiceImpl implements UserService{
             throw new ApiException("Phone number is already taken", "phoneNumber");
         }
         if (!userFromDb.isPhoneNumberVerified()) {
-            throw new ApiException("User phone number is not verified", "user");
+            throw new ApiException("Phone number is not verified", "phoneNumber");
         }
         String otp = tokenUtils.createOtp();
         userFromDb.setPendingPhoneNumber(newNumber);
@@ -110,5 +108,42 @@ public class UserServiceImpl implements UserService{
         userFromDb.setPendingEmail(null);
         userFromDb.setEmailUpdateToken(null);
         userFromDb.setEmailUpdateExpiryDate(null);
+    }
+
+    @Override
+    public void send2faSms(Long id, UpdateUser2FATokenRequest requestDto) {
+        User userFromDb = userRepository.findById(id).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        if (!Objects.equals(userFromDb.getPhoneNumber(), requestDto.phoneNumber())) {
+            throw new ApiException("User phone number doest not match", "phoneNumber");
+        }
+        if (!userFromDb.isPhoneNumberVerified()) {
+            throw new ApiException("Phone number is not verified", "phoneNumber");
+        }
+        if (userFromDb.isTwoFactorAuth()) {
+            throw new ApiException("Phone number already has 2fa enabled", "phoneNumber");
+        }
+        String otp = tokenUtils.createOtp();
+        userFromDb.setTwoFactorAuthUpdateToken(otp);
+        userFromDb.setTwoFactorAuthUpdateExpiryDate(LocalDateTime.now().plusMinutes(10));
+
+        smsService.sendSms("+48"+userFromDb.getPhoneNumber(), fromPhoneNumber,
+                "Kod weryfikacyjny do ustawienia " +
+                        "uwierzytelniania dwuskładnikowego w Aurorum Clinic : " + otp);
+    }
+
+    @Override
+    public void updateUser2fa(Long id, UpdateUser2FARequest request) {
+        User userFromDb = userRepository.findByIdAndTwoFactorAuthUpdateToken(id, request.otp());
+        if (userFromDb == null) {
+            throw new ApiNotFoundException("User not found", "id, otp");
+        }
+        if (userFromDb.getTwoFactorAuthUpdateExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ApiException("Token is expired", "token");
+        }
+        userFromDb.setTwoFactorAuth(true);
+        userFromDb.setTwoFactorAuthUpdateToken(null);
+        userFromDb.setTwoFactorAuthUpdateExpiryDate(null);
     }
 }
