@@ -33,7 +33,7 @@ public class JwtUtils {
                     .issuer(issuer)
                     .subject(String.valueOf(user.getId()))
                     .add("role", user.getRole().name())
-                    .expiration(Date.from(Instant.now().plus(30, ChronoUnit.SECONDS)))
+                    .expiration(Date.from(Instant.now().plus(15, ChronoUnit.MINUTES)))
                 .and()
                 .signWith(getSecretKey())
                 .compact();
@@ -57,7 +57,7 @@ public class JwtUtils {
     public Jws<Claims> validateJwt(String jwt) {
         return Jwts.parser()
                 .requireIssuer(issuer)
-//                .clockSkewSeconds(120)
+                .clockSkewSeconds(120)
                 .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(jwt);
@@ -67,7 +67,7 @@ public class JwtUtils {
         try {
             Jws<Claims> claims = Jwts.parser()
                     .requireIssuer(issuer)
-//                .clockSkewSeconds(120)
+                .clockSkewSeconds(120)
                     .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(jwt);
