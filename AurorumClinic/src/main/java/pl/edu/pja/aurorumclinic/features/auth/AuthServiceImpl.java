@@ -285,6 +285,9 @@ public class AuthServiceImpl implements AuthService{
         if (userFromDb == null) {
             throw new ApiAuthException("Email not found", "email");
         }
+        if (userFromDb.isEmailVerified()) {
+            throw new ApiException("Email is already verified", "email");
+        }
         sendVerificationEmail(userFromDb);
     }
 
@@ -311,6 +314,9 @@ public class AuthServiceImpl implements AuthService{
         }
         if (!Objects.equals(userFromDb.getId(), authentication.getPrincipal())) {
             throw new AuthorizationDeniedException("Access denied");
+        }
+        if (userFromDb.isPhoneNumberVerified()) {
+            throw new ApiException("Phone number is already verified", "phoneNumber");
         }
         sendPhoneNumberVerificationSms(userFromDb);
     }

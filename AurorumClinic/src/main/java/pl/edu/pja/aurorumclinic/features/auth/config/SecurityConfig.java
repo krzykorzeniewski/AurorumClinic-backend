@@ -40,9 +40,12 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain refreshAccessTokenAndLoginSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain authFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .securityMatcher("/api/auth/refresh", "/api/auth/login")
+                .securityMatcher("/api/auth/refresh", "/api/auth/login", "/api/auth/register-employee",
+                        "/api/auth/register-patient", "/api/auth/register-doctor", "/api/auth/reset-password-token",
+                        "/api/auth/reset-password", "/api/auth/login-2fa", "/api/auth/login-2fa-token",
+                        "/api/auth/verify-email", "/api/auth/verify-email-token")
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -65,7 +68,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/api/newsletter/**").permitAll()
                         .requestMatchers("/api/appointments/unregistered").permitAll()

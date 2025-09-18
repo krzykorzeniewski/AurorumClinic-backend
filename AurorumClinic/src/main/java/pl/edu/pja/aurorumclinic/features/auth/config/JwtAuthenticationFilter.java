@@ -34,6 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = null;
         if (WebUtils.getCookie(request, "Access-Token") != null) {
             jwt = WebUtils.getCookie(request, "Access-Token").getValue();
+        } else {
+            throw new ApiAuthException("Access-Token cookie not present", "cookie");
         }
         if (jwt == null) {
             filterChain.doFilter(request, response);
