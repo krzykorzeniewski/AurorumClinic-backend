@@ -22,7 +22,6 @@ public class SmsServiceImpl implements SmsService {
                 new PhoneNumber(from),
                 text
         ).create();
-        System.out.println("sms sent");
     }
 
 }

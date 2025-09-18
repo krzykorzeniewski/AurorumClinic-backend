@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,7 +20,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 
@@ -28,6 +28,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final UserRepository userRepository;
@@ -39,9 +40,12 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain refreshAccessTokenAndLoginSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain authFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .securityMatcher("/api/auth/refresh", "/api/auth/login")
+                .securityMatcher("/api/auth/refresh", "/api/auth/login", "/api/auth/register-employee",
+                        "/api/auth/register-patient", "/api/auth/register-doctor", "/api/auth/reset-password-token",
+                        "/api/auth/reset-password", "/api/auth/login-2fa", "/api/auth/login-2fa-token",
+                        "/api/auth/verify-email", "/api/auth/verify-email-token")
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -64,7 +68,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/api/newsletter/**").permitAll()
                         .requestMatchers("/api/appointments/unregistered").permitAll()
@@ -84,21 +87,9 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            User userFromDb = userRepository.findByEmail(username);
-            if (userFromDb == null) {
-                throw new UsernameNotFoundException("Email not found: " + username);
-            }
-            return userFromDb;
-        };
     }
 
     @Bean
@@ -106,6 +97,15 @@ public class SecurityConfig {
         FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>(filter);
         registration.setEnabled(false);
         return registration;
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return id -> {
+            return userRepository.findById(Long.valueOf(id)).orElseThrow(
+                    () -> new UsernameNotFoundException("Id not found")
+            );
+        };
     }
 
     @Bean

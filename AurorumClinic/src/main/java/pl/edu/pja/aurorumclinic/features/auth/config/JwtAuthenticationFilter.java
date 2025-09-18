@@ -34,16 +34,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = null;
         if (WebUtils.getCookie(request, "Access-Token") != null) {
             jwt = WebUtils.getCookie(request, "Access-Token").getValue();
+        } else {
+            throw new ApiAuthException("Access-Token cookie not present", "cookie");
         }
         if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String emailFromJwt;
+        Long userIdFromJwt;
         String roleFromJwt;
         try {
-            emailFromJwt = jwtUtils.getEmailFromJwt(jwt);
+            userIdFromJwt = jwtUtils.getUserIdFromJwt(jwt);
             roleFromJwt = jwtUtils.getRoleFromJwt(jwt);
         } catch (JwtException jwtException) {
             if (jwtException instanceof ExpiredJwtException) {
@@ -52,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new ApiAuthException("Invalid access token", "accessToken");
         }
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
-                emailFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))
+                userIdFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))
         );
         SecurityContext newContext = SecurityContextHolder.createEmptyContext();
         newContext.setAuthentication(authenticationToken);

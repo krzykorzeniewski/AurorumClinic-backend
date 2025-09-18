@@ -46,15 +46,18 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+
     @PostMapping("/verify-phone-number-token")
-    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberTokenRequest requestDto) {
-        authService.sendVerifyPhoneNumberMessage(requestDto);
+    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberTokenRequest requestDto,
+                                                       Authentication authentication) {
+        authService.sendVerifyPhoneNumberMessage(requestDto, authentication);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/verify-phone-number")
-    public ResponseEntity<?> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto) {
-        authService.verifyPhoneNumber(requestDto);
+    public ResponseEntity<?> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto,
+                                               Authentication authentication) {
+        authService.verifyPhoneNumber(requestDto, authentication);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -124,7 +127,7 @@ public class AuthController {
                 .body(ApiResponse.success(responseDto));
     }
 
-    @PostMapping("/2fa-token")
+    @PostMapping("/login-2fa-token")
     public ResponseEntity<?> get2faToken(@Valid @RequestBody TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
         authService.send2faToken(twoFactorAuthTokenRequest);
         return ResponseEntity.ok(ApiResponse.success(null));

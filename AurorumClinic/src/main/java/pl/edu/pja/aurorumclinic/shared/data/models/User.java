@@ -90,8 +90,8 @@ public class User implements UserDetails {
     @Column(name = "Phone_Number_Verified", columnDefinition = "bit")
     private boolean phoneNumberVerified = false;
 
-    @Column(name = "Phone_Number_Verification_Token", columnDefinition = "nvarchar(6)")
-    @Size(max = 6, message = "Maximum length for this field is 6 characters")
+    @Column(name = "Phone_Number_Verification_Token", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
     private String phoneNumberVerificationToken;
 
     @Column(name = "Phone_Number_Verification_Expiry_Date", columnDefinition = "datetime2(5)")
@@ -111,12 +111,42 @@ public class User implements UserDetails {
     @Column(name = "Password_Reset_Expiry_Date", columnDefinition = "datetime2(5)")
     private LocalDateTime passwordResetExpiryDate;
 
-    @Column(name = "Two_Factor_Auth_Token", columnDefinition = "nvarchar(6)")
-    @Size(min = 6, max = 6, message = "Required length for this field is 6 characters")
+    @Column(name = "Two_Factor_Auth_Token", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Required length for this field is 100 characters")
     private String twoFactorAuthToken;
 
     @Column(name = "Two_Factor_Auth_Expiry_Date", columnDefinition = "datetime2(5)")
     private LocalDateTime twoFactorAuthExpiryDate;
+
+    @Column(name = "Email_Update_Token", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    private String emailUpdateToken;
+
+    @Column(name = "Email_Update_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime emailUpdateExpiryDate;
+
+    @Column(name = "Phone_Number_Update_Token", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    private String phoneNumberUpdateToken;
+
+    @Column(name = "Phone_Number_Update_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime phoneNumberUpdateExpiryDate;
+
+    @Column(name = "Pending_Email", columnDefinition = "nvarchar(100)")
+    @Email(message = "Invalid email format")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    private String pendingEmail;
+
+    @Column(name = "Pending_Phone_Number", columnDefinition = "nvarchar(9)")
+    @Size(min = 9, max = 9, message = "Required length for this field is 9 characters")
+    private String pendingPhoneNumber;
+
+    @Column(name = "Two_Factor_Auth_Update_Token", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    private String twoFactorAuthUpdateToken;
+
+    @Column(name = "Two_Factor_Auth_Update_Expiry_Date", columnDefinition = "datetime2(5)")
+    private LocalDateTime twoFactorAuthUpdateExpiryDate;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -125,6 +155,6 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return String.valueOf(id);
     }
 }

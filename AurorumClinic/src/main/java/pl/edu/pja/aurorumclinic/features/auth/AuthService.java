@@ -19,6 +19,6 @@ public interface AuthService {
     TwoFactorAuthLoginResponse loginUserWithTwoFactorAuth(TwoFactorAuthLoginRequest requestDto);
     void sendVerifyUserAccountEmail(VerifyEmailTokenRequest verifyEmailTokenRequest);
     void send2faToken(TwoFactorAuthTokenRequest twoFactorAuthTokenRequest);
-    void sendVerifyPhoneNumberMessage(VerifyPhoneNumberTokenRequest requestDto);
-    void verifyPhoneNumber(VerifyPhoneNumberRequest requestDto);
+    void sendVerifyPhoneNumberMessage(VerifyPhoneNumberTokenRequest requestDto, Authentication authentication);
+    void verifyPhoneNumber(VerifyPhoneNumberRequest requestDto, Authentication authentication);
 }
