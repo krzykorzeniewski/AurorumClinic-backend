@@ -1,6 +1,7 @@
 package pl.edu.pja.aurorumclinic.features.auth;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -32,7 +33,7 @@ public class JwtUtils {
                     .issuer(issuer)
                     .subject(String.valueOf(user.getId()))
                     .add("role", user.getRole().name())
-                    .expiration(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
+                    .expiration(Date.from(Instant.now().plus(30, ChronoUnit.SECONDS)))
                 .and()
                 .signWith(getSecretKey())
                 .compact();
@@ -56,9 +57,24 @@ public class JwtUtils {
     public Jws<Claims> validateJwt(String jwt) {
         return Jwts.parser()
                 .requireIssuer(issuer)
-                .clockSkewSeconds(120)
+//                .clockSkewSeconds(120)
                 .verifyWith(getSecretKey())
                 .build()
                 .parseSignedClaims(jwt);
+    }
+
+    public Long getUserIdFromExpiredJwt(String jwt) {
+        try {
+            Jws<Claims> claims = Jwts.parser()
+                    .requireIssuer(issuer)
+//                .clockSkewSeconds(120)
+                    .verifyWith(getSecretKey())
+                    .build()
+                    .parseSignedClaims(jwt);
+            return Long.valueOf(claims.getPayload().getSubject());
+        } catch (ExpiredJwtException e) {
+            Claims claims = e.getClaims();
+            return Long.valueOf(claims.getSubject());
+        }
     }
 }

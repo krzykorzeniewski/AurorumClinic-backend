@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.auth;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.request.*;
 import pl.edu.pja.aurorumclinic.features.auth.dtos.response.*;
@@ -45,15 +46,18 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+
     @PostMapping("/verify-phone-number-token")
-    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberTokenRequest requestDto) {
-        authService.sendVerifyPhoneNumberMessage(requestDto);
+    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberTokenRequest requestDto,
+                                                       Authentication authentication) {
+        authService.sendVerifyPhoneNumberMessage(requestDto, authentication);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/verify-phone-number")
-    public ResponseEntity<?> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto) {
-        authService.verifyPhoneNumber(requestDto);
+    public ResponseEntity<?> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto,
+                                               Authentication authentication) {
+        authService.verifyPhoneNumber(requestDto, authentication);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
