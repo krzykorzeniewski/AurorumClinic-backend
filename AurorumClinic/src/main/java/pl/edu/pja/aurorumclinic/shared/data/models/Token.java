@@ -13,10 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Token",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"FK_User", "Name"})
-        })
+@Table(name = "Token")
 @Data
 @Builder
 @NoArgsConstructor

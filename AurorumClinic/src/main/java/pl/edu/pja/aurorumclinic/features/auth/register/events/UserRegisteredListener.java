@@ -1,11 +1,10 @@
-package pl.edu.pja.aurorumclinic.features.auth.register;
+package pl.edu.pja.aurorumclinic.features.auth.register.events;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
-import pl.edu.pja.aurorumclinic.shared.data.TokenRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
@@ -13,7 +12,7 @@ import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 
 @Component
 @RequiredArgsConstructor
-public class UserRegisteredEventListener {
+public class UserRegisteredListener {
 
     private final TokenService tokenService;
     private final EmailService emailService;

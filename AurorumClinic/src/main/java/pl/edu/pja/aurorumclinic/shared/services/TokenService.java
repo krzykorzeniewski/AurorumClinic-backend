@@ -13,6 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class TokenService {
     @Transactional
     public Token createToken(User user, TokenName tokenName, long minutesValid) {
         String tokenValue = createRandomToken();
+        deletePreviousTokens(user.getTokens(), tokenName);
         return tokenRepository.save(Token.builder()
                 .rawValue(tokenValue)
                 .value(passwordEncoder.encode(tokenValue))
@@ -47,6 +49,7 @@ public class TokenService {
     @Transactional
     public Token createOtpToken(User user, TokenName tokenName, long minutesValid) {
         String otp = createOtp();
+        deletePreviousTokens(user.getTokens(), tokenName);
         return tokenRepository.save(Token.builder()
                 .rawValue(otp)
                 .value(passwordEncoder.encode(otp))
@@ -67,6 +70,14 @@ public class TokenService {
             throw new ApiException("Verification token is expired", "token");
         }
         tokenRepository.delete(token);
+    }
+
+    @Transactional
+    protected void deletePreviousTokens(List<Token> userTokens, TokenName tokenName) {
+        List<Token> tokensToDelete = userTokens.stream().filter(
+                token -> token.getName().equals(tokenName)
+        ).toList();
+        tokenRepository.deleteAll(tokensToDelete);
     }
 
 }

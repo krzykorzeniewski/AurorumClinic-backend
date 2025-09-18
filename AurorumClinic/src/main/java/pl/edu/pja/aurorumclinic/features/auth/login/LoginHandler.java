@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaLoginEvent;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthException;
 import pl.edu.pja.aurorumclinic.features.auth.shared.JwtUtils;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
@@ -52,19 +53,6 @@ public class LoginHandler {
             throw new ApiAuthException("Email is not verified", "email");
         }
 
-        if (userFromDb.isTwoFactorAuth()) {
-            applicationEventPublisher.publishEvent(new MfaLoginEvent(userFromDb));
-            return ResponseEntity.ok(ApiResponse.success(LoginUserResponse.builder()
-                    .userId(userFromDb.getId())
-                    .email(userFromDb.getEmail())
-                    .twoFactorAuth(userFromDb.isTwoFactorAuth())
-                    .role(userFromDb.getRole())
-                    .build()));
-        }
-
-        String jwt = jwtUtils.createJwt(userFromDb);
-        Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);
-
         LoginUserResponse responseDto =  LoginUserResponse.builder()
                 .userId(userFromDb.getId())
                 .email(userFromDb.getEmail())
@@ -72,21 +60,25 @@ public class LoginHandler {
                 .role(userFromDb.getRole())
                 .build();
 
-        if (responseDto.twoFactorAuth()) {
+        if (userFromDb.isTwoFactorAuth()) {
+            applicationEventPublisher.publishEvent(new MfaLoginEvent(userFromDb));
+            return ResponseEntity.ok(ApiResponse.success(responseDto));
+        } else {
+            String jwt = jwtUtils.createJwt(userFromDb);
+            Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);
+
+            HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", jwt)
+                    .path("/")
+                    .httpOnly(true)
+                    .build();
+            HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", refreshToken.getRawValue())
+                    .path("/")
+                    .httpOnly(true)
+                    .build();
             return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
                     .body(ApiResponse.success(responseDto));
         }
-        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", jwt)
-                .path("/")
-                .httpOnly(true)
-                .build();
-        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", refreshToken.getRawValue())
-                .path("/")
-                .httpOnly(true)
-                .build();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
-                .body(ApiResponse.success(responseDto));
     }
 
     public record LoginUserRequest(@NotBlank @Email @Size(max = 100) String email,
@@ -99,6 +91,5 @@ public class LoginHandler {
                                     boolean twoFactorAuth,
                                     UserRole role) {
     }
-
 
 }

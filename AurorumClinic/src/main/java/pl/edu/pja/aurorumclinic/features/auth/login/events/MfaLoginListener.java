@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.auth.login;
+package pl.edu.pja.aurorumclinic.features.auth.login.events;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +12,7 @@ import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
 @Component
 @RequiredArgsConstructor
-public class MfaLoginEventListener {
+public class MfaLoginListener {
 
     private final TokenService tokenService;
     private final SmsService smsService;

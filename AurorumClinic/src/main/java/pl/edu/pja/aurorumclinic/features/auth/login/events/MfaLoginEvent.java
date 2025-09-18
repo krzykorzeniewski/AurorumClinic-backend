@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.auth.login;
+package pl.edu.pja.aurorumclinic.features.auth.login.events;
 
 import org.springframework.context.ApplicationEvent;
 
