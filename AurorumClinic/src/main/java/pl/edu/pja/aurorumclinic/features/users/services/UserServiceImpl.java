@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService{
     public void updateUser2fa(Long id, UpdateUser2FARequest request) {
         User userFromDb = userRepository.findByIdAndTwoFactorAuthUpdateToken(id, request.otp());
         if (userFromDb == null) {
-            throw new ApiNotFoundException("User not found", "id, otp");
+            throw new ApiNotFoundException("User not found", "id, token");
         }
         if (userFromDb.getTwoFactorAuthUpdateExpiryDate().isBefore(LocalDateTime.now())) {
             throw new ApiException("Token is expired", "token");

@@ -256,7 +256,7 @@ public class AuthServiceImpl implements AuthService{
         User userFromDb = userRepository.findById(requestDto.userId()).orElseThrow(
                 () -> new ApiAuthException("User not found", "id")
         );
-        if (!passwordEncoder.matches(requestDto.otp(), userFromDb.getTwoFactorAuthToken())) {
+        if (!passwordEncoder.matches(requestDto.token(), userFromDb.getTwoFactorAuthToken())) {
             throw new ApiAuthException("Code is invalid", "otp");
         }
         if (userFromDb.getTwoFactorAuthExpiryDate().isBefore(LocalDateTime.now())) {
