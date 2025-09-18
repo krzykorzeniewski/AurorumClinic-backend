@@ -15,8 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
-import pl.edu.pja.aurorumclinic.features.auth.ApiAuthException;
-import pl.edu.pja.aurorumclinic.features.auth.JwtUtils;
+import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthException;
+import pl.edu.pja.aurorumclinic.features.auth.shared.JwtUtils;
 
 import java.io.IOException;
 import java.util.*;

@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.auth;
+package pl.edu.pja.aurorumclinic.features.auth.shared;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

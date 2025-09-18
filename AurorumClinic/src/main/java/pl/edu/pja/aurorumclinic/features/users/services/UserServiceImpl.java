@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthException;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.*;
-import pl.edu.pja.aurorumclinic.shared.TokenUtils;
+import pl.edu.pja.aurorumclinic.shared.data.models.Token;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
+import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
@@ -23,7 +26,7 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final EmailService emailService;
-    private final TokenUtils tokenUtils;
+    private final TokenService tokenService;
     private final SmsService smsService;
 
     @Value("${twilio.trial_number}")
@@ -44,12 +47,10 @@ public class UserServiceImpl implements UserService{
         if (userRepository.existsByEmail(newEmail)) {
             throw new ApiException("Email is already taken", "email");
         }
-        String token = tokenUtils.createRandomToken();
-        userFromDb.setEmailUpdateToken(token);
-        userFromDb.setEmailUpdateExpiryDate(LocalDateTime.now().plusMinutes(15));
+        Token token = tokenService.createToken(userFromDb, TokenName.EMAIL_UPDATE, 15);
         userFromDb.setPendingEmail(newEmail);
 
-        String verificationLink = mailUpdateLink + token;
+        String verificationLink = mailUpdateLink + token.getRawValue();
 
         emailService.sendEmail(
                 fromEmailAddress,
@@ -61,17 +62,12 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void updateUserPhoneNumber(Long id, UpdateUserPhoneNumberRequest requestDto) {
-        User userFromDb = userRepository.findByIdAndPhoneNumberUpdateToken(id, requestDto.otp());
-        if (userFromDb == null) {
-            throw new ApiNotFoundException("User not found", "id, token");
-        }
-        if (userFromDb.getPhoneNumberUpdateExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ApiException("Token is expired", "token");
-        }
+        User userFromDb = userRepository.findById(id).orElseThrow(
+                () -> new ApiNotFoundException("User not found", "id")
+        );
+        tokenService.validateAndDeleteToken(userFromDb, requestDto.otp());
         userFromDb.setPhoneNumber(userFromDb.getPendingPhoneNumber());
         userFromDb.setPendingPhoneNumber(null);
-        userFromDb.setPhoneNumberUpdateToken(null);
-        userFromDb.setPhoneNumberUpdateExpiryDate(null);
     }
 
     @Override
@@ -86,28 +82,21 @@ public class UserServiceImpl implements UserService{
         if (!userFromDb.isPhoneNumberVerified()) {
             throw new ApiException("Phone number is not verified", "phoneNumber");
         }
-        String otp = tokenUtils.createOtp();
+        Token token = tokenService.createOtpToken(userFromDb, TokenName.PHONE_NUMBER_UPDATE, 15);
         userFromDb.setPendingPhoneNumber(newNumber);
-        userFromDb.setPhoneNumberUpdateToken(otp);
-        userFromDb.setPhoneNumberUpdateExpiryDate(LocalDateTime.now().plusMinutes(15));
 
         smsService.sendSms("+48"+newNumber, fromPhoneNumber,
-                "Kod weryfikacyjny zmiany numeru telefonu w Aurorum Clinic : " + otp);
+                "Kod weryfikacyjny zmiany numeru telefonu w Aurorum Clinic : " + token.getRawValue());
     }
 
     @Override
     public void updateUserEmail(Long id, UpdateUserEmailRequest requestDto) {
-        User userFromDb = userRepository.findByIdAndEmailUpdateToken(id, requestDto.token());
-        if (userFromDb == null) {
-            throw new ApiNotFoundException("User not found", "id, token");
-        }
-        if (userFromDb.getEmailUpdateExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ApiException("Token is expired", "token");
-        }
+        User userFromDb = userRepository.findById(id).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        tokenService.validateAndDeleteToken(userFromDb, requestDto.token());
         userFromDb.setEmail(userFromDb.getPendingEmail());
         userFromDb.setPendingEmail(null);
-        userFromDb.setEmailUpdateToken(null);
-        userFromDb.setEmailUpdateExpiryDate(null);
     }
 
     @Override
@@ -124,26 +113,19 @@ public class UserServiceImpl implements UserService{
         if (userFromDb.isTwoFactorAuth()) {
             throw new ApiException("Phone number already has 2fa enabled", "phoneNumber");
         }
-        String otp = tokenUtils.createOtp();
-        userFromDb.setTwoFactorAuthUpdateToken(otp);
-        userFromDb.setTwoFactorAuthUpdateExpiryDate(LocalDateTime.now().plusMinutes(10));
+        Token token = tokenService.createOtpToken(userFromDb, TokenName.TWO_FACTOR_AUTH_UPDATE, 10);
 
         smsService.sendSms("+48"+userFromDb.getPhoneNumber(), fromPhoneNumber,
                 "Kod weryfikacyjny do ustawienia " +
-                        "uwierzytelniania dwuskładnikowego w Aurorum Clinic : " + otp);
+                        "uwierzytelniania dwuskładnikowego w Aurorum Clinic : " + token.getRawValue());
     }
 
     @Override
     public void updateUser2fa(Long id, UpdateUser2FARequest request) {
-        User userFromDb = userRepository.findByIdAndTwoFactorAuthUpdateToken(id, request.otp());
-        if (userFromDb == null) {
-            throw new ApiNotFoundException("User not found", "id, token");
-        }
-        if (userFromDb.getTwoFactorAuthUpdateExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ApiException("Token is expired", "token");
-        }
+        User userFromDb = userRepository.findById(id).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        tokenService.validateAndDeleteToken(userFromDb, request.otp());
         userFromDb.setTwoFactorAuth(true);
-        userFromDb.setTwoFactorAuthUpdateToken(null);
-        userFromDb.setTwoFactorAuthUpdateExpiryDate(null);
     }
 }
