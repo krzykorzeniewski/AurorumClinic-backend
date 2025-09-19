@@ -2,11 +2,11 @@ package pl.edu.pja.aurorumclinic.features.auth.login;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.*;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
 import pl.edu.pja.aurorumclinic.features.auth.shared.JwtUtils;

@@ -1,13 +1,13 @@
 package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -48,7 +48,7 @@ public class PatientServiceImpl implements PatientService {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         if (patientRepository.findByEmail(requestDto.email()) != patientFromDb) {
-            throw new ApiException("Email already in use", "email");
+            throw new ApiConflictException("Email already in use", "email");
         }
         patientFromDb.setPhoneNumber(requestDto.phoneNumber());
         patientFromDb.setEmail(requestDto.email());

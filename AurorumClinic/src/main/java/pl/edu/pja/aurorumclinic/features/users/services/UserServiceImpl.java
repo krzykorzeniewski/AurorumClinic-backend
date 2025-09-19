@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService{
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         if (userRepository.existsByEmail(newEmail)) {
-            throw new ApiException("Email is already taken", "email");
+            throw new ApiConflictException("Email is already taken", "email");
         }
         Token token = tokenService.createToken(userFromDb, TokenName.EMAIL_UPDATE, 15);
         userFromDb.setPendingEmail(newEmail);
@@ -75,7 +76,7 @@ public class UserServiceImpl implements UserService{
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         if (userRepository.existsByPhoneNumber(newNumber)) {
-            throw new ApiException("Phone number is already taken", "phoneNumber");
+            throw new ApiConflictException("Phone number is already taken", "phoneNumber");
         }
         if (!userFromDb.isPhoneNumberVerified()) {
             throw new ApiException("Phone number is not verified", "phoneNumber");

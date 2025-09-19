@@ -1,11 +1,10 @@
 package pl.edu.pja.aurorumclinic.features.auth.reset_password;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;

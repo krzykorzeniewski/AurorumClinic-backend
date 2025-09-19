@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .securityMatcher("/api/auth/refresh", "/api/auth/login", "/api/auth/register-employee",
                         "/api/auth/register-patient", "/api/auth/register-doctor", "/api/auth/reset-password-token",
                         "/api/auth/reset-password", "/api/auth/login-2fa", "/api/auth/login-2fa-token",
-                        "/api/auth/verify-email", "/api/auth/verify-email-token")
+                        "/api/auth/verify-email", "/api/auth/verify-email-token", "/api/appointments/unregistered")
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)

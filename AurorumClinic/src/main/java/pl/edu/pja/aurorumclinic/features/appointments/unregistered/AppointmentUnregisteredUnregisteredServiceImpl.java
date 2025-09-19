@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentValidator;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.*;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
+@Transactional
 public class AppointmentUnregisteredUnregisteredServiceImpl implements AppointmentUnregisteredService {
 
     private final AppointmentRepository appointmentRepository;
@@ -25,6 +28,10 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
     private final ServiceRepository serviceRepository;
     private final EmailService emailService;
     private final TokenService tokenService;
+    private final AppointmentValidator appointmentValidator;
+
+    @Value("${mail.backend.noreply-address}")
+    private String noreplyEmailAddres;
 
     @Value("${mail.frontend.appointment.unregistered-delete-link}")
     private String deleteAppointmentLink;
@@ -33,8 +40,30 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
     private String rescheduleAppointmentLink;
 
     @Override
-    @Transactional
     public void createAppointmentForUnregisteredUser(CreateAppointmentUnregisteredRequest createRequest) {
+        if (userRepository.findByEmail(createRequest.email()) != null) {
+            throw new ApiConflictException("An account is registered for this email", "email");
+        }
+        Service serviceFromDb = serviceRepository.findById(createRequest.serviceId()).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        Doctor doctorFromDb = (Doctor) userRepository.findById(createRequest.doctorId()).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        appointmentValidator.validateTimeSlot(createRequest.startedAt(),
+                createRequest.startedAt().plusMinutes(serviceFromDb.getDuration()),
+                doctorFromDb.getId(),
+                serviceFromDb.getId());
+        Appointment appointment = Appointment.builder()
+                .doctor(doctorFromDb)
+                .service(serviceFromDb)
+                .startedAt(createRequest.startedAt())
+                .finishedAt(createRequest.startedAt().plusMinutes(serviceFromDb.getDuration()))
+                .status(AppointmentStatus.CREATED)
+                .description(createRequest.description())
+                .build();
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
         Guest guest = Guest.builder()
                 .name(createRequest.name())
                 .surname(createRequest.surname())
@@ -42,48 +71,14 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
                 .birthdate(createRequest.birthDate())
                 .email(createRequest.email())
                 .phoneNumber(createRequest.phoneNumber())
+                .appointment(savedAppointment)
                 .build();
         Guest savedGuest = guestRepository.save(guest);
-        Service serviceFromDb = serviceRepository.findById(createRequest.serviceId()).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
-        );
-        Doctor doctorFromDb = (Doctor) userRepository.findById(createRequest.doctorId()).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
-        );
-        Appointment appointment = Appointment.builder()
-                .doctor(doctorFromDb)
-                .service(serviceFromDb)
-                .startedAt(createRequest.startedAt())
-                .finishedAt(createRequest.startedAt().plusMinutes(serviceFromDb.getDuration()))
-                .status(AppointmentStatus.CREATED)
-                .guest(savedGuest)
-                .description(createRequest.description())
-                .build();
-        if (appointmentRepository.timeSlotExists(appointment.getStartedAt(), appointment.getFinishedAt(),
-                appointment.getDoctor().getId(), appointment.getService().getId())) {
-            Appointment savedAppointment = appointmentRepository.save(appointment);
-            savedGuest.setAppointment(savedAppointment);
 
-            String appointmentDeleteToken = tokenService.createRandomToken();
-            savedGuest.setAppointmentDeleteToken(appointmentDeleteToken);
-            String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
-
-            String appointmentRescheduleToken = tokenService.createRandomToken();
-            savedGuest.setAppointmentRescheduleToken(appointmentRescheduleToken);
-            String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
-
-            emailService.sendEmail(
-                    "support@aurorumclinic.pl", savedGuest.getEmail(),
-                    "wizyta umówiona", "twoja wizyta została umówiona \n" +
-                            "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
-                            "aby ją przełożyć naciśnij link: " + rescheduleLink);
-        } else {
-            throw new ApiException("Timeslot is not available", "appointment");
-        }
+        sendConfirmationEmail(savedGuest);
     }
 
     @Override
-    @Transactional
     public void deleteAppointmentForUnregisteredUser(String token) {
         Guest guestFromDb = guestRepository.findByAppointmentDeleteToken(token);
         if (guestFromDb == null) {
@@ -96,7 +91,6 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
     }
 
     @Override
-    @Transactional
     public void rescheduleAppointmentForUnregisteredUser(String token, RescheduleAppointmentUnregisteredRequest rescheduleRequest) {
         Guest guestFromDb = guestRepository.findByAppointmentRescheduleToken(token);
         if (guestFromDb == null) {
@@ -105,30 +99,33 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
         if (guestFromDb.getAppointment().getStartedAt().isBefore(LocalDateTime.now())) {
             throw new ApiException("Appointment has already started", "token");
         }
+
         Appointment appointmentFromDb = guestFromDb.getAppointment();
-        if (appointmentRepository.timeSlotExists(rescheduleRequest.startedAt(),
+        appointmentValidator.validateTimeSlot(rescheduleRequest.startedAt(),
                 rescheduleRequest.startedAt().plusMinutes(appointmentFromDb.getService().getDuration()),
-                appointmentFromDb.getDoctor().getId(), appointmentFromDb.getService().getId())) {
+                appointmentFromDb.getDoctor().getId(),
+                appointmentFromDb.getService().getId());
 
-            appointmentFromDb.setStartedAt(rescheduleRequest.startedAt());
-            appointmentFromDb.setFinishedAt(rescheduleRequest.startedAt()
-                    .plusMinutes(appointmentFromDb.getService().getDuration()));
+        appointmentFromDb.setStartedAt(rescheduleRequest.startedAt());
+        appointmentFromDb.setFinishedAt(rescheduleRequest.startedAt()
+                .plusMinutes(appointmentFromDb.getService().getDuration()));
 
-            String appointmentDeleteToken = tokenService.createRandomToken();
-            guestFromDb.setAppointmentDeleteToken(appointmentDeleteToken);
-            String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
+        sendConfirmationEmail(guestFromDb);
+    }
 
-            String appointmentRescheduleToken = tokenService.createRandomToken();
-            guestFromDb.setAppointmentRescheduleToken(appointmentRescheduleToken);
-            String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
+    private void sendConfirmationEmail(Guest guest) {
+        String appointmentDeleteToken = tokenService.createRandomToken();
+        guest.setAppointmentDeleteToken(appointmentDeleteToken);
+        String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
 
-            emailService.sendEmail(
-                    "support@aurorumclinic.pl", guestFromDb.getEmail(),
-                    "wizyta przełożona", "twoja wizyta została przełożona \n" +
-                            "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
-                            "aby ją przełożyć naciśnij link: " + rescheduleLink);
-        } else {
-            throw new ApiException("Timeslot is not available", "appointment");
-        }
+        String appointmentRescheduleToken = tokenService.createRandomToken();
+        guest.setAppointmentRescheduleToken(appointmentRescheduleToken);
+        String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
+
+        emailService.sendEmail(
+                noreplyEmailAddres, guest.getEmail(),
+                "wizyta umówiona", "twoja wizyta została umówiona \n" +
+                        "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
+                        "aby ją przełożyć naciśnij link: " + rescheduleLink);
     }
 }

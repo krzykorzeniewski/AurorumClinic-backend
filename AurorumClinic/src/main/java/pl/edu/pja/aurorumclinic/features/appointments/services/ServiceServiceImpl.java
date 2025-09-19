@@ -1,10 +1,12 @@
 package pl.edu.pja.aurorumclinic.features.appointments.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
+@Transactional
 public class ServiceServiceImpl implements ServiceService {
 
     private final ServiceRepository serviceRepository;
