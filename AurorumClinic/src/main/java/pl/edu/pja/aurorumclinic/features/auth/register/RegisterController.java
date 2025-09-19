@@ -1,0 +1,51 @@
+package pl.edu.pja.aurorumclinic.features.auth.register;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class RegisterController {
+
+    private final RegisterService registerService;
+
+    @PostMapping("/register-employee")
+    public ResponseEntity<?> registerEmployee(@Valid @RequestBody RegisterEmployeeRequest requestDto) {
+        registerService.registerEmployee(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
+    }
+
+    @PostMapping("/register-patient")
+    public ResponseEntity<?> registerPatient(@Valid @RequestBody RegisterPatientRequest requestDto) {
+        registerService.registerPatient(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
+    }
+
+    @PostMapping("/register-doctor")
+    public ResponseEntity<?> registerDoctor(@Valid @RequestBody RegisterDoctorRequest requestDto) {
+        registerService.registerDoctor(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
+    }
+
+    @PostMapping("/verify-email-token")
+    public ResponseEntity<?> getVerifyEmailToken(@Valid @RequestBody VerifyEmailTokenRequest requestDto) {
+        registerService.sendVerifyEmail(requestDto);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyEmailRequest requestDto) {
+        registerService.verifyEmail(requestDto);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+}

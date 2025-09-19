@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.auth.dtos.request;
+package pl.edu.pja.aurorumclinic.features.auth.register.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

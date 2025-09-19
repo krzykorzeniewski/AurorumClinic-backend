@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
-import pl.edu.pja.aurorumclinic.shared.TokenUtils;
+import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
@@ -24,7 +24,7 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
     private final GuestRepository guestRepository;
     private final ServiceRepository serviceRepository;
     private final EmailService emailService;
-    private final TokenUtils tokenUtils;
+    private final TokenService tokenService;
 
     @Value("${mail.frontend.appointment.unregistered-delete-link}")
     private String deleteAppointmentLink;
@@ -64,11 +64,11 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
             Appointment savedAppointment = appointmentRepository.save(appointment);
             savedGuest.setAppointment(savedAppointment);
 
-            String appointmentDeleteToken = tokenUtils.createRandomToken();
+            String appointmentDeleteToken = tokenService.createRandomToken();
             savedGuest.setAppointmentDeleteToken(appointmentDeleteToken);
             String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
 
-            String appointmentRescheduleToken = tokenUtils.createRandomToken();
+            String appointmentRescheduleToken = tokenService.createRandomToken();
             savedGuest.setAppointmentRescheduleToken(appointmentRescheduleToken);
             String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
 
@@ -114,11 +114,11 @@ public class AppointmentUnregisteredUnregisteredServiceImpl implements Appointme
             appointmentFromDb.setFinishedAt(rescheduleRequest.startedAt()
                     .plusMinutes(appointmentFromDb.getService().getDuration()));
 
-            String appointmentDeleteToken = tokenUtils.createRandomToken();
+            String appointmentDeleteToken = tokenService.createRandomToken();
             guestFromDb.setAppointmentDeleteToken(appointmentDeleteToken);
             String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
 
-            String appointmentRescheduleToken = tokenUtils.createRandomToken();
+            String appointmentRescheduleToken = tokenService.createRandomToken();
             guestFromDb.setAppointmentRescheduleToken(appointmentRescheduleToken);
             String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
 

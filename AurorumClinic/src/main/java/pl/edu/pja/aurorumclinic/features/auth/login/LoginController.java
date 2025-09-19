@@ -1,81 +1,22 @@
-package pl.edu.pja.aurorumclinic.features.auth;
+package pl.edu.pja.aurorumclinic.features.auth.login;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.auth.dtos.request.*;
-import pl.edu.pja.aurorumclinic.features.auth.dtos.response.*;
+import pl.edu.pja.aurorumclinic.features.auth.login.dtos.*;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class LoginController {
 
-    private final AuthService authService;
-
-    @PostMapping("/register-employee")
-    public ResponseEntity<?> registerEmployee(@Valid @RequestBody RegisterEmployeeRequest requestDto) {
-        authService.registerEmployee(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
-    }
-
-    @PostMapping("/register-patient")
-    public ResponseEntity<?> registerPatient(@Valid @RequestBody RegisterPatientRequest requestDto) {
-        authService.registerPatient(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
-    }
-
-    @PostMapping("/register-doctor")
-    public ResponseEntity<?> registerDoctor(@Valid @RequestBody RegisterDoctorRequest requestDto) {
-        authService.registerDoctor(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
-    }
-
-    @PostMapping("/verify-email-token")
-    public ResponseEntity<?> getVerifyEmailToken(@Valid @RequestBody VerifyEmailTokenRequest requestDto) {
-        authService.sendVerifyUserAccountEmail(requestDto);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-    @PostMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyEmailRequest requestDto) {
-        authService.verifyUserEmail(requestDto);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-
-    @PostMapping("/verify-phone-number-token")
-    public ResponseEntity<?> getVerifyPhoneNumberToken(@Valid @RequestBody VerifyPhoneNumberTokenRequest requestDto,
-                                                       Authentication authentication) {
-        authService.sendVerifyPhoneNumberMessage(requestDto, authentication);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-    @PostMapping("/verify-phone-number")
-    public ResponseEntity<?> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto,
-                                               Authentication authentication) {
-        authService.verifyPhoneNumber(requestDto, authentication);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-    @PostMapping("/reset-password-token")
-    public ResponseEntity<?> getResetPasswordToken(@Valid @RequestBody PasswordResetTokenRequest requestDto) {
-        authService.sendResetPasswordEmail(requestDto);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest requestDto) {
-        authService.resetPassword(requestDto);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
+    private final LoginService loginService;
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequest requestDto) {
-        LoginUserResponse responseDto = authService.loginUser(requestDto);
+        LoginUserResponse responseDto = loginService.login(requestDto);
         if (responseDto.twoFactorAuth()) {
             return ResponseEntity.ok()
                     .body(ApiResponse.success(responseDto));
@@ -97,7 +38,7 @@ public class AuthController {
     public ResponseEntity<?> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
                                                 @CookieValue("Refresh-Token") String refreshToken) {
         @Valid RefreshAccessTokenRequest requestDto = new RefreshAccessTokenRequest(accessToken, refreshToken);
-        RefreshAccessTokenResponse responseDto = authService.refreshAccessToken(requestDto);
+        LoginUserResponse responseDto = loginService.refresh(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -113,7 +54,7 @@ public class AuthController {
 
     @PostMapping("/login-2fa")
     public ResponseEntity<?> loginUserWith2fa(@Valid @RequestBody TwoFactorAuthLoginRequest requestDto) {
-        TwoFactorAuthLoginResponse responseDto = authService.loginUserWithTwoFactorAuth(requestDto);
+        LoginUserResponse responseDto = loginService.login2fa(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
@@ -129,7 +70,7 @@ public class AuthController {
 
     @PostMapping("/login-2fa-token")
     public ResponseEntity<?> get2faToken(@Valid @RequestBody TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
-        authService.send2faToken(twoFactorAuthTokenRequest);
+        loginService.send2fa(twoFactorAuthTokenRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

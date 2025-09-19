@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.auth.dtos.request;
+package pl.edu.pja.aurorumclinic.features.auth.verify_phone_number;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
