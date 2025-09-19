@@ -15,7 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
-import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthException;
+import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
 import pl.edu.pja.aurorumclinic.features.auth.shared.JwtUtils;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (WebUtils.getCookie(request, "Access-Token") != null) {
             jwt = WebUtils.getCookie(request, "Access-Token").getValue();
         } else {
-            throw new ApiAuthException("Access-Token cookie not present", "cookie");
+            throw new ApiAuthenticationException("Access-Token cookie not present", "cookie");
         }
         if (jwt == null) {
             filterChain.doFilter(request, response);
@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtException instanceof ExpiredJwtException) {
                 response.setHeader("Token-expired", "true");
             }
-            throw new ApiAuthException("Invalid access token", "accessToken");
+            throw new ApiAuthenticationException("Invalid access token", "accessToken");
         }
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
                 userIdFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))

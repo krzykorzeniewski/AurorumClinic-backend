@@ -2,12 +2,13 @@ package pl.edu.pja.aurorumclinic.features.auth.login;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.*;
-import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthException;
+import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
 import pl.edu.pja.aurorumclinic.features.auth.shared.JwtUtils;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
@@ -18,6 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LoginServiceImpl implements LoginService{
 
     private final UserRepository userRepository;
@@ -32,13 +34,13 @@ public class LoginServiceImpl implements LoginService{
     public LoginUserResponse login(LoginUserRequest loginUserRequest) {
         User userFromDb = userRepository.findByEmail(loginUserRequest.email());
         if (userFromDb == null) {
-            throw new ApiAuthException("Invalid credentials", "credentials");
+            throw new ApiAuthenticationException("Invalid credentials", "credentials");
         }
         if (!passwordEncoder.matches(loginUserRequest.password(), userFromDb.getPassword())) {
-            throw new ApiAuthException("Invalid credentials", "credentials");
+            throw new ApiAuthenticationException("Invalid credentials", "credentials");
         }
         if (!userFromDb.isEmailVerified()) {
-            throw new ApiAuthException("Email is not verified", "email");
+            throw new ApiAuthenticationException("Email is not verified", "email");
         }
 
         if (userFromDb.isTwoFactorAuth()) {
@@ -74,11 +76,11 @@ public class LoginServiceImpl implements LoginService{
         } catch (ExpiredJwtException e) {
             userId = jwtUtils.getUserIdFromExpiredJwt(jwt);
         } catch (JwtException jwtException) {
-            throw new ApiAuthException(jwtException.getMessage(), "accessToken");
+            throw new ApiAuthenticationException(jwtException.getMessage(), "accessToken");
         }
 
         User userFromDb = userRepository.findById(userId).orElseThrow(
-                () -> new ApiAuthException("Invalid credentials", "credentials")
+                () -> new ApiAuthenticationException("Invalid credentials", "credentials")
         );
         tokenService.validateAndDeleteToken(userFromDb, refreshAccessTokenRequest.refreshToken());
 
@@ -98,7 +100,7 @@ public class LoginServiceImpl implements LoginService{
     @Override
     public LoginUserResponse login2fa (TwoFactorAuthLoginRequest twoFactorAuthLoginRequest){
         User userFromDb = userRepository.findById(twoFactorAuthLoginRequest.userId()).orElseThrow(
-                () -> new ApiAuthException("User not found", "id")
+                () -> new ApiAuthenticationException("User not found", "id")
         );
         tokenService.validateAndDeleteToken(userFromDb, twoFactorAuthLoginRequest.token());
 
@@ -118,13 +120,13 @@ public class LoginServiceImpl implements LoginService{
     public void send2fa (TwoFactorAuthTokenRequest twoFactorAuthTokenRequest){
         User userFromDb = userRepository.findByEmail(twoFactorAuthTokenRequest.email());
         if (userFromDb == null) {
-            throw new ApiAuthException("Email not found", "email");
+            throw new ApiAuthenticationException("Email not found", "email");
         }
         if (!userFromDb.isPhoneNumberVerified()) {
-            throw new ApiAuthException("Phone number is not verified", "phoneNumber");
+            throw new ApiAuthenticationException("Phone number is not verified", "phoneNumber");
         }
         if (!userFromDb.isTwoFactorAuth()) {
-            throw new ApiAuthException("Given email has 2fa disabled", "email");
+            throw new ApiAuthenticationException("Given email has 2fa disabled", "email");
         }
         send2fasms(userFromDb);
     }

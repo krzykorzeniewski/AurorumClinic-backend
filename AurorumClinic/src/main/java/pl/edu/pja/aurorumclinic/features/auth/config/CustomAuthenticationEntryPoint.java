@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthException;
+import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
         ApiResponse<?> apiResponse = null;
-        if (authException instanceof ApiAuthException) {
+        if (authException instanceof ApiAuthenticationException) {
             String message = authException.getMessage();
             String field = "accessToken";
             apiResponse = ApiResponse.fail(Map.of(field, message));

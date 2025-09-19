@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.shared;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthException;
+import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
@@ -31,9 +32,9 @@ public class GlobalExceptionResolver {
         return ApiResponse.fail(Map.of(ex.getField(), ex.getMessage()));
     }
 
-    @ExceptionHandler(ApiAuthException.class)
+    @ExceptionHandler(ApiAuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiResponse<?> handleApiAuthException(ApiAuthException ex) {
+    public ApiResponse<?> handleApiAuthException(ApiAuthenticationException ex) {
         return ApiResponse.fail(Map.of(ex.getField(), ex.getMessage()));
     }
 
@@ -64,7 +65,7 @@ public class GlobalExceptionResolver {
     @ExceptionHandler(AuthorizationDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
-        return ApiResponse.fail(Map.of("role", "Access is denied"));
+        return ApiResponse.fail(Map.of("authority", "Access is denied"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
