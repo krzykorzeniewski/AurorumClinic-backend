@@ -1,0 +1,9 @@
+package pl.edu.pja.aurorumclinic.features.auth.login.dtos;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record LoginUserRequest(@NotBlank @Email @Size(max = 100) String email,
+                               @NotBlank @Size(max = 200) String password) {
+}

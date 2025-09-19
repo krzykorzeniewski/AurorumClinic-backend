@@ -1,0 +1,95 @@
+package pl.edu.pja.aurorumclinic.features.auth.login;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import pl.edu.pja.aurorumclinic.features.auth.login.dtos.*;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class LoginController {
+
+    private final LoginService loginService;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequest requestDto) {
+        LoginUserResponse responseDto = loginService.login(requestDto);
+        if (responseDto.twoFactorAuth()) {
+            return ResponseEntity.ok()
+                    .body(ApiResponse.success(responseDto));
+        }
+        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .body(ApiResponse.success(responseDto));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
+                                                @CookieValue("Refresh-Token") String refreshToken) {
+        @Valid RefreshAccessTokenRequest requestDto = new RefreshAccessTokenRequest(accessToken, refreshToken);
+        LoginUserResponse responseDto = loginService.refresh(requestDto);
+        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .body(ApiResponse.success(responseDto));
+    }
+
+    @PostMapping("/login-2fa")
+    public ResponseEntity<?> loginUserWith2fa(@Valid @RequestBody TwoFactorAuthLoginRequest requestDto) {
+        LoginUserResponse responseDto = loginService.login2fa(requestDto);
+        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
+                .path("/")
+                .httpOnly(true)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .body(ApiResponse.success(responseDto));
+    }
+
+    @PostMapping("/login-2fa-token")
+    public ResponseEntity<?> get2faToken(@Valid @RequestBody TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
+        loginService.send2fa(twoFactorAuthTokenRequest);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logoutUser() {
+        HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", "")
+                .path("/")
+                .httpOnly(true)
+                .maxAge(0)
+                .build();
+        HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", "")
+                .path("/")
+                .httpOnly(true)
+                .maxAge(0)
+                .build();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
+                .body(ApiResponse.success(null));
+    }
+
+}

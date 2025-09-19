@@ -67,13 +67,16 @@ public class TokenService {
                 .orElseThrow(() -> new ApiException("Invalid token", "token"));
 
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new ApiException("Verification token is expired", "token");
+            throw new ApiException("Token is expired", "token");
         }
         tokenRepository.delete(token);
     }
 
     @Transactional
     protected void deletePreviousTokens(List<Token> userTokens, TokenName tokenName) {
+        if (userTokens == null) {
+            return;
+        }
         List<Token> tokensToDelete = userTokens.stream().filter(
                 token -> token.getName().equals(tokenName)
         ).toList();
