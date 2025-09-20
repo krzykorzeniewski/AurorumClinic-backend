@@ -21,15 +21,16 @@ public class AppointmentUnregisteredController {
     }
 
     @PutMapping("")
-    public ResponseEntity<?> updateAppointmentForUnregisteredUser(@RequestParam("token") String token,
+    public ResponseEntity<?> updateAppointmentForUnregisteredUser(
                                       @RequestBody @Valid RescheduleAppointmentUnregisteredRequest rescheduleRequest) {
-        appointmentUnregisteredService.rescheduleAppointmentForUnregisteredUser(token, rescheduleRequest);
+        appointmentUnregisteredService.rescheduleAppointmentForUnregisteredUser(rescheduleRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @DeleteMapping("")
-    public ResponseEntity<?> deleteAppointmentForUnregisteredUser(@RequestParam("token") String token) {
-        appointmentUnregisteredService.deleteAppointmentForUnregisteredUser(token);
+    public ResponseEntity<?> deleteAppointmentForUnregisteredUser(
+            @RequestBody @Valid DeleteAppointmentUnregisteredRequest deleteRequest) {
+        appointmentUnregisteredService.deleteAppointmentForUnregisteredUser(deleteRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

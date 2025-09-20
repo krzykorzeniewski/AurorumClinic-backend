@@ -79,8 +79,8 @@ public class AppointmentUnregisteredServiceImpl implements AppointmentUnregister
     }
 
     @Override
-    public void deleteAppointmentForUnregisteredUser(String token) {
-        Guest guestFromDb = guestRepository.findByAppointmentDeleteToken(token);
+    public void deleteAppointmentForUnregisteredUser(DeleteAppointmentUnregisteredRequest deleteRequest) {
+        Guest guestFromDb = guestRepository.findByAppointmentDeleteToken(deleteRequest.token());
         if (guestFromDb == null) {
             throw new ApiNotFoundException("Token not found", "token");
         }
@@ -91,8 +91,8 @@ public class AppointmentUnregisteredServiceImpl implements AppointmentUnregister
     }
 
     @Override
-    public void rescheduleAppointmentForUnregisteredUser(String token, RescheduleAppointmentUnregisteredRequest rescheduleRequest) {
-        Guest guestFromDb = guestRepository.findByAppointmentRescheduleToken(token);
+    public void rescheduleAppointmentForUnregisteredUser(RescheduleAppointmentUnregisteredRequest rescheduleRequest) {
+        Guest guestFromDb = guestRepository.findByAppointmentRescheduleToken(rescheduleRequest.token());
         if (guestFromDb == null) {
             throw new ApiNotFoundException("Token not found", "token");
         }
