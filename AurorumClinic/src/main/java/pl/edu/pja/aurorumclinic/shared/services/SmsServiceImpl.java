@@ -21,7 +21,7 @@ public class SmsServiceImpl implements SmsService {
                 new PhoneNumber(to),
                 new PhoneNumber(from),
                 text
-        ).create();
+        ).createAsync();
     }
 
 }

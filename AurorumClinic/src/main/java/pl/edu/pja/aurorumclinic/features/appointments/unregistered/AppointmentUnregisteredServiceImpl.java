@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 @Transactional
-public class AppointmentUnregisteredUnregisteredServiceImpl implements AppointmentUnregisteredService {
+public class AppointmentUnregisteredServiceImpl implements AppointmentUnregisteredService {
 
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
