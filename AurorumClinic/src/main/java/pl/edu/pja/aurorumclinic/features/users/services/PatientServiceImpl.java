@@ -14,7 +14,6 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -102,6 +101,8 @@ public class PatientServiceImpl implements PatientService {
                 .twoFactorAuth(patient.isTwoFactorAuth())
                 .newsletter(patient.isNewsletter())
                 .communicationPreferences(patient.getCommunicationPreferences().name())
+                .emailVerified(patient.isEmailVerified())
+                .phoneNumberVerified(patient.isPhoneNumberVerified())
                 .build();
     }
 }

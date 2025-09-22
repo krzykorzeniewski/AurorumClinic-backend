@@ -14,5 +14,7 @@ public record GetPatientResponse(Long id,
                                  String phoneNumber,
                                  boolean twoFactorAuth,
                                  boolean newsletter,
+                                 boolean emailVerified,
+                                 boolean phoneNumberVerified,
                                  String communicationPreferences) {
 }
