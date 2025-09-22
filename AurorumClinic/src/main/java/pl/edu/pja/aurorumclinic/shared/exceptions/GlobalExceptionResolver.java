@@ -1,6 +1,5 @@
-package pl.edu.pja.aurorumclinic.shared;
+package pl.edu.pja.aurorumclinic.shared.exceptions;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -11,8 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
-import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
-import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 import java.util.Map;
 
@@ -47,6 +45,7 @@ public class GlobalExceptionResolver {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleException(Exception ex) {
+        ex.printStackTrace();
         return ApiResponse.error("Internal server error");
     }
 

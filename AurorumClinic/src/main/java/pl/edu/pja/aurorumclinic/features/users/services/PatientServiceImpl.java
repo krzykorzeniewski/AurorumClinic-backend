@@ -46,14 +46,8 @@ public class PatientServiceImpl implements PatientService {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        if (patientRepository.findByEmail(requestDto.email()) != patientFromDb) {
-            throw new ApiConflictException("Email already in use", "email");
-        }
-        patientFromDb.setPhoneNumber(requestDto.phoneNumber());
-        patientFromDb.setEmail(requestDto.email());
         patientFromDb.setCommunicationPreferences(requestDto.communicationPreferences());
         patientFromDb.setNewsletter(requestDto.newsletter());
-        patientFromDb.setTwoFactorAuth(requestDto.twoFactorAuth());
 
         GetPatientResponse responseDto = mapPatientToGetResponseDto(patientRepository.save(patientFromDb));
         return responseDto;
