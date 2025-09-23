@@ -75,6 +75,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/patients/**").hasAuthority(UserRole.PATIENT.name())
                         .requestMatchers(HttpMethod.PUT, "/api/patients/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
                                 UserRole.ADMIN.name())
+                        .requestMatchers("/api/schedules").hasAnyAuthority(UserRole.DOCTOR.name(),
+                                UserRole.EMPLOYEE.name(), UserRole.ADMIN.name())
                         .requestMatchers("/api/services").hasAuthority(UserRole.ADMIN.name())
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/api/auth/verify-phone-number").authenticated()

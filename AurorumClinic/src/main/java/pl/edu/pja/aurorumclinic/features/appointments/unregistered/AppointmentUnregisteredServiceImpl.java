@@ -2,10 +2,14 @@ package pl.edu.pja.aurorumclinic.features.appointments.unregistered;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentValidator;
+import pl.edu.pja.aurorumclinic.features.appointments.unregistered.events.AppointmentUnregisteredCreatedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.unregistered.events.AppointmentUnregisteredDeletedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.unregistered.events.AppointmentUnregisteredRescheduledEvent;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
@@ -13,7 +17,6 @@ import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
-import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 
 import java.time.LocalDateTime;
 
@@ -26,12 +29,9 @@ public class AppointmentUnregisteredServiceImpl implements AppointmentUnregister
     private final UserRepository userRepository;
     private final GuestRepository guestRepository;
     private final ServiceRepository serviceRepository;
-    private final EmailService emailService;
     private final TokenService tokenService;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final AppointmentValidator appointmentValidator;
-
-    @Value("${mail.backend.noreply-address}")
-    private String noreplyEmailAddres;
 
     @Value("${mail.frontend.appointment.unregistered-delete-link}")
     private String deleteAppointmentLink;
@@ -75,7 +75,16 @@ public class AppointmentUnregisteredServiceImpl implements AppointmentUnregister
                 .build();
         Guest savedGuest = guestRepository.save(guest);
 
-        sendConfirmationEmail(savedGuest);
+        String appointmentDeleteToken = tokenService.createRandomToken();
+        savedGuest.setAppointmentDeleteToken(appointmentDeleteToken);
+        String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
+
+        String appointmentRescheduleToken = tokenService.createRandomToken();
+        savedGuest.setAppointmentRescheduleToken(appointmentRescheduleToken);
+        String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
+
+        applicationEventPublisher.publishEvent(new AppointmentUnregisteredCreatedEvent(savedGuest, savedAppointment,
+                rescheduleLink, deleteLink));
     }
 
     @Override
@@ -88,6 +97,8 @@ public class AppointmentUnregisteredServiceImpl implements AppointmentUnregister
             throw new ApiException("Appointment has already started", "token");
         }
         guestRepository.delete(guestFromDb);
+        applicationEventPublisher.publishEvent(
+                new AppointmentUnregisteredDeletedEvent(guestFromDb, guestFromDb.getAppointment()));
     }
 
     @Override
@@ -108,22 +119,16 @@ public class AppointmentUnregisteredServiceImpl implements AppointmentUnregister
 
         appointmentFromDb.setStartedAt(newStartedAt);
         appointmentFromDb.setFinishedAt(newFinishedAt);
-        sendConfirmationEmail(guestFromDb);
-    }
 
-    private void sendConfirmationEmail(Guest guest) {
         String appointmentDeleteToken = tokenService.createRandomToken();
-        guest.setAppointmentDeleteToken(appointmentDeleteToken);
+        guestFromDb.setAppointmentDeleteToken(appointmentDeleteToken);
         String deleteLink = deleteAppointmentLink + appointmentDeleteToken;
 
         String appointmentRescheduleToken = tokenService.createRandomToken();
-        guest.setAppointmentRescheduleToken(appointmentRescheduleToken);
+        guestFromDb.setAppointmentRescheduleToken(appointmentRescheduleToken);
         String rescheduleLink = rescheduleAppointmentLink + appointmentRescheduleToken;
 
-        emailService.sendEmail(
-                noreplyEmailAddres, guest.getEmail(),
-                "wizyta umówiona", "twoja wizyta została umówiona \n" +
-                        "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
-                        "aby ją przełożyć naciśnij link: " + rescheduleLink);
+        applicationEventPublisher.publishEvent(new AppointmentUnregisteredRescheduledEvent(guestFromDb, appointmentFromDb,
+                rescheduleLink, deleteLink));
     }
 }
