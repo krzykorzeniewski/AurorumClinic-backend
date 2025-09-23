@@ -1,8 +1,14 @@
 package pl.edu.pja.aurorumclinic.features.appointments.registered;
 
 
-import org.springframework.security.core.Authentication;
+import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.CreateAppointmentPatientRequest;
+import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.DeleteAppointmentPatientRequest;
+import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.UpdateAppointmentPatientRequest;
 
 public interface AppointmentService {
-    void createAppointment(CreateAppointmentRequest createAppointmentRequest, Long userId);
+    void createAppointment(CreateAppointmentPatientRequest createAppointmentPatientRequest, Long userId);
+
+    void updateAppointment(UpdateAppointmentPatientRequest updateAppointmentPatientRequest, Long userId);
+
+    void deleteAppointment(DeleteAppointmentPatientRequest deleteAppointmentPatientRequest, Long userId);
 }

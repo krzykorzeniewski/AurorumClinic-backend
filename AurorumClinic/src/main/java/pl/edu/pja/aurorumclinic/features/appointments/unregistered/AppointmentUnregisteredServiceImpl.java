@@ -101,15 +101,13 @@ public class AppointmentUnregisteredServiceImpl implements AppointmentUnregister
         }
 
         Appointment appointmentFromDb = guestFromDb.getAppointment();
-        appointmentValidator.validateTimeSlot(rescheduleRequest.startedAt(),
-                rescheduleRequest.startedAt().plusMinutes(appointmentFromDb.getService().getDuration()),
-                appointmentFromDb.getDoctor().getId(),
+        LocalDateTime newStartedAt = rescheduleRequest.startedAt();
+        LocalDateTime newFinishedAt = newStartedAt.plusMinutes(appointmentFromDb.getService().getDuration());
+        appointmentValidator.validateTimeSlot(newStartedAt, newFinishedAt, appointmentFromDb.getDoctor().getId(),
                 appointmentFromDb.getService().getId());
 
-        appointmentFromDb.setStartedAt(rescheduleRequest.startedAt());
-        appointmentFromDb.setFinishedAt(rescheduleRequest.startedAt()
-                .plusMinutes(appointmentFromDb.getService().getDuration()));
-
+        appointmentFromDb.setStartedAt(newStartedAt);
+        appointmentFromDb.setFinishedAt(newFinishedAt);
         sendConfirmationEmail(guestFromDb);
     }
 
