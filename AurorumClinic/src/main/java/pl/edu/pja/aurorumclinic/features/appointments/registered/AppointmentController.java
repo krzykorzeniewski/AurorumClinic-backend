@@ -37,4 +37,10 @@ public class AppointmentController {
         appointmentService.deleteAppointment(request, userId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
+
+    @GetMapping("/{id}/me")
+    public ResponseEntity<?> getAppointment(@PathVariable Long id,
+                                               @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(appointmentService.getAppointmentForPatient(id, userId)));
+    }
 }

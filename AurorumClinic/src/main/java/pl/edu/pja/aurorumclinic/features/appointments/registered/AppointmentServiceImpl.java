@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.CreateAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.DeleteAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.UpdateAppointmentPatientRequest;
+import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.response.GetAppointmentPatientResponse;
 import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentDeletedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentRescheduledEvent;
@@ -102,6 +103,15 @@ public class AppointmentServiceImpl implements AppointmentService{
         appointmentRepository.delete(appointmentFromDb);
         applicationEventPublisher.publishEvent(
                 new AppointmentDeletedEvent(appointmentFromDb.getPatient(), appointmentFromDb));
+    }
+
+    @Override
+    public GetAppointmentPatientResponse getAppointmentForPatient(Long appointmentId, Long userId) {
+        GetAppointmentPatientResponse response = appointmentRepository.findByIdAndPatientId(appointmentId, userId);
+        if (response == null) {
+            throw new ApiNotFoundException("Id not found", "id");
+        }
+        return response;
     }
 
 }
