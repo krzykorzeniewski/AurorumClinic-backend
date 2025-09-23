@@ -14,8 +14,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -45,7 +43,7 @@ public class SecurityConfig {
                 .securityMatcher("/api/auth/refresh", "/api/auth/login", "/api/auth/register-employee",
                         "/api/auth/register-patient", "/api/auth/register-doctor", "/api/auth/reset-password-token",
                         "/api/auth/reset-password", "/api/auth/login-2fa", "/api/auth/login-2fa-token",
-                        "/api/auth/verify-email", "/api/auth/verify-email-token", "/api/appointments/unregistered")
+                        "/api/auth/verify-email", "/api/auth/verify-email-token", "/api/appointments/guest")
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -70,16 +68,19 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/api/newsletter/**").permitAll()
-                        .requestMatchers("/api/appointments/unregistered").permitAll()
+                        .requestMatchers("/api/appointments/guest").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/patients/**").hasAnyAuthority(UserRole.PATIENT.name())
                         .requestMatchers(HttpMethod.DELETE, "/api/patients/**").hasAuthority(UserRole.PATIENT.name())
                         .requestMatchers(HttpMethod.PUT, "/api/patients/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
                                 UserRole.ADMIN.name())
+                        .requestMatchers("/api/schedules").hasAnyAuthority(UserRole.DOCTOR.name(),
+                                UserRole.EMPLOYEE.name(), UserRole.ADMIN.name())
                         .requestMatchers("/api/services").hasAuthority(UserRole.ADMIN.name())
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/api/auth/verify-phone-number").authenticated()
                         .requestMatchers("/api/auth/verify-phone-number-token").authenticated()
                         .requestMatchers("/api/auth/logout").authenticated()
+                        .requestMatchers("/api/appointments/me").hasAuthority(UserRole.PATIENT.name())
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
