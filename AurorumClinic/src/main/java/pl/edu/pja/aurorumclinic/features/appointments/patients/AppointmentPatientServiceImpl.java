@@ -1,16 +1,16 @@
-package pl.edu.pja.aurorumclinic.features.appointments.registered;
+package pl.edu.pja.aurorumclinic.features.appointments.patients;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.CreateAppointmentPatientRequest;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.DeleteAppointmentPatientRequest;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.request.UpdateAppointmentPatientRequest;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.response.GetAppointmentPatientResponse;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentDeletedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentRescheduledEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.CreateAppointmentPatientRequest;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.DeleteAppointmentPatientRequest;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.UpdateAppointmentPatientRequest;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.GetAppointmentPatientResponse;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentCreatedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentDeletedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentRescheduledEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentValidator;
@@ -26,7 +26,7 @@ import java.util.Objects;
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
 @Transactional
-public class AppointmentServiceImpl implements AppointmentService{
+public class AppointmentPatientServiceImpl implements AppointmentPatientService {
 
     private final AppointmentValidator appointmentValidator;
     private final UserRepository userRepository;

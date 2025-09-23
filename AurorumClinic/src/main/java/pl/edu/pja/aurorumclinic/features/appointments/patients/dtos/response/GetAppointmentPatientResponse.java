@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.response;
+package pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

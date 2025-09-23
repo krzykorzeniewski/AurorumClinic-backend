@@ -2,7 +2,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.response.GetAppointmentPatientResponse;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.GetAppointmentPatientResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 
 import java.time.LocalDateTime;
@@ -34,7 +34,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("""
             select new
-            pl.edu.pja.aurorumclinic.features.appointments.registered.dtos.response.GetAppointmentPatientResponse(
+            pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.GetAppointmentPatientResponse(
                         d.name, d.surname, d.profilePicture, s.name, s.price, a.startedAt)
                         from Appointment a
                         join Doctor d on d.id = a.doctor.id

@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentDeletedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.registered.events.AppointmentRescheduledEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.unregistered.events.AppointmentUnregisteredCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.unregistered.events.AppointmentUnregisteredDeletedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.unregistered.events.AppointmentUnregisteredRescheduledEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentCreatedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentDeletedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentRescheduledEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.guests.events.AppointmentGuestCreatedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.guests.events.AppointmentGuestDeletedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.guests.events.AppointmentGuestRescheduledEvent;
 import pl.edu.pja.aurorumclinic.shared.data.models.Guest;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
@@ -78,7 +78,7 @@ public class AppointmentNotificationListener {
     }
 
     @EventListener
-    public void handleAppointmentUnregisteredDeletedEvent(AppointmentUnregisteredDeletedEvent event) {
+    public void handleAppointmentUnregisteredDeletedEvent(AppointmentGuestDeletedEvent event) {
         Guest guest = event.getGuest();
         String message = "twoja wizyta w dniu " + event.getAppointment().getStartedAt() + " została anulowana";
         emailService.sendEmail(
@@ -87,7 +87,7 @@ public class AppointmentNotificationListener {
     }
 
     @EventListener
-    public void handleAppointmentUnregisteredRescheduledEvent(AppointmentUnregisteredRescheduledEvent event) {
+    public void handleAppointmentUnregisteredRescheduledEvent(AppointmentGuestRescheduledEvent event) {
         Guest guest = event.getGuest();
         String message = "twoja wizyta została przełożona na datę " + event.getAppointment().getStartedAt() + "\n" +
                 "aby ją odwołać naciśnij link: " + event.getDeleteLink() + "\n" +
@@ -98,7 +98,7 @@ public class AppointmentNotificationListener {
     }
 
     @EventListener
-    public void handeAppointmentUnregisteredCreatedEvent(AppointmentUnregisteredCreatedEvent event) {
+    public void handeAppointmentUnregisteredCreatedEvent(AppointmentGuestCreatedEvent event) {
         Guest guest = event.getGuest();
         String message = "twoja wizyta została umówiona w dniu " + event.getAppointment().getStartedAt() + "\n" +
                 "aby ją odwołać naciśnij link: " + event.getDeleteLink() + "\n" +
