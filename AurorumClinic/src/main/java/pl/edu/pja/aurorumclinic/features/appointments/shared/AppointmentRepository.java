@@ -35,11 +35,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("""
             select new
             pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.GetAppointmentPatientResponse(
-                        d.name, d.surname, d.profilePicture, s.name, s.price, a.startedAt)
+                        d.name, d.surname, d.profilePicture, s.name, s.price, a.startedAt, a.payment.amount)
                         from Appointment a
                         join Doctor d on d.id = a.doctor.id
                         join Service s on s.id = a.service.id
                         join Patient p on p.id = a.patient.id
+                        left join Payment p2 on p2.id = a.payment.id
             where a.id = :appointmentId and p.id = :patientId
             """)
     GetAppointmentPatientResponse findByIdAndPatientId(Long appointmentId, Long patientId);

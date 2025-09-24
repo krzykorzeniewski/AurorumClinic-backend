@@ -36,7 +36,8 @@ public class DoctorController {
                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAt,
                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime finishedAt,
                           @RequestParam Integer serviceDuration) {
-        return ResponseEntity.ok(ApiResponse.success(doctorService.getAppointmentSlots(id, startedAt, finishedAt, serviceDuration)));
+        return ResponseEntity.ok(ApiResponse.success(doctorService.getAppointmentSlots(id, startedAt,
+                finishedAt, serviceDuration)));
     }
 
 }

@@ -10,5 +10,6 @@ public record GetAppointmentPatientResponse(String doctorName,
                                             String doctorImage,
                                             String serviceName,
                                             @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal price,
-                                            LocalDateTime startedAt) {
+                                            LocalDateTime startedAt,
+                                            @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal paymentAmount) {
 }
