@@ -1,6 +1,7 @@
 package pl.edu.pja.aurorumclinic.features.users.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,6 +9,7 @@ import pl.edu.pja.aurorumclinic.features.users.services.DoctorService;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 
 @RestController
@@ -23,10 +25,18 @@ public class DoctorController {
     }
 
     @PostMapping("/{id}/profile-picture")
-    public ResponseEntity<?> uploadProfilePicture(@RequestParam("image") MultipartFile image,
+    public ResponseEntity<?> uploadProfilePicture(@RequestParam MultipartFile image,
                                                   @PathVariable Long id) throws IOException {
         doctorService.uploadProfilePicture(image, id);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @GetMapping("/{id}/appointment-slots")
+    public ResponseEntity<?> getAppointmentSlots(@PathVariable Long id,
+                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAt,
+                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime finishedAt,
+                          @RequestParam Integer serviceDuration) {
+        return ResponseEntity.ok(ApiResponse.success(doctorService.getAppointmentSlots(id, startedAt, finishedAt, serviceDuration)));
     }
 
 }

@@ -5,10 +5,15 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetDoctorResponse;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public interface DoctorService {
+
     List<GetDoctorResponse> getAllDoctors() throws IOException;
     void uploadProfilePicture(MultipartFile image, Long doctorId) throws IOException;
+
+    List<LocalDateTime> getAppointmentSlots(Long doctorId, LocalDateTime startedAt,
+                                            LocalDateTime finishedAt, Integer serviceDuration);
 }

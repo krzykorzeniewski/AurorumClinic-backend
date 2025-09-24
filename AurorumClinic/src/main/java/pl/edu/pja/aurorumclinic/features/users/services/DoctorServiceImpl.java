@@ -12,6 +12,8 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -65,4 +67,16 @@ public class DoctorServiceImpl implements DoctorService {
         doctorFromDb.setProfilePicture(imagePath);
         doctorRepository.save(doctorFromDb);
     }
+
+    @Override
+    public List<LocalDateTime> getAppointmentSlots(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt, Integer serviceDuration) {
+        doctorRepository.findById(doctorId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        return doctorRepository.appointmentSlots(startedAt, finishedAt, serviceDuration, Math.toIntExact(doctorId))
+                .stream()
+                .map(Timestamp::toLocalDateTime)
+                .toList();
+    }
+
 }
