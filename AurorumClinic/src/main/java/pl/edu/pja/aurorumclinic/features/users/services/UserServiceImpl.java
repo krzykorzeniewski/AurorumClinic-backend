@@ -34,9 +34,6 @@ public class UserServiceImpl implements UserService{
     @Value("${mail.backend.noreply-address}")
     private String fromEmailAddress;
 
-    @Value("${mail.frontend.email-update-link}")
-    private String mailUpdateLink;
-
     @Override
     public void sendUpdateEmail(Long id, UpdateUserEmailTokenRequest requestDto) {
         String newEmail = requestDto.email();
@@ -46,16 +43,14 @@ public class UserServiceImpl implements UserService{
         if (userRepository.existsByEmail(newEmail)) {
             throw new ApiConflictException("Email is already taken", "email");
         }
-        Token token = tokenService.createToken(userFromDb, TokenName.EMAIL_UPDATE, 15);
+        Token token = tokenService.createOtpToken(userFromDb, TokenName.EMAIL_UPDATE, 10);
         userFromDb.setPendingEmail(newEmail);
-
-        String verificationLink = mailUpdateLink + token.getRawValue();
 
         emailService.sendEmail(
                 fromEmailAddress,
                 newEmail,
                 "Zmiana adresu email",
-                "Naciśnij link aby zmienić adres email: " + verificationLink
+                "Twój kod do zmiany adresu email w Aurorum Clinic:  " + token.getRawValue()
         );
     }
 
