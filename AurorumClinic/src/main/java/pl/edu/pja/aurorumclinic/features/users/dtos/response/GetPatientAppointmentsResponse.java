@@ -1,42 +1,41 @@
 package pl.edu.pja.aurorumclinic.features.users.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface GetPatientAppointmentsResponse {
+@Builder
+public record GetPatientAppointmentsResponse(Long id,
+                                             String name,
+                                             String surname,
+                                             String pesel,
+                                             LocalDate birthdate,
+                                             String email,
+                                             String phoneNumber,
+                                             List<AppointmentDto> appointments) {
 
-    Long getId();
-    String getName();
-    String getSurname();
-    String getPesel();
-    LocalDate getBirthdate();
-    String getEmail();
-    String getPhoneNumber();
-    List<AppointmentDto> getAppointments();
-
-    interface AppointmentDto {
-        Long getId();
-        LocalDateTime getStartedAt();
-        String getDescription();
-        DoctorDto getDoctor();
-        ServiceDto getService();
+    @Builder
+    public record ServiceDto(Long id,
+                             String name,
+                             @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal price) {
     }
 
-    interface DoctorDto {
-        Long getId();
-        String getName();
-        String getSurname();
-        String getProfilePicture();
+    @Builder
+    public record DoctorDto(Long id,
+                            String name,
+                            String surname,
+                            String profilePicture) {
     }
 
-    interface ServiceDto {
-        Long getId();
-        String getName();
-
-        @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT)
-        BigDecimal getPrice();
+    @Builder
+    public record AppointmentDto(Long id,
+                                 LocalDateTime startedAt,
+                                 String description,
+                                 DoctorDto doctor,
+                                 ServiceDto service) {
     }
 }
