@@ -28,7 +28,7 @@ public class AppointmentEmployeeController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @DeleteMapping("/{id}/me")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAppointment(@PathVariable("id") Long appointmentId) {
         appointmentEmployeeService.deleteAppointment(appointmentId);
         return ResponseEntity.ok(ApiResponse.success(null));

@@ -3,11 +3,10 @@ package pl.edu.pja.aurorumclinic.features.users.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.features.users.dtos.response.*;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
-import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -86,6 +85,41 @@ public class PatientServiceImpl implements PatientService {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         patientRepository.delete(patientFromDb);
+    }
+
+    @Override
+    public GetPatientAppointmentsResponse getPatientAppointments(Long patientId) {
+        Patient patientFromDb = patientRepository.findPatientWithAppointmentsById(patientId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        GetPatientAppointmentsResponse response = GetPatientAppointmentsResponse.builder()
+                .id(patientFromDb.getId())
+                .name(patientFromDb.getName())
+                .surname(patientFromDb.getSurname())
+                .pesel(patientFromDb.getPesel())
+                .birthdate(patientFromDb.getBirthdate())
+                .email(patientFromDb.getEmail())
+                .phoneNumber(patientFromDb.getPhoneNumber())
+                .appointments(patientFromDb.getAppointments().stream()
+                        .map(a -> AppointmentDto.builder()
+                                .id(a.getId())
+                                .startedAt(a.getStartedAt())
+                                .description(a.getDescription())
+                                .doctor(DoctorDto.builder()
+                                        .id(a.getDoctor().getId())
+                                        .name(a.getDoctor().getName())
+                                        .surname(a.getDoctor().getSurname())
+                                        .profilePicture(a.getDoctor().getProfilePicture())
+                                        .build())
+                                .service(ServiceDto.builder()
+                                        .id(a.getService().getId())
+                                        .name(a.getService().getName())
+                                        .price(a.getService().getPrice())
+                                        .build())
+                                .build())
+                        .toList())
+                .build();
+        return response;
     }
 
     private GetPatientResponse mapPatientToGetResponseDto(Patient patient) {

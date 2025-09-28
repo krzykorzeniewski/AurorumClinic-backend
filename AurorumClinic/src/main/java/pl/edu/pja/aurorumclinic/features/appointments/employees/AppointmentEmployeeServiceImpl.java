@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AppointmentEmployeeServiceImpl implements AppointmentEmployeeService{
 
     private final AppointmentValidator appointmentValidator;

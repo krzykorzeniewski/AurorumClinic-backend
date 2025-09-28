@@ -49,4 +49,9 @@ public class PatientController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @GetMapping("/{id}/appointments")
+    public ResponseEntity<?> getPatientAppointments(@PathVariable("id") Long patientId) {
+        return ResponseEntity.ok(ApiResponse.success(patientService.getPatientAppointments(patientId)));
+    }
+
 }

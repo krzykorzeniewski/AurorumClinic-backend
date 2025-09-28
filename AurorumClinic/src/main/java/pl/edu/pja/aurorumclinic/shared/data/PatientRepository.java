@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
@@ -22,4 +23,13 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
            """)
     List<Patient> searchAllBySearchParam(String query);
 
+
+    @Query("""
+           select p from Patient p
+                      join fetch Appointment a on a.patient.id = p.id
+                      join fetch Doctor d on d.id = a.doctor.id
+                      join fetch Service s on s.id = a.service.id
+           where p.id = :id
+           """)
+    Optional<Patient> findPatientWithAppointmentsById(Long id);
 }
