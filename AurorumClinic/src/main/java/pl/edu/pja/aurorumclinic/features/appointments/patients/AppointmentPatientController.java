@@ -6,12 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.CreateAppointmentPatientRequest;
-import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.DeleteAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.UpdateAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
-@RequestMapping("/api/appointments/patient")
+@RequestMapping("/api/appointments")
 @RequiredArgsConstructor
 public class AppointmentPatientController {
 
@@ -24,17 +23,18 @@ public class AppointmentPatientController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @PutMapping("/me")
+    @PutMapping("/{id}/me")
     public ResponseEntity<?> updateAppointment(@RequestBody @Valid UpdateAppointmentPatientRequest request,
-                                               @AuthenticationPrincipal Long userId) {
-        appointmentPatientService.updateAppointment(request, userId);
+                                               @AuthenticationPrincipal Long userId,
+                                               @PathVariable("id") Long appointmentId) {
+        appointmentPatientService.updateAppointment(request, userId, appointmentId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @DeleteMapping("/me")
-    public ResponseEntity<?> deleteAppointment(@RequestBody @Valid DeleteAppointmentPatientRequest request,
+    @DeleteMapping("{id}/me")
+    public ResponseEntity<?> deleteAppointment(@PathVariable("id") Long appointmentId,
                                                @AuthenticationPrincipal Long userId) {
-        appointmentPatientService.deleteAppointment(request, userId);
+        appointmentPatientService.deleteAppointment(appointmentId, userId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

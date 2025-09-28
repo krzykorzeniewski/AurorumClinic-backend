@@ -63,4 +63,9 @@ public class AppointmentEmployeeServiceImpl implements AppointmentEmployeeServic
                 new AppointmentCreatedEvent(patientFromDb, appointmentFromDb, rescheduleLink, deleteLink));
     }
 
+    @Override
+    public void updateAppointment(UpdateAppointmentEmployeeRequest request) {
+
+    }
+
 }

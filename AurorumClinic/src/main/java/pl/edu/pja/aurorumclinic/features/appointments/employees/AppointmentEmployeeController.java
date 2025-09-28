@@ -3,13 +3,13 @@ package pl.edu.pja.aurorumclinic.features.appointments.employees;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.UpdateAppointmentPatientRequest;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
-@RequestMapping("/api/appointments/employee")
+@RequestMapping("/api/appointments")
 @RequiredArgsConstructor
 public class AppointmentEmployeeController {
 
@@ -18,7 +18,13 @@ public class AppointmentEmployeeController {
     @PostMapping("")
     public ResponseEntity<?> createAppointment(@RequestBody @Valid CreateAppointmentEmployeeRequest request) {
         appointmentEmployeeService.createAppointment(request);
-        return null;
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateAppointment(@RequestBody @Valid UpdateAppointmentEmployeeRequest request) {
+        appointmentEmployeeService.updateAppointment(request);
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
 }

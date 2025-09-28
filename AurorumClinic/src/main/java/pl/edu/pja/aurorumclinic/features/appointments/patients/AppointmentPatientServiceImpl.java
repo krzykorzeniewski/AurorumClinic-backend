@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.CreateAppointmentPatientRequest;
-import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.DeleteAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.UpdateAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.GetAppointmentPatientResponse;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
@@ -72,8 +71,8 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     }
 
     @Override
-    public void updateAppointment(UpdateAppointmentPatientRequest updateAppointmentPatientRequest, Long userId) {
-        Appointment appointmentFromDb = appointmentRepository.findById(updateAppointmentPatientRequest.appointmentId())
+    public void updateAppointment(UpdateAppointmentPatientRequest updateAppointmentPatientRequest, Long userId, Long appointmentId) {
+        Appointment appointmentFromDb = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));
         if (!Objects.equals(appointmentFromDb.getPatient().getId(), userId)) {
             throw new ApiAuthorizationException("Patient id does not match user id");
@@ -94,8 +93,8 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     }
 
     @Override
-    public void deleteAppointment(DeleteAppointmentPatientRequest deleteAppointmentPatientRequest, Long userId) {
-        Appointment appointmentFromDb = appointmentRepository.findById(deleteAppointmentPatientRequest.appointmentId())
+    public void deleteAppointment(Long appointmentId, Long userId) {
+        Appointment appointmentFromDb = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));
         if (!Objects.equals(appointmentFromDb.getPatient().getId(), userId)) {
             throw new ApiAuthorizationException("Patient id does not match user id");
