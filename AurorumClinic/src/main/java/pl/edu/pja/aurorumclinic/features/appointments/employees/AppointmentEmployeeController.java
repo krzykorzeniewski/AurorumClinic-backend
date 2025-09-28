@@ -1,8 +1,10 @@
 package pl.edu.pja.aurorumclinic.features.appointments.employees;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +16,8 @@ public class AppointmentEmployeeController {
     private final AppointmentEmployeeService appointmentEmployeeService;
 
     @PostMapping("")
-    public ResponseEntity<?> createAppointment() { //miec na uwadze ten ekran z wyszukiwaniem dla pracownika skibidi
+    public ResponseEntity<?> createAppointment(@RequestBody @Valid CreateAppointmentEmployeeRequest request) {
+        appointmentEmployeeService.createAppointment(request);
         return null;
     }
 

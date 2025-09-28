@@ -8,9 +8,9 @@ import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.Crea
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.DeleteAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.UpdateAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.GetAppointmentPatientResponse;
-import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentDeletedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.patients.events.AppointmentRescheduledEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentValidator;
