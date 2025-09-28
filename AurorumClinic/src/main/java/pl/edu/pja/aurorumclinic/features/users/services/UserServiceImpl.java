@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService{
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("User not found", "id")
         );
-        tokenService.validateAndDeleteToken(userFromDb, requestDto.otp());
+        tokenService.validateAndDeleteToken(userFromDb, requestDto.token());
         userFromDb.setPhoneNumber(userFromDb.getPendingPhoneNumber());
         userFromDb.setPendingPhoneNumber(null);
     }

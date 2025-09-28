@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
@@ -20,8 +19,8 @@ public class PatientController {
     private final PatientService patientService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAllPatients() {
-        return ResponseEntity.ok(ApiResponse.success(patientService.getAllPatients()));
+    public ResponseEntity<?> getAllPatients(@RequestParam(required = false) String searchParam) {
+        return ResponseEntity.ok(ApiResponse.success(patientService.getAllPatients(searchParam)));
     }
 
     @GetMapping("/{id}")
@@ -48,6 +47,11 @@ public class PatientController {
     public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
         patientService.deletePatient(id);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @GetMapping("/{id}/appointments")
+    public ResponseEntity<?> getPatientAppointments(@PathVariable("id") Long patientId) {
+        return ResponseEntity.ok(ApiResponse.success(patientService.getPatientAppointments(patientId)));
     }
 
 }

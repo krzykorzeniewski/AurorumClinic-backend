@@ -3,11 +3,10 @@ package pl.edu.pja.aurorumclinic.features.users.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.features.users.dtos.response.*;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
-import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -23,8 +22,13 @@ public class PatientServiceImpl implements PatientService {
     private final PatientRepository patientRepository;
 
     @Override
-    public List<GetPatientResponse> getAllPatients() {
-        List<Patient> patientsFromDb = patientRepository.findAll();
+    public List<GetPatientResponse> getAllPatients(String query) {
+        List<Patient> patientsFromDb;
+        if (query == null) {
+            patientsFromDb = patientRepository.findAll();
+        } else {
+            patientsFromDb = patientRepository.searchAllBySearchParam(query);
+        }
         List<GetPatientResponse> patientDtos = new ArrayList<>();
         for (Patient patient : patientsFromDb) {
             GetPatientResponse patientDto = mapPatientToGetResponseDto(patient);
@@ -81,6 +85,13 @@ public class PatientServiceImpl implements PatientService {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         patientRepository.delete(patientFromDb);
+    }
+
+    @Override
+    public GetPatientAppointmentsResponse getPatientAppointments(Long patientId) {
+        return patientRepository.findPatientWithAppointmentsById(patientId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
     }
 
     private GetPatientResponse mapPatientToGetResponseDto(Patient patient) {

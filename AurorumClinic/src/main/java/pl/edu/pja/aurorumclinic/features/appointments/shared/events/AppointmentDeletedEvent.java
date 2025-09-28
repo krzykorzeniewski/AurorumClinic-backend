@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.patients.events;
+package pl.edu.pja.aurorumclinic.features.appointments.shared.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,11 +7,9 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 @RequiredArgsConstructor
 @Getter
-public class AppointmentRescheduledEvent {
+public class AppointmentDeletedEvent {
 
     private final Patient patient;
-    private final String rescheduleLink;
-    private final String deleteLink;
     private final Appointment appointment;
 
 }

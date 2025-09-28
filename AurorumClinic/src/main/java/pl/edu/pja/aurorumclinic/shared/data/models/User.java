@@ -43,7 +43,7 @@ public class User implements UserDetails {
     @NotBlank(message = "This field is required")
     private String surname;
 
-    @Column(name = "PESEL", columnDefinition = "nvarchar(11)")
+    @Column(name = "PESEL", columnDefinition = "nvarchar(11)", unique = true)
     @Size(min = 11, max = 11, message = "Required length for this field is 11 characters")
     private String pesel;
 

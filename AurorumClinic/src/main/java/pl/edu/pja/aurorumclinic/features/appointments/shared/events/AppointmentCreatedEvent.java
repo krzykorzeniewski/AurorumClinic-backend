@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.patients.events;
+package pl.edu.pja.aurorumclinic.features.appointments.shared.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
