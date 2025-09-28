@@ -5,7 +5,6 @@ import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientAppointme
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
-import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.util.List;
 

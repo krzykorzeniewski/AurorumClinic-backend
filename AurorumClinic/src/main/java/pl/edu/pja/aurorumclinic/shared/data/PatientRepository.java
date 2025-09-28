@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.shared.data;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientAppointmentsResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.util.List;
@@ -11,7 +12,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     Patient findByEmail(String email);
     List<Patient> findByNewsletterTrue();
-
 
     @Query("""
            select p from Patient p where
@@ -23,13 +23,5 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
            """)
     List<Patient> searchAllBySearchParam(String query);
 
-
-    @Query("""
-           select p from Patient p
-                      join fetch Appointment a on a.patient.id = p.id
-                      join fetch Doctor d on d.id = a.doctor.id
-                      join fetch Service s on s.id = a.service.id
-           where p.id = :id
-           """)
-    Optional<Patient> findPatientWithAppointmentsById(Long id);
+    Optional<GetPatientAppointmentsResponse> findPatientWithAppointmentsById(Long id);
 }
