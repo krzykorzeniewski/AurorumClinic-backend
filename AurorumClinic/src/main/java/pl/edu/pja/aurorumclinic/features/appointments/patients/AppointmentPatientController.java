@@ -31,7 +31,7 @@ public class AppointmentPatientController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @DeleteMapping("{id}/me")
+    @DeleteMapping("/{id}/me")
     public ResponseEntity<?> deleteAppointment(@PathVariable("id") Long appointmentId,
                                                @AuthenticationPrincipal Long userId) {
         appointmentPatientService.deleteAppointment(appointmentId, userId);

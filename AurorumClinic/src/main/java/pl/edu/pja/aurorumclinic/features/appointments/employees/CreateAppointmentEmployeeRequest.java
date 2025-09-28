@@ -9,6 +9,6 @@ public record CreateAppointmentEmployeeRequest(@NotNull Long patientId,
                                                @NotNull LocalDateTime startedAt,
                                                @NotNull Long serviceId,
                                                @NotNull Long doctorId,
-                                               @NotBlank String description //TODO check whether this is qualified as edm
+                                               @NotBlank String description
 ) {
 }

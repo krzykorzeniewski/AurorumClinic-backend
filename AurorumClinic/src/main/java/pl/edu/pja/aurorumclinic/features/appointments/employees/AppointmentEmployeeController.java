@@ -22,8 +22,15 @@ public class AppointmentEmployeeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAppointment(@RequestBody @Valid UpdateAppointmentEmployeeRequest request) {
-        appointmentEmployeeService.updateAppointment(request);
+    public ResponseEntity<?> updateAppointment(@RequestBody @Valid UpdateAppointmentEmployeeRequest request,
+                                               @PathVariable("id") Long appointmentId) {
+        appointmentEmployeeService.updateAppointment(appointmentId, request);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @DeleteMapping("/{id}/me")
+    public ResponseEntity<?> deleteAppointment(@PathVariable("id") Long appointmentId) {
+        appointmentEmployeeService.deleteAppointment(appointmentId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

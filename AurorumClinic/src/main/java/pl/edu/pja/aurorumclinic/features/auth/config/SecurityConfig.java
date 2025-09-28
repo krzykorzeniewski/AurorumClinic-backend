@@ -81,7 +81,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/verify-phone-number-token").authenticated()
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/api/appointments/me").hasAuthority(UserRole.PATIENT.name())
-                        .requestMatchers("/api/appointments/**").hasAuthority(UserRole.EMPLOYEE.name())
+                        .requestMatchers("/api/appointments/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
+                                UserRole.ADMIN.name())
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -8,12 +8,16 @@ import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentC
 import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentValidator;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -64,8 +68,32 @@ public class AppointmentEmployeeServiceImpl implements AppointmentEmployeeServic
     }
 
     @Override
-    public void updateAppointment(UpdateAppointmentEmployeeRequest request) {
+    public void updateAppointment(Long appointmentId, UpdateAppointmentEmployeeRequest request) {
+        Appointment appointmentFromDb = appointmentRepository.findById(appointmentId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        LocalDateTime newStartedAt = request.startedAt();
+        LocalDateTime newFinishedAt = newStartedAt.plusMinutes(appointmentFromDb.getService().getDuration());
+        appointmentValidator.validateTimeSlot(newStartedAt, newFinishedAt, appointmentFromDb.getDoctor().getId(),
+                appointmentFromDb.getService().getId());
 
+        appointmentFromDb.setStartedAt(newStartedAt);
+        appointmentFromDb.setFinishedAt(newFinishedAt);
+        appointmentFromDb.setDescription(request.description());
+
+        String rescheduleLink = rescheduleAppointmentLink + appointmentFromDb.getId();
+        String deleteLink = deleteAppointmentLink + appointmentFromDb.getId();
+        applicationEventPublisher.publishEvent(new AppointmentRescheduledEvent(appointmentFromDb.getPatient(),
+                rescheduleLink, deleteLink, appointmentFromDb));
+    }
+
+    @Override
+    public void deleteAppointment(Long appointmentId) {
+        Appointment appointmentFromDb = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));
+        appointmentRepository.delete(appointmentFromDb);
+        applicationEventPublisher.publishEvent(
+                new AppointmentDeletedEvent(appointmentFromDb.getPatient(), appointmentFromDb));
     }
 
 }
