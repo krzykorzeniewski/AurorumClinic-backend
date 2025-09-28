@@ -11,7 +11,7 @@ import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.Upda
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
-@RequestMapping("/api/appointments")
+@RequestMapping("/api/appointments/patient")
 @RequiredArgsConstructor
 public class AppointmentPatientController {
 

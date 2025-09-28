@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public interface PatientService {
 
-    List<GetPatientResponse> getAllPatients();
+    List<GetPatientResponse> getAllPatients(String query);
     GetPatientResponse getPatientById(Long patientId);
     GetPatientResponse partiallyUpdatePatient(Long patientId, PatchPatientRequest requestDto);
     GetPatientResponse updatePatient(Long patientId, PutPatientRequest requestDto);

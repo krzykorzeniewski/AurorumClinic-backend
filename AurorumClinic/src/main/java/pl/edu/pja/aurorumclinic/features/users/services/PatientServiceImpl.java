@@ -23,8 +23,13 @@ public class PatientServiceImpl implements PatientService {
     private final PatientRepository patientRepository;
 
     @Override
-    public List<GetPatientResponse> getAllPatients() {
-        List<Patient> patientsFromDb = patientRepository.findAll();
+    public List<GetPatientResponse> getAllPatients(String query) {
+        List<Patient> patientsFromDb;
+        if (query == null) {
+            patientsFromDb = patientRepository.findAll();
+        } else {
+            patientsFromDb = patientRepository.searchAllBySearchParam(query);
+        }
         List<GetPatientResponse> patientDtos = new ArrayList<>();
         for (Patient patient : patientsFromDb) {
             GetPatientResponse patientDto = mapPatientToGetResponseDto(patient);
