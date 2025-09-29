@@ -64,25 +64,6 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/users/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers("/favicon.ico").permitAll()
-                        .requestMatchers("/api/newsletter/**").permitAll()
-                        .requestMatchers("/api/appointments/guest").permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "/api/patients/**").hasAnyAuthority(UserRole.PATIENT.name())
-                        .requestMatchers(HttpMethod.DELETE, "/api/patients/**").hasAuthority(UserRole.PATIENT.name())
-                        .requestMatchers(HttpMethod.PUT, "/api/patients/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
-                                UserRole.ADMIN.name())
-                        .requestMatchers("/api/schedules").hasAnyAuthority(UserRole.DOCTOR.name(),
-                                UserRole.EMPLOYEE.name(), UserRole.ADMIN.name())
-                        .requestMatchers("/api/services").hasAuthority(UserRole.ADMIN.name())
-                        .requestMatchers("/api/auth/logout").authenticated()
-                        .requestMatchers("/api/auth/verify-phone-number").authenticated()
-                        .requestMatchers("/api/auth/verify-phone-number-token").authenticated()
-                        .requestMatchers("/api/auth/logout").authenticated()
-                        .requestMatchers("/api/appointments/**").hasAnyAuthority(UserRole.EMPLOYEE.name(),
-                        UserRole.ADMIN.name())
-                        .requestMatchers("/api/me/appointments/**").hasAuthority(UserRole.PATIENT.name())
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.newsletter;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RestController
 @RequestMapping("/api/newsletter")
 @RequiredArgsConstructor
+@PermitAll
 public class NewsletterController {
 
     private final PatientRepository patientRepository;

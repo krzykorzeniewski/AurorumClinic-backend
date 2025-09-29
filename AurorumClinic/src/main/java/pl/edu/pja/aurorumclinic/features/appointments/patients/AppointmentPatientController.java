@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.patients;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.CreateAppointmentPatientRequest;
@@ -10,8 +11,9 @@ import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.Upda
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
-@RequestMapping("/api/me/appointments")
+@RequestMapping("/api/appointments/me")
 @RequiredArgsConstructor
+@PreAuthorize("hasAuthority(UserRole.PATIENT.name())")
 public class AppointmentPatientController {
 
     private final AppointmentPatientService appointmentPatientService;

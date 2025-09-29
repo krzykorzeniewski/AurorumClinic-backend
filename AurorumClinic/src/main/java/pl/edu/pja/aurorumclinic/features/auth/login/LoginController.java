@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.auth.login;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -10,6 +11,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@PermitAll
 public class LoginController {
 
     private final LoginService loginService;

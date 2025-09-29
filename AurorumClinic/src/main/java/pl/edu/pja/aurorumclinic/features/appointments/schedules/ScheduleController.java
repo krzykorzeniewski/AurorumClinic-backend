@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.schedules;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority(UserRole.DOCTOR.name(), UserRole.EMPLOYEE.name(), UserRole.ADMIN.name())")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;

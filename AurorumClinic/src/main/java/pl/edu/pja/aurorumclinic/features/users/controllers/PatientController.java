@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
@@ -14,6 +15,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/patients")
 @RequiredArgsConstructor
+@PreAuthorize("hasAuthority(UserRole.EMPLOYEE.name())")
 public class PatientController {
 
     private final PatientService patientService;
@@ -35,16 +37,17 @@ public class PatientController {
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> partiallyUpdatePatient(@PathVariable Long id,
+    @PatchMapping("/me")
+    @PreAuthorize("hasAuthority(hasAuthority(UserRole.PATIENT.name()))")
+    public ResponseEntity<?> partiallyUpdatePatient(@AuthenticationPrincipal Long id,
                                                     @Valid @RequestBody PatchPatientRequest requestDto) {
         GetPatientResponse responseDto = patientService.partiallyUpdatePatient(id, requestDto);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("#id == authentication.principal")
-    public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
+    @DeleteMapping("/me")
+    @PreAuthorize("hasAuthority(hasAuthority(UserRole.PATIENT.name()))")
+    public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal Long id) {
         patientService.deletePatient(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
