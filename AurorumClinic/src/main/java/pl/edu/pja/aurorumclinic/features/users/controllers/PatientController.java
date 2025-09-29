@@ -25,8 +25,8 @@ public class PatientController {
         return ResponseEntity.ok(ApiResponse.success(patientService.getAllPatients(searchParam)));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getPatientById(@PathVariable Long id) {
+    @GetMapping("/me")
+    public ResponseEntity<?> getPatient(@AuthenticationPrincipal Long id) {
         return ResponseEntity.ok(ApiResponse.success(patientService.getPatientById(id)));
     }
 
