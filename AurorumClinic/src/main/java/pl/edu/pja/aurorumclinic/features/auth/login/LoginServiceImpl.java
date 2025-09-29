@@ -46,8 +46,6 @@ public class LoginServiceImpl implements LoginService{
         if (userFromDb.isTwoFactorAuth()) {
             send2fasms(userFromDb);
             return LoginUserResponse.builder()
-                    .userId(userFromDb.getId())
-                    .email(userFromDb.getEmail())
                     .twoFactorAuth(userFromDb.isTwoFactorAuth())
                     .role(userFromDb.getRole())
                     .build();
@@ -57,8 +55,6 @@ public class LoginServiceImpl implements LoginService{
         Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);
 
         return LoginUserResponse.builder()
-                .userId(userFromDb.getId())
-                .email(userFromDb.getEmail())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .accessToken(jwt)
@@ -88,8 +84,6 @@ public class LoginServiceImpl implements LoginService{
         Token newRefreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);;
 
         return LoginUserResponse.builder()
-                .userId(userFromDb.getId())
-                .email(userFromDb.getEmail())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .accessToken(newJwt)
@@ -108,7 +102,6 @@ public class LoginServiceImpl implements LoginService{
         Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);
 
         return LoginUserResponse.builder()
-                .userId(userFromDb.getId())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .accessToken(jwt)
