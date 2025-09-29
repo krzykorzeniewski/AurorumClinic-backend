@@ -10,20 +10,20 @@ import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.Upda
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController
-@RequestMapping("/api/appointments")
+@RequestMapping("/api/me/appointments")
 @RequiredArgsConstructor
 public class AppointmentPatientController {
 
     private final AppointmentPatientService appointmentPatientService;
 
-    @PostMapping("/me")
+    @PostMapping("")
     public ResponseEntity<?> createAppointment(@RequestBody @Valid CreateAppointmentPatientRequest request,
                                                @AuthenticationPrincipal Long userId) {
         appointmentPatientService.createAppointment(request, userId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @PutMapping("/{id}/me")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateAppointment(@RequestBody @Valid UpdateAppointmentPatientRequest request,
                                                @AuthenticationPrincipal Long userId,
                                                @PathVariable("id") Long appointmentId) {
@@ -31,14 +31,14 @@ public class AppointmentPatientController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @DeleteMapping("/{id}/me")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAppointment(@PathVariable("id") Long appointmentId,
                                                @AuthenticationPrincipal Long userId) {
         appointmentPatientService.deleteAppointment(appointmentId, userId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @GetMapping("/{id}/me")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getAppointment(@PathVariable Long id,
                                                @AuthenticationPrincipal Long userId) {
         return ResponseEntity.ok(ApiResponse.success(appointmentPatientService.getAppointmentForPatient(id, userId)));

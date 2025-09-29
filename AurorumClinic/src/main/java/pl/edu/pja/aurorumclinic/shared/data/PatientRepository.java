@@ -1,9 +1,7 @@
 package pl.edu.pja.aurorumclinic.shared.data;
 
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientAppointmentsResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.util.List;
