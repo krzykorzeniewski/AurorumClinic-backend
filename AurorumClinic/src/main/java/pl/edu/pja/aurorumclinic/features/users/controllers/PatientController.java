@@ -15,7 +15,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/patients")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('EMPLOYEE')")
+@PreAuthorize("hasRole('EMPLOYEE')")
 public class PatientController {
 
     private final PatientService patientService;
@@ -26,7 +26,7 @@ public class PatientController {
     }
 
     @GetMapping("/me")
-    @PreAuthorize("hasAuthority('PATIENT')")
+    @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<?> getPatient(@AuthenticationPrincipal Long id) {
         return ResponseEntity.ok(ApiResponse.success(patientService.getPatientById(id)));
     }
@@ -39,7 +39,7 @@ public class PatientController {
     }
 
     @PatchMapping("/me")
-    @PreAuthorize("hasAuthority('PATIENT')")
+    @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<?> partiallyUpdatePatient(@AuthenticationPrincipal Long id,
                                                     @Valid @RequestBody PatchPatientRequest requestDto) {
         GetPatientResponse responseDto = patientService.partiallyUpdatePatient(id, requestDto);
@@ -47,7 +47,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/me")
-    @PreAuthorize("hasAuthority('PATIENT')")
+    @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal Long id) {
         patientService.deletePatient(id);
         return ResponseEntity.ok(ApiResponse.success(null));

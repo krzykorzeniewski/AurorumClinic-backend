@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('DOCTOR')")
+@PreAuthorize("hasRole('DOCTOR')")
 public class DoctorController {
 
     private final DoctorService doctorService;
@@ -33,6 +33,7 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @PreAuthorize("hasAnyRole('DOCTOR', 'EMPLOYEE', 'PATIENT')")
     @GetMapping("/{id}/appointment-slots")
     public ResponseEntity<?> getAppointmentSlots(@PathVariable Long id,
                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAt,

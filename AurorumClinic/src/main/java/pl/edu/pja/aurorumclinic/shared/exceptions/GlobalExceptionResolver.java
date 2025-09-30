@@ -115,6 +115,9 @@ public class GlobalExceptionResolver {
                 case "uk_doctor_pwz_number" -> {
                     return ApiResponse.fail(Map.of("pwzNumber", "already in use"));
                 }
+                case "uk_service_name" -> {
+                    return ApiResponse.fail(Map.of("name", "already in use"));
+                }
                 default -> {
                     return ApiResponse.fail(Map.of("duplicate", "already in use"));
                 }

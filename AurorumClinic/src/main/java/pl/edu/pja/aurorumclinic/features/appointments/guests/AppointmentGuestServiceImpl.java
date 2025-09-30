@@ -41,8 +41,14 @@ public class AppointmentGuestServiceImpl implements AppointmentGuestService {
 
     @Override
     public void createAppointmentForUnregisteredUser(CreateAppointmentGuestRequest createRequest) {
-        if (userRepository.findByEmail(createRequest.email()) != null) {
+        if (userRepository.existsByEmail(createRequest.email())) {
             throw new ApiConflictException("An account is registered for this email", "email");
+        }
+        if (userRepository.existsByPesel(createRequest.pesel())) {
+            throw new ApiConflictException("An account is registered with this pesel", "pesel");
+        }
+        if (userRepository.existsByPhoneNumber(createRequest.phoneNumber())) {
+            throw new ApiConflictException("An account is registered with this phone number", "phoneNumber");
         }
         Service serviceFromDb = serviceRepository.findById(createRequest.serviceId()).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")

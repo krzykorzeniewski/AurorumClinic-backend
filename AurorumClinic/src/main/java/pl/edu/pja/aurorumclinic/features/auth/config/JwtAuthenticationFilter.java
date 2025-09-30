@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new ApiAuthenticationException("Invalid access token", "accessToken");
         }
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(
-                userIdFromJwt, List.of(new SimpleGrantedAuthority(roleFromJwt))
+                userIdFromJwt, List.of(new SimpleGrantedAuthority("ROLE_" + roleFromJwt))
         );
         SecurityContext newContext = SecurityContextHolder.createEmptyContext();
         newContext.setAuthentication(authenticationToken);

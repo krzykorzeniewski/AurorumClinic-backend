@@ -15,6 +15,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "Service", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_service_name", columnNames = {"Name"})
+})
 public class Service {
 
     @Id
@@ -24,7 +27,7 @@ public class Service {
 
     @Size(max = 150, message = "Maximum length for this field is 150 characters")
     @NotBlank(message = "This field is required")
-    @Column(name = "Name", unique = true, columnDefinition = "nvarchar(150)")
+    @Column(name = "Name", columnDefinition = "nvarchar(150)")
     private String name;
 
     @Column(name = "Duration")
