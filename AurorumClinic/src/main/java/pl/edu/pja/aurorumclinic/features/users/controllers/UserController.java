@@ -19,9 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/me/2fa-token")
-    public ResponseEntity<?> set2faToken(@AuthenticationPrincipal Long id,
-                                          @Valid @RequestBody UpdateUser2FATokenRequest requestDto) {
-        userService.send2faSms(id, requestDto);
+    public ResponseEntity<?> set2faToken(@AuthenticationPrincipal Long id) {
+        userService.send2faUpdateSms(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

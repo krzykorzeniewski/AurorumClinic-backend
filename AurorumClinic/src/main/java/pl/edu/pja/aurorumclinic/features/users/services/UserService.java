@@ -12,7 +12,7 @@ public interface UserService {
 
     void updateUserEmail(Long id, UpdateUserEmailRequest requestDto);
 
-    void send2faSms(Long id, UpdateUser2FATokenRequest requestDto);
+    void send2faUpdateSms(Long id);
 
     void updateUser2fa(Long id, UpdateUser2FARequest requestDto);
 }

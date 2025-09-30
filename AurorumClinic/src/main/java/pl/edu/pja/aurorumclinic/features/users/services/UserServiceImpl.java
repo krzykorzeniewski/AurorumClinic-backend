@@ -16,8 +16,6 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -94,13 +92,10 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void send2faSms(Long id, UpdateUser2FATokenRequest requestDto) {
+    public void send2faUpdateSms(Long id) {
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        if (!Objects.equals(userFromDb.getPhoneNumber(), requestDto.phoneNumber())) {
-            throw new ApiException("User phone number doest not match", "phoneNumber");
-        }
         if (!userFromDb.isPhoneNumberVerified()) {
             throw new ApiException("Phone number is not verified", "phoneNumber");
         }
@@ -119,7 +114,7 @@ public class UserServiceImpl implements UserService{
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        tokenService.validateAndDeleteToken(userFromDb, request.otp());
+        tokenService.validateAndDeleteToken(userFromDb, request.token());
         userFromDb.setTwoFactorAuth(true);
     }
 }
