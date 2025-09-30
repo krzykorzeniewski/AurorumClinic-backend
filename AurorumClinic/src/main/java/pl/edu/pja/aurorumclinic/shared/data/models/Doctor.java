@@ -16,6 +16,11 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @PrimaryKeyJoinColumn(name = "PK_Doctor")
+@Table(name = "Doctor",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_doctor_pwz_number",
+                columnNames = {"PWZ_Number"}
+        ))
 public class Doctor extends User{
 
     @Column(name = "Description", columnDefinition = "nvarchar(500)")
