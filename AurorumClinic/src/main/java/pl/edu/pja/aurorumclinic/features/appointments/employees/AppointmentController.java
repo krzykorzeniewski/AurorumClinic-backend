@@ -10,7 +10,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyAuthority(UserRole.EMPLOYEE.name())")
+@PreAuthorize("hasAnyAuthority('EMPLOYEE')")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;

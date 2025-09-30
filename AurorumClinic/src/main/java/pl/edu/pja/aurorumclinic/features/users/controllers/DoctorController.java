@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority(UserRole.DOCTOR.name())")
+@PreAuthorize("hasAuthority('DOCTOR')")
 public class DoctorController {
 
     private final DoctorService doctorService;

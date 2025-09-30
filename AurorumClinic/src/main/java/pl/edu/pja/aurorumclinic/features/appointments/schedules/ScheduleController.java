@@ -13,7 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyAuthority(UserRole.DOCTOR.name(), UserRole.EMPLOYEE.name(), UserRole.ADMIN.name())")
+@PreAuthorize("hasAnyAuthority('DOCTOR', 'EMPLOYEE', 'ADMIN')")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;

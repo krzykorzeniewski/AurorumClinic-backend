@@ -13,7 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/services")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority(UserRole.ADMIN.name())")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class ServiceController {
 
     private final ServiceService serviceService;

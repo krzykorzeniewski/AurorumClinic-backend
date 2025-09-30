@@ -7,12 +7,14 @@ import pl.edu.pja.aurorumclinic.features.users.dtos.response.*;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PatchPatientRequest;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.PutPatientRequest;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +52,10 @@ public class PatientServiceImpl implements PatientService {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
+        if (!patientFromDb.isPhoneNumberVerified() &&
+                Objects.equals(requestDto.communicationPreferences(), CommunicationPreference.PHONE_NUMBER)) {
+            throw new ApiException("phone number is not verified", "communicationPreferences");
+        }
         patientFromDb.setCommunicationPreferences(requestDto.communicationPreferences());
         patientFromDb.setNewsletter(requestDto.newsletter());
 

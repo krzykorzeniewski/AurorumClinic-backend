@@ -13,7 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/appointments/me")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority(UserRole.PATIENT.name())")
+@PreAuthorize("hasAuthority('PATIENT')")
 public class AppointmentPatientController {
 
     private final AppointmentPatientService appointmentPatientService;
