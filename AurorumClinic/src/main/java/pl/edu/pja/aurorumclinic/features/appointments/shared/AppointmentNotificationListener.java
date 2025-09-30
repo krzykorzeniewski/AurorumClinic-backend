@@ -7,10 +7,6 @@ import org.springframework.stereotype.Component;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.guests.events.AppointmentGuestCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.guests.events.AppointmentGuestDeletedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.guests.events.AppointmentGuestRescheduledEvent;
-import pl.edu.pja.aurorumclinic.shared.data.models.Guest;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
@@ -82,38 +78,5 @@ public class AppointmentNotificationListener {
         }
     }
 
-    @EventListener
-    public void handleAppointmentUnregisteredDeletedEvent(AppointmentGuestDeletedEvent event) {
-        Guest guest = event.getGuest();
-        String message = "twoja wizyta w dniu " + event.getAppointment().getStartedAt()
-                .format(dateFormatter) + " została anulowana";
-        emailService.sendEmail(
-                noreplyEmailAddres, guest.getEmail(),
-                "wizyta odwołana", message);
-    }
-
-    @EventListener
-    public void handleAppointmentUnregisteredRescheduledEvent(AppointmentGuestRescheduledEvent event) {
-        Guest guest = event.getGuest();
-        String message = "twoja wizyta została przełożona na datę " + event.getAppointment().getStartedAt()
-                .format(dateFormatter) + "\n" +
-                "aby ją odwołać naciśnij link: " + event.getDeleteLink() + "\n" +
-                "aby ją przełożyć naciśnij link: " + event.getRescheduleLink();
-        emailService.sendEmail(
-                noreplyEmailAddres, guest.getEmail(),
-                "wizyta przełożona", message);
-    }
-
-    @EventListener
-    public void handeAppointmentUnregisteredCreatedEvent(AppointmentGuestCreatedEvent event) {
-        Guest guest = event.getGuest();
-        String message = "twoja wizyta została umówiona w dniu " + event.getAppointment().getStartedAt()
-                .format(dateFormatter) + "\n" +
-                "aby ją odwołać naciśnij link: " + event.getDeleteLink() + "\n" +
-                "aby ją przełożyć naciśnij link: " + event.getRescheduleLink();
-        emailService.sendEmail(
-                noreplyEmailAddres, guest.getEmail(),
-                "wizyta umówiona", message);
-    }
 
 }
