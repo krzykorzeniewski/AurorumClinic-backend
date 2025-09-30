@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pl.edu.pja.aurorumclinic.features.users.services.DoctorService;
@@ -26,10 +27,10 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success(doctorService.getAllDoctors()));
     }
 
-    @PostMapping("/{id}/profile-picture")
+    @PostMapping("/me/profile-picture")
     public ResponseEntity<?> uploadProfilePicture(@RequestParam MultipartFile image,
-                                                  @PathVariable Long id) throws IOException {
-        doctorService.uploadProfilePicture(image, id);
+                                                  @AuthenticationPrincipal Long doctorId) throws IOException {
+        doctorService.uploadProfilePicture(image, doctorId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

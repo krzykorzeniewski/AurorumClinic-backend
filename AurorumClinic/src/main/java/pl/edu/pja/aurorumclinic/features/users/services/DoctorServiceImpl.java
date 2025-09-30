@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetDoctorResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
@@ -58,6 +59,7 @@ public class DoctorServiceImpl implements DoctorService {
         return doctorsToReturn;
     }
 
+    @Transactional
     @Override
     public void uploadProfilePicture(MultipartFile image, Long doctorId) throws IOException {
         Doctor doctorFromDb = doctorRepository.findById(doctorId).orElseThrow(
@@ -65,7 +67,6 @@ public class DoctorServiceImpl implements DoctorService {
         );
         String imagePath = objectStorageService.uploadObject(image);
         doctorFromDb.setProfilePicture(imagePath);
-        doctorRepository.save(doctorFromDb);
     }
 
     @Override
