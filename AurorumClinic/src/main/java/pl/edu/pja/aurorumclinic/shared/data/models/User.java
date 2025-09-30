@@ -105,7 +105,7 @@ public class User implements UserDetails {
     @Size(min = 9, max = 9, message = "Required length for this field is 9 characters")
     private String pendingPhoneNumber;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Token> tokens;
 
     @Override

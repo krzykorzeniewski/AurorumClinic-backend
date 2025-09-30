@@ -26,6 +26,7 @@ public class PatientController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasAuthority('PATIENT')")
     public ResponseEntity<?> getPatient(@AuthenticationPrincipal Long id) {
         return ResponseEntity.ok(ApiResponse.success(patientService.getPatientById(id)));
     }
