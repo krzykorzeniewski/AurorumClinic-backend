@@ -29,14 +29,10 @@ public class VerifyPhoneNumberServiceImpl implements VerifyPhoneNumberService{
     private String fromPhoneNumber;
 
     @Override
-    public void sendVerifyPhoneNumberSms(VerifyPhoneNumberTokenRequest verifyPhoneNumberTokenRequest, Authentication authentication) {
-        User userFromDb = userRepository.findByPhoneNumber(verifyPhoneNumberTokenRequest.phoneNumber());
-        if (userFromDb == null) {
-            throw new ApiNotFoundException("Phone number not found", "phoneNumber");
-        }
-        if (!Objects.equals(userFromDb.getId(), authentication.getPrincipal())) {
-            throw new ApiAuthorizationException("Access denied");
-        }
+    public void sendVerifyPhoneNumberSms(Long id) {
+        User userFromDb = userRepository.findById(id).orElseThrow(
+                () -> new ApiNotFoundException("id not found", "id")
+        );
         if (userFromDb.isPhoneNumberVerified()) {
             throw new ApiException("Phone number is already verified", "phoneNumber");
         }
@@ -47,14 +43,10 @@ public class VerifyPhoneNumberServiceImpl implements VerifyPhoneNumberService{
     }
 
     @Override
-    public void verifyPhoneNumber(VerifyPhoneNumberRequest verifyPhoneNumberRequest, Authentication authentication) {
-        User userFromDb = userRepository.findByPhoneNumber(verifyPhoneNumberRequest.phoneNumber());
-        if (userFromDb == null) {
-            throw new ApiNotFoundException("Phone number not found", "phoneNumber");
-        }
-        if (!Objects.equals(userFromDb.getId(), authentication.getPrincipal())) {
-            throw new ApiAuthorizationException("Access denied");
-        }
+    public void verifyPhoneNumber(VerifyPhoneNumberRequest verifyPhoneNumberRequest, Long id) {
+        User userFromDb = userRepository.findById(id).orElseThrow(
+                () -> new ApiNotFoundException("id not found", "id")
+        );
         tokenService.validateAndDeleteToken(userFromDb, verifyPhoneNumberRequest.token());
         userFromDb.setPhoneNumberVerified(true);
     }
