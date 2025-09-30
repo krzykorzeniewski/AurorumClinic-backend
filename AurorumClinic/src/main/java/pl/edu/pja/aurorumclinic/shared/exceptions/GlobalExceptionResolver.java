@@ -1,6 +1,9 @@
 package pl.edu.pja.aurorumclinic.shared.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +16,7 @@ import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 import java.util.Map;
+import java.util.Objects;
 
 @RestControllerAdvice
 public class GlobalExceptionResolver {
@@ -26,8 +30,14 @@ public class GlobalExceptionResolver {
 
     @ExceptionHandler(ApiNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse<?> handleApiNotFoundException(ApiException ex) {
+    public ApiResponse<?> handleApiNotFoundException(ApiNotFoundException ex) {
         return ApiResponse.fail(Map.of(ex.getField(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(ApiConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiResponse<?> handleApiConflictException(ApiConflictException ex) {
+        return ApiResponse.fail(Map.of(ex.getField(), "already in use"));
     }
 
     @ExceptionHandler(ApiAuthenticationException.class)
@@ -74,6 +84,50 @@ public class GlobalExceptionResolver {
         String field = fieldAndMessage.split(":")[0];
         String message = fieldAndMessage.split(":")[1].trim();
         return ApiResponse.fail(Map.of(field, message));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<?> handleConstraintViolationException(ConstraintViolationException ex) {
+        String message = ex.getConstraintViolations().stream().findFirst().orElseThrow().getMessage();
+        String field = String.valueOf(ex.getConstraintViolations().stream().findFirst().orElseThrow().getPropertyPath());
+        return ApiResponse.fail(Map.of(field, message));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiResponse<?> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof org.hibernate.exception.ConstraintViolationException) {
+            org.hibernate.exception.ConstraintViolationException causeException =
+                    (org.hibernate.exception.ConstraintViolationException) ex.getCause();
+            String constraintName = causeException.getConstraintName();
+            switch (Objects.requireNonNull(constraintName)) {
+                case "uk_user_email" -> {
+                    return ApiResponse.fail(Map.of("email", "already in use"));
+                }
+                case "uk_user_pesel" -> {
+                    return ApiResponse.fail(Map.of("pesel", "already in use"));
+                }
+                case "uk_user_phone_number" -> {
+                    return ApiResponse.fail(Map.of("phoneNumber", "already in use"));
+                }
+                case "uk_doctor_pwz_number" -> {
+                    return ApiResponse.fail(Map.of("pwzNumber", "already in use"));
+                }
+                default -> {
+                    return ApiResponse.fail(Map.of("duplicate", "already in use"));
+                }
+            }
+        } else {
+            return ApiResponse.fail(Map.of("duplicate", "already in use"));
+        }
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        return ApiResponse.fail(Map.of("payload", "invalid message format"));
     }
 
 }

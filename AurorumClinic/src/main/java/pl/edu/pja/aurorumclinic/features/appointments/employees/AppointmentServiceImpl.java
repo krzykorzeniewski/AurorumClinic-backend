@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AppointmentEmployeeServiceImpl implements AppointmentEmployeeService{
+public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentValidator appointmentValidator;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -38,7 +38,7 @@ public class AppointmentEmployeeServiceImpl implements AppointmentEmployeeServic
     private String rescheduleAppointmentLink;
 
     @Override
-    public void createAppointment(CreateAppointmentEmployeeRequest request) {
+    public void createAppointment(CreateAppointmentRequest request) {
         Patient patientFromDb = (Patient) userRepository.findById(request.patientId()).orElseThrow(
                 () ->  new ApiNotFoundException("Id not found", "id")
         );
@@ -70,7 +70,7 @@ public class AppointmentEmployeeServiceImpl implements AppointmentEmployeeServic
     }
 
     @Override
-    public void updateAppointment(Long appointmentId, UpdateAppointmentEmployeeRequest request) {
+    public void updateAppointment(Long appointmentId, UpdateAppointmentRequest request) {
         Appointment appointmentFromDb = appointmentRepository.findById(appointmentId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );

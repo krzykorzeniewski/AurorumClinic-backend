@@ -44,10 +44,7 @@ public class LoginServiceImpl implements LoginService{
         }
 
         if (userFromDb.isTwoFactorAuth()) {
-            send2fasms(userFromDb);
             return LoginUserResponse.builder()
-                    .userId(userFromDb.getId())
-                    .email(userFromDb.getEmail())
                     .twoFactorAuth(userFromDb.isTwoFactorAuth())
                     .role(userFromDb.getRole())
                     .build();
@@ -57,8 +54,6 @@ public class LoginServiceImpl implements LoginService{
         Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);
 
         return LoginUserResponse.builder()
-                .userId(userFromDb.getId())
-                .email(userFromDb.getEmail())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .accessToken(jwt)
@@ -88,8 +83,6 @@ public class LoginServiceImpl implements LoginService{
         Token newRefreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);;
 
         return LoginUserResponse.builder()
-                .userId(userFromDb.getId())
-                .email(userFromDb.getEmail())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .accessToken(newJwt)
@@ -99,16 +92,16 @@ public class LoginServiceImpl implements LoginService{
 
     @Override
     public LoginUserResponse login2fa (TwoFactorAuthLoginRequest twoFactorAuthLoginRequest){
-        User userFromDb = userRepository.findById(twoFactorAuthLoginRequest.userId()).orElseThrow(
-                () -> new ApiAuthenticationException("User not found", "id")
-        );
+        User userFromDb = userRepository.findByEmail(twoFactorAuthLoginRequest.email());
+        if (userFromDb == null) {
+            throw new ApiAuthenticationException("credentials", "email or token invalid");
+        }
         tokenService.validateAndDeleteToken(userFromDb, twoFactorAuthLoginRequest.token());
 
         String jwt = jwtUtils.createJwt(userFromDb);
         Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);
 
         return LoginUserResponse.builder()
-                .userId(userFromDb.getId())
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
                 .role(userFromDb.getRole())
                 .accessToken(jwt)
@@ -132,7 +125,7 @@ public class LoginServiceImpl implements LoginService{
     }
 
     private void send2fasms (User user){
-        Token token = tokenService.createOtpToken(user, TokenName.TWO_FACTOR_AUTH, 5);
+        Token token = tokenService.createOtpToken(user, TokenName.TWO_FACTOR_AUTH, 1);
         smsService.sendSms("+48" + user.getPhoneNumber(), fromPhoneNumber,
                 "Kod logowania do Aurorum Clinic : " + token.getRawValue());
     }

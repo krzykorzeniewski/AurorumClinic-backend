@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.auth.reset_password;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@PermitAll
 public class ResetPasswordController {
 
     private final ResetPasswordService resetPasswordService;

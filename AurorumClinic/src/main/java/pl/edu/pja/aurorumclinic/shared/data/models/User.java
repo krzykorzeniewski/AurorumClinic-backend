@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,7 +23,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Table(name = "User_")
+@Table(name = "User_",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_user_email",
+                        columnNames = {"Email"}
+                ),
+                @UniqueConstraint(
+                        name = "uk_user_pesel",
+                        columnNames = {"PESEL"}
+                ),
+                @UniqueConstraint(
+                        name = "uk_user_phone_number",
+                        columnNames = {"Phone_Number"}
+                )
+        })
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User implements UserDetails {
 
@@ -43,7 +56,7 @@ public class User implements UserDetails {
     @NotBlank(message = "This field is required")
     private String surname;
 
-    @Column(name = "PESEL", columnDefinition = "nvarchar(11)", unique = true)
+    @Column(name = "PESEL", columnDefinition = "nvarchar(11)")
     @Size(min = 11, max = 11, message = "Required length for this field is 11 characters")
     private String pesel;
 
@@ -51,7 +64,7 @@ public class User implements UserDetails {
     @NotNull(message = "This field is required")
     private LocalDate birthdate;
 
-    @Column(name = "Email", columnDefinition = "nvarchar(100)", unique = true)
+    @Column(name = "Email", columnDefinition = "nvarchar(100)")
     @Email(message = "Invalid email format")
     @Size(max = 100, message = "Maximum length for this field is 100 characters")
     @NotBlank(message = "This field is required")
@@ -61,7 +74,7 @@ public class User implements UserDetails {
     @Size(max = 200, message = "Maximum length for this field is 200 characters")
     private String password;
 
-    @Column(name = "Phone_Number", columnDefinition = "nvarchar(9)", unique = true)
+    @Column(name = "Phone_Number", columnDefinition = "nvarchar(9)")
     @Size(min = 9, max = 9, message = "Required length for this field is 9 characters")
     @NotBlank(message = "This field is required")
     private String phoneNumber;
