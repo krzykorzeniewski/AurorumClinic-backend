@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 
 import java.time.LocalDateTime;
@@ -44,6 +41,7 @@ public class Token {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "FK_User", nullable = false)
+    @ToString.Exclude
     private User user;
 
 }
