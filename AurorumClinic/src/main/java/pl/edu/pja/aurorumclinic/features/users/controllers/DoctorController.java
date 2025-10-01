@@ -23,8 +23,11 @@ public class DoctorController {
     private final DoctorService doctorService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAllDoctors() throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(doctorService.getAllDoctors()));
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'PATIENT')")
+    public ResponseEntity<?> getAllDoctors(@RequestParam(required = false) String searchParam,
+                                           @RequestParam(defaultValue = "0") int page,
+                                           @RequestParam (defaultValue = "5") int size) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(doctorService.getAllDoctors(searchParam, page, size)));
     }
 
     @PostMapping("/me/profile-picture")

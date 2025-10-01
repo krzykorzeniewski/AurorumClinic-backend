@@ -65,9 +65,6 @@ public class Appointment {
     @JoinColumn(name = "FK_Patient")
     private Patient patient;
 
-    @OneToOne(mappedBy = "appointment")
-    private Guest guest;
-
     @OneToMany(mappedBy = "appointment")
     private List<Message> messages;
 }

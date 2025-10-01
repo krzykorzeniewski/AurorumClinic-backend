@@ -4,6 +4,8 @@ import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.Crea
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.UpdateAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.GetAppointmentPatientResponse;
 
+import java.io.IOException;
+
 public interface AppointmentPatientService {
     void createAppointment(CreateAppointmentPatientRequest createAppointmentPatientRequest, Long userId);
 
@@ -11,5 +13,5 @@ public interface AppointmentPatientService {
 
     void deleteAppointment(Long appointmentId, Long userId);
 
-    GetAppointmentPatientResponse getAppointmentForPatient(Long appointmentId, Long userId);
+    GetAppointmentPatientResponse getAppointmentForPatient(Long appointmentId, Long userId) throws IOException;
 }

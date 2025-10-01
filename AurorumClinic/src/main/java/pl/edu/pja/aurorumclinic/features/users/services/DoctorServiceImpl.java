@@ -1,6 +1,9 @@
 package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,8 +30,9 @@ public class DoctorServiceImpl implements DoctorService {
     private final ObjectStorageService objectStorageService;
 
     @Override
-    public List<GetDoctorResponse> getAllDoctors() throws IOException {
-        List<Doctor> doctorsFromDb = doctorRepository.findAll();
+    public List<GetDoctorResponse> getAllDoctors(String searchText, int page, int size) throws IOException {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Doctor> doctorsFromDb = doctorRepository.findAll(pageable);
         List<GetDoctorResponse> doctorsToReturn = new ArrayList<>();
         for (Doctor doctor : doctorsFromDb) {
             GetDoctorResponse responseDto = GetDoctorResponse.builder()
@@ -51,8 +55,6 @@ public class DoctorServiceImpl implements DoctorService {
                             .mapToInt(Opinion::getRating)
                             .average()
                             .orElse(0.0))
-                    .appointments(doctor.getAppointments())
-                    .schedules(doctor.getSchedules())
                     .build();
             doctorsToReturn.add(responseDto);
         }

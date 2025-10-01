@@ -18,7 +18,6 @@ import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
@@ -33,6 +32,7 @@ public class UserServiceImpl implements UserService{
     private String fromEmailAddress;
 
     @Override
+    @Transactional
     public void sendUpdateEmail(Long id, UpdateUserEmailTokenRequest requestDto) {
         String newEmail = requestDto.email();
         User userFromDb = userRepository.findById(id).orElseThrow(
@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updateUserPhoneNumber(Long id, UpdateUserPhoneNumberRequest requestDto) {
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("User not found", "id")
@@ -63,6 +64,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void sendUpdateSms(Long id, UpdateUserPhoneNumberTokenRequest requestDto) {
         String newNumber = requestDto.phoneNumber();
         User userFromDb = userRepository.findById(id).orElseThrow(
@@ -82,6 +84,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updateUserEmail(Long id, UpdateUserEmailRequest requestDto) {
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
@@ -92,6 +95,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void send2faUpdateSms(Long id) {
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
@@ -110,6 +114,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public void updateUser2fa(Long id, UpdateUser2FARequest request) {
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")

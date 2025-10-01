@@ -21,8 +21,10 @@ public class PatientController {
     private final PatientService patientService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAllPatients(@RequestParam(required = false) String searchParam) {
-        return ResponseEntity.ok(ApiResponse.success(patientService.getAllPatients(searchParam)));
+    public ResponseEntity<?> getAllPatients(@RequestParam(required = false) String searchParam,
+                                            @RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(ApiResponse.success(patientService.getAllPatients(searchParam, page, size)));
     }
 
     @GetMapping("/me")

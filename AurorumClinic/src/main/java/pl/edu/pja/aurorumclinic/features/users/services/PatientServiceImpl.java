@@ -1,6 +1,9 @@
 package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.users.dtos.response.*;
@@ -18,18 +21,18 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
 
     @Override
-    public List<GetPatientResponse> getAllPatients(String query) {
-        List<Patient> patientsFromDb;
+    public List<GetPatientResponse> getAllPatients(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Patient> patientsFromDb;
         if (query == null) {
-            patientsFromDb = patientRepository.findAll();
+            patientsFromDb = patientRepository.findAll(pageable);
         } else {
-            patientsFromDb = patientRepository.searchAllBySearchParam(query);
+            patientsFromDb = patientRepository.searchAllBySearchParam(query, pageable);
         }
         List<GetPatientResponse> patientDtos = new ArrayList<>();
         for (Patient patient : patientsFromDb) {
@@ -48,6 +51,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
+    @Transactional
     public GetPatientResponse partiallyUpdatePatient(Long patientId, PatchPatientRequest requestDto) {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
@@ -64,6 +68,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
+    @Transactional
     public GetPatientResponse updatePatient(Long patientId, PutPatientRequest requestDto) {
         Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
@@ -86,6 +91,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
+    @Transactional
     public void deletePatient(Long id) {
         Patient patientFromDb = patientRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
