@@ -2,9 +2,11 @@ package pl.edu.pja.aurorumclinic.features.users.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.*;
+import pl.edu.pja.aurorumclinic.features.users.events.PendingEmailCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
@@ -13,7 +15,6 @@ import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
-import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
 @Service
@@ -21,15 +22,12 @@ import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
-    private final EmailService emailService;
     private final TokenService tokenService;
     private final SmsService smsService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Value("${twilio.trial_number}")
     private String fromPhoneNumber;
-
-    @Value("${mail.backend.noreply-address}")
-    private String fromEmailAddress;
 
     @Override
     @Transactional
@@ -41,15 +39,8 @@ public class UserServiceImpl implements UserService{
         if (userRepository.existsByEmail(newEmail)) {
             throw new ApiConflictException("Email is already taken", "email");
         }
-        Token token = tokenService.createOtpToken(userFromDb, TokenName.EMAIL_UPDATE, 10);
         userFromDb.setPendingEmail(newEmail);
-
-        emailService.sendEmail(
-                fromEmailAddress,
-                newEmail,
-                "Zmiana adresu email",
-                "Twój kod do zmiany adresu email w Aurorum Clinic:  " + token.getRawValue()
-        );
+        applicationEventPublisher.publishEvent(new PendingEmailCreatedEvent(userFromDb));
     }
 
     @Override
