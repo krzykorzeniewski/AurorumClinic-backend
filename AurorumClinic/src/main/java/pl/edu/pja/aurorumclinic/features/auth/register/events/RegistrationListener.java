@@ -17,7 +17,7 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 @Component
 @RequiredArgsConstructor
-public class UserRegistrationListener {
+public class RegistrationListener {
 
     private final EmailService emailService;
     private final TokenService tokenService;

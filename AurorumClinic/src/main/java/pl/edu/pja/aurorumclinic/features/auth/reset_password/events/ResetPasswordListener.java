@@ -1,10 +1,9 @@
-package pl.edu.pja.aurorumclinic.features.auth.reset_password;
+package pl.edu.pja.aurorumclinic.features.auth.reset_password.events;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
