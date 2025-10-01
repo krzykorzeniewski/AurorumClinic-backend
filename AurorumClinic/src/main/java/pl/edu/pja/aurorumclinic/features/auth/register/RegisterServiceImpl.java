@@ -12,15 +12,12 @@ import pl.edu.pja.aurorumclinic.features.auth.register.events.VerifyAccountMessa
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
-import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
-import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
-import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 @Service

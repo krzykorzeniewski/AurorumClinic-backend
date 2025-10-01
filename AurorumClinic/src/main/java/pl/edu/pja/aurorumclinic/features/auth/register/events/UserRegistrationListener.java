@@ -29,7 +29,6 @@ public class UserRegistrationListener {
     @Value("${mail.backend.noreply-address}")
     private String noreplyEmailAddres;
 
-
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleUserRegisteredEvent(UserRegisteredEvent event) {
@@ -50,7 +49,7 @@ public class UserRegistrationListener {
     }
 
     @EventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void handleAccountVerifyMessageRequestedEvent(VerifyAccountMessageRequestedEvent event) {
         User user = event.user();
         Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
