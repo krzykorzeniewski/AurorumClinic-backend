@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wizyta została umówiona</title>
+</head>
+<body style="background-color:#F4F3F2; font-family: Roboto, sans-serif;">
+
+<table style="background-color:#F4F3F2; margin: auto;">
+    <tr>
+        <td>
+            <table style="background-color:#FFFFFF; padding:40px; text-align:justify;">
+                <tr>
+                    <td style="font-size:20px; font-weight:500; color:#333333; line-height:1.4; padding-bottom:20px;">
+                        Dzień dobry,<br/>wizyta została umówiona
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:16px; color:#333333; line-height:1.5; padding-bottom:30px;">
+                        Twoja wizyta została umówiona w dniu
+                        <b style="font-weight:bold;" th:text="${appointmentDate}">2025-09-30 10:00</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom:12px;">
+                        <a href="#" th:href="${rescheduleLink}"
+                           style="display:block; width:auto;  background-color:#76227D; color:#FFFFFF; text-decoration:none; font-size:15px; font-weight:500; text-align:center; padding:14px; border-radius:4px;">
+                            przełóż wizytę
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom:30px;">
+                        <a href="#" th:href="${deleteLink}"
+                           style="display:block; width:auto;  background-color:#76227D; color:#FFFFFF; text-decoration:none; font-size:15px; font-weight:500; text-align:center; padding:14px; border-radius:4px;">
+                            odwołaj wizytę
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size:12px; color:#666666; line-height:1.4; padding-top:10px;">
+                        Wiadomość została wygenerowana automatycznie. Prosimy na nią nie odpowiadać. <br/>
+                        W celu kontaktu z placówką prosimy wysłać wiadomość na adres
+                        <b>support@aurorumclinic.pl</b> lub kontakt telefoniczny.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

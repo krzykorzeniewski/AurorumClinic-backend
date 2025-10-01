@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
@@ -23,6 +25,7 @@ public class AppointmentNotificationListener {
     private final EmailService emailService;
     private final SmsService smsService;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+    private final SpringTemplateEngine springTemplateEngine;
 
     @Value("${mail.frontend.appointment.delete-link}")
     private String deleteAppointmentLink;
@@ -43,17 +46,19 @@ public class AppointmentNotificationListener {
         String deleteLink = deleteAppointmentLink + appointment.getId();
         Patient patient = event.getPatient();
 
-        String message = "twoja wizyta została umówiona w dniu " + event.getAppointment().getStartedAt()
-                .format(dateFormatter) + "\n" +
-                "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
-                "aby ją przełożyć naciśnij link: " + rescheduleLink;
+        Context context = new Context();
+        context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
+        context.setVariable("rescheduleLink", rescheduleLink);
+        context.setVariable("deleteLink", deleteLink);
+        String htmlPageAsText = springTemplateEngine.process("appointment-created-email", context);
+
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
             emailService.sendEmail(
                     noreplyEmailAddres, patient.getEmail(),
-                    "wizyta umówiona", message);
+                    "wizyta umówiona", htmlPageAsText);
         } else {
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
-                    message);
+                    "wizyta umówiona: " + appointment.getStartedAt().format(dateFormatter));
         }
     }
 
@@ -64,32 +69,38 @@ public class AppointmentNotificationListener {
         String deleteLink = deleteAppointmentLink + appointment.getId();
         Patient patient = event.getPatient();
 
-        String message = "twoja wizyta została przełożona na datę " + event.getAppointment().getStartedAt()
-                .format(dateFormatter) + "\n" +
-                "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
-                "aby ją przełożyć naciśnij link: " + rescheduleLink;
+        Context context = new Context();
+        context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
+        context.setVariable("rescheduleLink", rescheduleLink);
+        context.setVariable("deleteLink", deleteLink);
+        String htmlPageAsText = springTemplateEngine.process("appointment-rescheduled-email", context);
+
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
             emailService.sendEmail(
                     noreplyEmailAddres, patient.getEmail(),
-                    "wizyta przełożona", message);
+                    "wizyta umówiona", htmlPageAsText);
         } else {
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
-                    message);
+                    "wizyta umówiona: " + appointment.getStartedAt().format(dateFormatter)); //TODO add links to reschedule/delete in sms
         }
     }
 
     @TransactionalEventListener
     public void handleAppointmentDeletedEvent(AppointmentDeletedEvent event) {
         Patient patient = event.getPatient();
-        String message = "twoja wizyta w dniu " + event.getAppointment().getStartedAt()
-                .format(dateFormatter) + " została anulowana";
+        Appointment appointment = event.getAppointment();
+
+        Context context = new Context();
+        context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
+        String htmlPageAsText = springTemplateEngine.process("appointment-deleted-email", context);
+
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
             emailService.sendEmail(
                     noreplyEmailAddres, patient.getEmail(),
-                    "wizyta odwołana", message);
+                    "wizyta odwołana", htmlPageAsText);
         } else {
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
-                    message);
+                    "wizyta odwołana: " + appointment.getStartedAt().format(dateFormatter));
         }
     }
 
