@@ -1,14 +1,13 @@
 package pl.edu.pja.aurorumclinic.features.auth.register;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.UserRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.VerifyAccountMessageRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
@@ -104,7 +103,7 @@ public class RegisterServiceImpl implements RegisterService{
         if (userFromDb.isEmailVerified()) {
             throw new ApiException("Email is already verified", "email");
         }
-        applicationEventPublisher.publishEvent(new VerifyAccountMessageRequestedEvent(userFromDb));
+        applicationEventPublisher.publishEvent(new AccountVerificationRequestedEvent(userFromDb));
     }
 
     @Override

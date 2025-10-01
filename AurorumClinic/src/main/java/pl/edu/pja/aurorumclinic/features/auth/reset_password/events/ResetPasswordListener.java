@@ -29,7 +29,7 @@ public class ResetPasswordListener {
 
     @EventListener
     @Transactional
-    public void handleResetPasswordMessageRequestEvent(ResetPasswordMessageRequestedEvent event) {
+    public void handleResetPasswordMessageRequestEvent(ResetPasswordRequestedEvent event) {
         User user = event.user();
         Token token = tokenService.createToken(user, TokenName.PASSWORD_RESET, 15);
         String resetLink = resetPasswordLink + token.getRawValue();

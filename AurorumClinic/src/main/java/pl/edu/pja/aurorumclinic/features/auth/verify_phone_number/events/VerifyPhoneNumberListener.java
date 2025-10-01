@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.auth.login.events;
+package pl.edu.pja.aurorumclinic.features.auth.verify_phone_number.events;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,22 +13,20 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 @Component
 @RequiredArgsConstructor
-public class LoginListener {
+public class VerifyPhoneNumberListener {
 
     private final TokenService tokenService;
     private final SmsService smsService;
-
     @Value("${twilio.trial_number}")
     private String fromPhoneNumber;
 
     @EventListener
     @Transactional
-    public void handleMfaLoginAttemptedEvent(MfaLoginRequestedEvent event) {
+    public void handleVerifyPhoneNumberRequestedEvent(PhoneNumberVerificationRequestedEvent event) {
         User user = event.user();
-        Token token = tokenService.createOtpToken(user, TokenName.TWO_FACTOR_AUTH, 1);
+        Token token = tokenService.createOtpToken(user, TokenName.PHONE_NUMBER_VERIFICATION, 10);
         System.err.println(token.getRawValue());
-        smsService.sendSms("+48" + user.getPhoneNumber(), fromPhoneNumber,
-                "Kod logowania do Aurorum Clinic : " + token.getRawValue());
+        smsService.sendSms("+48"+user.getPhoneNumber(), fromPhoneNumber,
+                "Kod weryfikacyjny numeru telefonu w Aurorum Clinic: " + token.getRawValue());
     }
-
 }

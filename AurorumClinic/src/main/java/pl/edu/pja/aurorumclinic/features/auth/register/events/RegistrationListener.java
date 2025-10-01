@@ -50,7 +50,7 @@ public class RegistrationListener {
 
     @EventListener
     @Transactional
-    public void handleAccountVerifyMessageRequestedEvent(VerifyAccountMessageRequestedEvent event) {
+    public void handleAccountVerifyMessageRequestedEvent(AccountVerificationRequestedEvent event) {
         User user = event.user();
         Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
         String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue();

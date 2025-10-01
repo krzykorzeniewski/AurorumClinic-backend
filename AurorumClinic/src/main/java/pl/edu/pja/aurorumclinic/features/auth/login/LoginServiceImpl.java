@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.*;
-import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaLoginAttemptedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaLoginRequestedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
 import pl.edu.pja.aurorumclinic.features.auth.shared.JwtUtils;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
@@ -121,7 +121,7 @@ public class LoginServiceImpl implements LoginService{
         if (!userFromDb.isTwoFactorAuth()) {
             throw new ApiAuthenticationException("Given email has 2fa disabled", "email");
         }
-        applicationEventPublisher.publishEvent(new MfaLoginAttemptedEvent(userFromDb));
+        applicationEventPublisher.publishEvent(new MfaLoginRequestedEvent(userFromDb));
     }
 
 }
