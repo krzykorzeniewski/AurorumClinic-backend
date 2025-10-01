@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
@@ -19,9 +21,14 @@ public class UserRegistrationListener {
 
     private final EmailService emailService;
     private final TokenService tokenService;
+    private final SpringTemplateEngine springTemplateEngine;
 
     @Value("${mail.frontend.verification-link}")
     private String mailVerificationLink;
+
+    @Value("${mail.backend.noreply-address}")
+    private String noreplyEmailAddres;
+
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -30,11 +37,15 @@ public class UserRegistrationListener {
         Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
         String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue();
 
+        Context context = new Context();
+        context.setVariable("verificationLink", verificationLink);
+        String htmlPageAsText = springTemplateEngine.process("user-registered-email", context);
+
         emailService.sendEmail(
-                "support@aurorumclinic.pl",
+                noreplyEmailAddres,
                 user.getEmail(),
                 "Weryfikacja konta",
-                "Naciśnij link aby zweryfikować adres email: " + verificationLink
+                htmlPageAsText
         );
     }
 
@@ -45,11 +56,15 @@ public class UserRegistrationListener {
         Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
         String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue();
 
+        Context context = new Context();
+        context.setVariable("verificationLink", verificationLink);
+        String htmlPageAsText = springTemplateEngine.process("user-registered-email", context);
+
         emailService.sendEmail(
-                "support@aurorumclinic.pl",
+                noreplyEmailAddres,
                 user.getEmail(),
                 "Weryfikacja konta",
-                "Naciśnij link aby zweryfikować adres email: " + verificationLink
+                htmlPageAsText
         );
     }
 
