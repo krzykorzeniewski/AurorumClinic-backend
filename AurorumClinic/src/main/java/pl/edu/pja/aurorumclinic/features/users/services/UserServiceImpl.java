@@ -6,16 +6,15 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.users.dtos.request.*;
+import pl.edu.pja.aurorumclinic.features.users.events.MfaUpdateRequestedEvent;
 import pl.edu.pja.aurorumclinic.features.users.events.PendingEmailCreatedEvent;
-import pl.edu.pja.aurorumclinic.shared.data.models.Token;
-import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
+import pl.edu.pja.aurorumclinic.features.users.events.PendingPhoneNumberCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
-import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +22,6 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
-    private final SmsService smsService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Value("${twilio.trial_number}")
@@ -67,11 +65,8 @@ public class UserServiceImpl implements UserService{
         if (!userFromDb.isPhoneNumberVerified()) {
             throw new ApiException("Phone number is not verified", "phoneNumber");
         }
-        Token token = tokenService.createOtpToken(userFromDb, TokenName.PHONE_NUMBER_UPDATE, 15);
         userFromDb.setPendingPhoneNumber(newNumber);
-
-        smsService.sendSms("+48"+newNumber, fromPhoneNumber,
-                "Kod weryfikacyjny zmiany numeru telefonu w Aurorum Clinic : " + token.getRawValue());
+        applicationEventPublisher.publishEvent(new PendingPhoneNumberCreatedEvent(userFromDb));
     }
 
     @Override
@@ -86,7 +81,6 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
     public void send2faUpdateSms(Long id) {
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
@@ -97,11 +91,7 @@ public class UserServiceImpl implements UserService{
         if (userFromDb.isTwoFactorAuth()) {
             throw new ApiException("Phone number already has 2fa enabled", "phoneNumber");
         }
-        Token token = tokenService.createOtpToken(userFromDb, TokenName.TWO_FACTOR_AUTH_UPDATE, 10);
-
-        smsService.sendSms("+48"+userFromDb.getPhoneNumber(), fromPhoneNumber,
-                "Kod weryfikacyjny do ustawienia " +
-                        "uwierzytelniania dwuskładnikowego w Aurorum Clinic : " + token.getRawValue());
+        applicationEventPublisher.publishEvent(new MfaUpdateRequestedEvent(userFromDb));
     }
 
     @Override
