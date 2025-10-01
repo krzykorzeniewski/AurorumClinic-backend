@@ -2,8 +2,8 @@ package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
@@ -29,7 +29,7 @@ public class AppointmentNotificationListener {
     @Value("${twilio.trial_number}")
     private String clinicPhoneNumber;
 
-    @EventListener
+    @TransactionalEventListener
     public void handleAppointmentCreatedEvent(AppointmentCreatedEvent event) {
         Patient patient = event.getPatient();
         String message = "twoja wizyta została umówiona w dniu " + event.getAppointment().getStartedAt()
@@ -46,7 +46,7 @@ public class AppointmentNotificationListener {
         }
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void handleAppointmentRescheduleEvent(AppointmentRescheduledEvent event) {
         Patient patient = event.getPatient();
         String message = "twoja wizyta została przełożona na datę " + event.getAppointment().getStartedAt()
@@ -63,7 +63,7 @@ public class AppointmentNotificationListener {
         }
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void handleAppointmentDeletedEvent(AppointmentDeletedEvent event) {
         Patient patient = event.getPatient();
         String message = "twoja wizyta w dniu " + event.getAppointment().getStartedAt()

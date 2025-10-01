@@ -10,6 +10,8 @@ import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.Crea
 import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.request.UpdateAppointmentPatientRequest;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/appointments/me")
 @RequiredArgsConstructor
@@ -42,7 +44,7 @@ public class AppointmentPatientController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAppointment(@PathVariable Long id,
-                                               @AuthenticationPrincipal Long userId) {
+                                               @AuthenticationPrincipal Long userId) throws IOException {
         return ResponseEntity.ok(ApiResponse.success(appointmentPatientService.getAppointmentForPatient(id, userId)));
     }
 }

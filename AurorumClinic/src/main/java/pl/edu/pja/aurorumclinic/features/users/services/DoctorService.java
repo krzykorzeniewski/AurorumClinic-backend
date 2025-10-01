@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public interface DoctorService {
 
-    List<GetDoctorResponse> getAllDoctors() throws IOException;
+    List<GetDoctorResponse> getAllDoctors(String searchText, int page, int size) throws IOException;
     void uploadProfilePicture(MultipartFile image, Long doctorId) throws IOException;
 
     List<LocalDateTime> getAppointmentSlots(Long doctorId, LocalDateTime startedAt,

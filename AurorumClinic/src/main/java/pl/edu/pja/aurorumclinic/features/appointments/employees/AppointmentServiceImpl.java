@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentValidator;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentValidator appointmentValidator;
@@ -38,6 +37,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private String rescheduleAppointmentLink;
 
     @Override
+    @Transactional
     public void createAppointment(CreateAppointmentRequest request) {
         Patient patientFromDb = (Patient) userRepository.findById(request.patientId()).orElseThrow(
                 () ->  new ApiNotFoundException("Id not found", "id")
@@ -70,6 +70,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @Transactional
     public void updateAppointment(Long appointmentId, UpdateAppointmentRequest request) {
         Appointment appointmentFromDb = appointmentRepository.findById(appointmentId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
@@ -90,6 +91,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @Transactional
     public void deleteAppointment(Long appointmentId) {
         Appointment appointmentFromDb = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));

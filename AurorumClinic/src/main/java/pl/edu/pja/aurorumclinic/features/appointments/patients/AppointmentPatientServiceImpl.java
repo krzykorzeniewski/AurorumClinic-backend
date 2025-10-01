@@ -10,7 +10,7 @@ import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.Get
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.services.ServiceRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.ServiceRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentValidator;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
@@ -18,13 +18,14 @@ import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
+import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
-@Transactional
 public class AppointmentPatientServiceImpl implements AppointmentPatientService {
 
     private final AppointmentValidator appointmentValidator;
@@ -32,6 +33,7 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     private final ServiceRepository serviceRepository;
     private final AppointmentRepository appointmentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ObjectStorageService objectStorageService;
 
     @Value("${mail.frontend.appointment.delete-link}")
     private String deleteAppointmentLink;
@@ -40,6 +42,7 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     private String rescheduleAppointmentLink;
 
     @Override
+    @Transactional
     public void createAppointment(CreateAppointmentPatientRequest createAppointmentPatientRequest, Long userId) {
         Patient patientFromDb = (Patient) userRepository.findById(userId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
@@ -71,6 +74,7 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     }
 
     @Override
+    @Transactional
     public void updateAppointment(UpdateAppointmentPatientRequest updateAppointmentPatientRequest, Long userId, Long appointmentId) {
         Appointment appointmentFromDb = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));
@@ -93,6 +97,7 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     }
 
     @Override
+    @Transactional
     public void deleteAppointment(Long appointmentId, Long userId) {
         Appointment appointmentFromDb = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));
@@ -105,12 +110,23 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     }
 
     @Override
-    public GetAppointmentPatientResponse getAppointmentForPatient(Long appointmentId, Long userId) {
-        GetAppointmentPatientResponse response = appointmentRepository.findByIdAndPatientId(appointmentId, userId);
-        if (response == null) {
-            throw new ApiNotFoundException("Id not found", "id");
+    public GetAppointmentPatientResponse getAppointmentForPatient(Long appointmentId, Long userId) throws IOException {
+        Appointment appointmentFromDb = appointmentRepository.findById(appointmentId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        if (!Objects.equals(appointmentFromDb.getPatient().getId(), userId)) {
+            throw new ApiAuthorizationException("user id does not match patient id");
         }
-        return response;
+        return GetAppointmentPatientResponse.builder()
+                .doctorName(appointmentFromDb.getDoctor().getName())
+                .doctorSurname(appointmentFromDb.getDoctor().getName())
+                .doctorImage(objectStorageService.generateSignedUrl(appointmentFromDb.getDoctor().getProfilePicture()))
+                .serviceName(appointmentFromDb.getService().getName())
+                .startedAt(appointmentFromDb.getStartedAt())
+                .price(appointmentFromDb.getService().getPrice())
+                .paymentAmount(appointmentFromDb.getPayment() != null ?
+                        appointmentFromDb.getPayment().getAmount() : null)
+                .build();
     }
 
 }

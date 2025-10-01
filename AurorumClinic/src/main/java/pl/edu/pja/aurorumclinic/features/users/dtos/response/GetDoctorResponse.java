@@ -21,7 +21,5 @@ public record GetDoctorResponse(Long id,
                                 String education,
                                 String experience,
                                 String pwzNumber,
-                                int rating,
-                                List<Schedule> schedules,
-                                List<Appointment> appointments) {
+                                int rating) {
 }

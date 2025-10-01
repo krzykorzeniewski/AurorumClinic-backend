@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public interface PatientService {
 
-    List<GetPatientResponse> getAllPatients(String query);
+    List<GetPatientResponse> getAllPatients(String query, int page, int size);
     GetPatientResponse getPatientById(Long patientId);
     GetPatientResponse partiallyUpdatePatient(Long patientId, PatchPatientRequest requestDto);
     GetPatientResponse updatePatient(Long patientId, PutPatientRequest requestDto);
