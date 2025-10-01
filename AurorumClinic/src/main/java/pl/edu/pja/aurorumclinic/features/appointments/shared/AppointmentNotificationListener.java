@@ -7,6 +7,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
+import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
@@ -23,6 +24,12 @@ public class AppointmentNotificationListener {
     private final SmsService smsService;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
+    @Value("${mail.frontend.appointment.delete-link}")
+    private String deleteAppointmentLink;
+
+    @Value("${mail.frontend.appointment.reschedule-link}")
+    private String rescheduleAppointmentLink;
+
     @Value("${mail.backend.noreply-address}")
     private String noreplyEmailAddres;
 
@@ -31,11 +38,15 @@ public class AppointmentNotificationListener {
 
     @TransactionalEventListener
     public void handleAppointmentCreatedEvent(AppointmentCreatedEvent event) {
+        Appointment appointment = event.getAppointment();
+        String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
+        String deleteLink = deleteAppointmentLink + appointment.getId();
         Patient patient = event.getPatient();
+
         String message = "twoja wizyta została umówiona w dniu " + event.getAppointment().getStartedAt()
                 .format(dateFormatter) + "\n" +
-                "aby ją odwołać naciśnij link: " + event.getDeleteLink() + "\n" +
-                "aby ją przełożyć naciśnij link: " + event.getRescheduleLink();
+                "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
+                "aby ją przełożyć naciśnij link: " + rescheduleLink;
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
             emailService.sendEmail(
                     noreplyEmailAddres, patient.getEmail(),
@@ -48,11 +59,15 @@ public class AppointmentNotificationListener {
 
     @TransactionalEventListener
     public void handleAppointmentRescheduleEvent(AppointmentRescheduledEvent event) {
+        Appointment appointment = event.getAppointment();
+        String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
+        String deleteLink = deleteAppointmentLink + appointment.getId();
         Patient patient = event.getPatient();
+
         String message = "twoja wizyta została przełożona na datę " + event.getAppointment().getStartedAt()
                 .format(dateFormatter) + "\n" +
-                "aby ją odwołać naciśnij link: " + event.getDeleteLink() + "\n" +
-                "aby ją przełożyć naciśnij link: " + event.getRescheduleLink();
+                "aby ją odwołać naciśnij link: " + deleteLink + "\n" +
+                "aby ją przełożyć naciśnij link: " + rescheduleLink;
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
             emailService.sendEmail(
                     noreplyEmailAddres, patient.getEmail(),
