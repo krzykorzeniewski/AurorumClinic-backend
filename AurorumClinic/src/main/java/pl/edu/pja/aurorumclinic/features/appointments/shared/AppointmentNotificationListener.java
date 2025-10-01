@@ -2,9 +2,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
