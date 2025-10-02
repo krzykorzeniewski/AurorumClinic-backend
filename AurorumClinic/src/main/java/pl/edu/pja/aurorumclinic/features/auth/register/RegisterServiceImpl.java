@@ -1,38 +1,35 @@
 package pl.edu.pja.aurorumclinic.features.auth.register;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.UserRegisteredEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
-import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
-import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
-import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class RegisterServiceImpl implements RegisterService{
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-    private final EmailService emailService;
-    @Value("${mail.frontend.verification-link}")
-    private String mailVerificationLink;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
+    @Transactional
     public void registerDoctor(RegisterDoctorRequest registerDoctorRequest) {
         if (userRepository.findByEmail(registerDoctorRequest.email()) != null) {
             throw new ApiConflictException("Email already in use", "email");
@@ -53,10 +50,11 @@ public class RegisterServiceImpl implements RegisterService{
                 .pwzNumber(registerDoctorRequest.pwzNumber())
                 .build();
         userRepository.save(doctor);
-        sendAccountVerificationEmail(doctor);
+        applicationEventPublisher.publishEvent(new UserRegisteredEvent(doctor));
     }
 
     @Override
+    @Transactional
     public void registerPatient(RegisterPatientRequest registerPatientRequest) {
         if (userRepository.findByEmail(registerPatientRequest.email()) != null) {
             throw new ApiConflictException("Email already in use", "email");
@@ -73,10 +71,11 @@ public class RegisterServiceImpl implements RegisterService{
                 .phoneNumber(registerPatientRequest.phoneNumber())
                 .build();
         userRepository.save(patient);
-        sendAccountVerificationEmail(patient);
+        applicationEventPublisher.publishEvent(new UserRegisteredEvent(patient));
     }
 
     @Override
+    @Transactional
     public void registerEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
         if (userRepository.findByEmail(registerEmployeeRequest.email()) != null) {
             throw new ApiConflictException("Email already in use", "email");
@@ -92,7 +91,7 @@ public class RegisterServiceImpl implements RegisterService{
                 .phoneNumber(registerEmployeeRequest.phoneNumber())
                 .build();
         userRepository.save(employee);
-        sendAccountVerificationEmail(employee);
+        applicationEventPublisher.publishEvent(new UserRegisteredEvent(employee));
     }
 
     @Override
@@ -104,10 +103,11 @@ public class RegisterServiceImpl implements RegisterService{
         if (userFromDb.isEmailVerified()) {
             throw new ApiException("Email is already verified", "email");
         }
-        sendAccountVerificationEmail(userFromDb);
+        applicationEventPublisher.publishEvent(new AccountVerificationRequestedEvent(userFromDb));
     }
 
     @Override
+    @Transactional
     public void verifyEmail(VerifyEmailRequest verifyEmailRequest) {
         User userFromDb = userRepository.findByEmail(verifyEmailRequest.email());
         if (userFromDb == null) {
@@ -120,15 +120,4 @@ public class RegisterServiceImpl implements RegisterService{
         userFromDb.setEmailVerified(true);
     }
 
-    private void sendAccountVerificationEmail(User user) {
-        Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
-        String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue();
-
-        emailService.sendEmail(
-                "support@aurorumclinic.pl",
-                user.getEmail(),
-                "Weryfikacja konta",
-                "Naciśnij link aby zweryfikować adres email: " + verificationLink
-        );
-    }
 }

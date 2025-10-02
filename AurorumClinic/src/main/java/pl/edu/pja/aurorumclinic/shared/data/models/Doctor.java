@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -55,6 +56,7 @@ public class Doctor extends User{
     private List<Appointment> appointments;
 
     @OneToMany(mappedBy = "doctor")
+    @ToString.Exclude
     private List<Schedule> schedules;
 
 }

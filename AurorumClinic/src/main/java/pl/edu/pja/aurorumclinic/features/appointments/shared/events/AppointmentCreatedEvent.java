@@ -11,6 +11,5 @@ public class AppointmentCreatedEvent {
 
     private final Patient patient;
     private final Appointment appointment;
-    private final String rescheduleLink;
-    private final String deleteLink;
+
 }

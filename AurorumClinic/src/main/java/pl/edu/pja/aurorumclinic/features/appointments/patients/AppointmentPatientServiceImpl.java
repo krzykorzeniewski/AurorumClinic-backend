@@ -35,12 +35,6 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ObjectStorageService objectStorageService;
 
-    @Value("${mail.frontend.appointment.delete-link}")
-    private String deleteAppointmentLink;
-
-    @Value("${mail.frontend.appointment.reschedule-link}")
-    private String rescheduleAppointmentLink;
-
     @Override
     @Transactional
     public void createAppointment(CreateAppointmentPatientRequest createAppointmentPatientRequest, Long userId) {
@@ -66,11 +60,8 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
                 newAppointment.getDoctor().getId(), newAppointment.getService().getId());
 
         Appointment appointmentFromDb = appointmentRepository.save(newAppointment);
-
-        String rescheduleLink = rescheduleAppointmentLink + appointmentFromDb.getId();
-        String deleteLink = deleteAppointmentLink + appointmentFromDb.getId();
         applicationEventPublisher.publishEvent(
-                new AppointmentCreatedEvent(patientFromDb, appointmentFromDb, rescheduleLink, deleteLink));
+                new AppointmentCreatedEvent(patientFromDb, appointmentFromDb));
     }
 
     @Override
@@ -90,10 +81,8 @@ public class AppointmentPatientServiceImpl implements AppointmentPatientService 
         appointmentFromDb.setFinishedAt(newFinishedAt);
         appointmentFromDb.setDescription(updateAppointmentPatientRequest.description());
 
-        String rescheduleLink = rescheduleAppointmentLink + appointmentFromDb.getId();
-        String deleteLink = deleteAppointmentLink + appointmentFromDb.getId();
         applicationEventPublisher.publishEvent(new AppointmentRescheduledEvent(appointmentFromDb.getPatient(),
-                rescheduleLink, deleteLink, appointmentFromDb));
+                appointmentFromDb));
     }
 
     @Override

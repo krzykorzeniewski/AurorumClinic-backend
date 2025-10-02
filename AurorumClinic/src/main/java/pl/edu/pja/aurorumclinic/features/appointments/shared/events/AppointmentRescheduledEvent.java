@@ -10,8 +10,6 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 public class AppointmentRescheduledEvent {
 
     private final Patient patient;
-    private final String rescheduleLink;
-    private final String deleteLink;
     private final Appointment appointment;
 
 }

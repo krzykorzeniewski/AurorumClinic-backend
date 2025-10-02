@@ -30,12 +30,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final ServiceRepository serviceRepository;
     private final AppointmentRepository appointmentRepository;
 
-    @Value("${mail.frontend.appointment.delete-link}")
-    private String deleteAppointmentLink;
-
-    @Value("${mail.frontend.appointment.reschedule-link}")
-    private String rescheduleAppointmentLink;
-
     @Override
     @Transactional
     public void createAppointment(CreateAppointmentRequest request) {
@@ -62,11 +56,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                 newAppointment.getDoctor().getId(), newAppointment.getService().getId());
 
         Appointment appointmentFromDb = appointmentRepository.save(newAppointment);
-
-        String rescheduleLink = rescheduleAppointmentLink + appointmentFromDb.getId();
-        String deleteLink = deleteAppointmentLink + appointmentFromDb.getId();
         applicationEventPublisher.publishEvent(
-                new AppointmentCreatedEvent(patientFromDb, appointmentFromDb, rescheduleLink, deleteLink));
+                new AppointmentCreatedEvent(patientFromDb, appointmentFromDb));
     }
 
     @Override
@@ -84,10 +75,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentFromDb.setFinishedAt(newFinishedAt);
         appointmentFromDb.setDescription(request.description());
 
-        String rescheduleLink = rescheduleAppointmentLink + appointmentFromDb.getId();
-        String deleteLink = deleteAppointmentLink + appointmentFromDb.getId();
         applicationEventPublisher.publishEvent(new AppointmentRescheduledEvent(appointmentFromDb.getPatient(),
-                rescheduleLink, deleteLink, appointmentFromDb));
+                appointmentFromDb));
     }
 
     @Override
