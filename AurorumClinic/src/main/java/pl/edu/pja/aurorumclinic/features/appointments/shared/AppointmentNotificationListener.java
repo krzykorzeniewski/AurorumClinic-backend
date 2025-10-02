@@ -57,8 +57,12 @@ public class AppointmentNotificationListener {
                     noreplyEmailAddres, patient.getEmail(),
                     "wizyta umówiona", htmlPageAsText);
         } else {
+            String message = String.format("""
+                    Twoja wizyta została umówiona w dniu: %s
+                    przełóż wizytę: %s
+                    odwołaj wizytę: %s""", appointment.getStartedAt().format(dateFormatter), rescheduleLink, deleteLink);
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
-                    "wizyta umówiona: " + appointment.getStartedAt().format(dateFormatter));
+                    message);
         }
     }
 
@@ -80,8 +84,12 @@ public class AppointmentNotificationListener {
                     noreplyEmailAddres, patient.getEmail(),
                     "wizyta umówiona", htmlPageAsText);
         } else {
+            String message = String.format("""
+                    Twoja wizyta została przełożona na dzień: %s
+                    przełóż wizytę: %s
+                    odwołaj wizytę: %s""", appointment.getStartedAt().format(dateFormatter), rescheduleLink, deleteLink);
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
-                    "wizyta umówiona: " + appointment.getStartedAt().format(dateFormatter)); //TODO add links to reschedule/delete in sms
+                    message);
         }
     }
 
@@ -99,10 +107,12 @@ public class AppointmentNotificationListener {
                     noreplyEmailAddres, patient.getEmail(),
                     "wizyta odwołana", htmlPageAsText);
         } else {
+            String message = String.format("""
+                    Twoja wizyta z dnia: %s
+                    została odwołana.""", appointment.getStartedAt().format(dateFormatter));
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
-                    "wizyta odwołana: " + appointment.getStartedAt().format(dateFormatter));
+                    message);
         }
     }
-
 
 }
