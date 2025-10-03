@@ -32,7 +32,7 @@ public class PatientServiceImpl implements PatientService {
         if (query == null) {
             patientsFromDb = patientRepository.findAll(pageable);
         } else {
-            patientsFromDb = patientRepository.searchAllBySearchParam(query, pageable);
+            patientsFromDb = patientRepository.searchAllByQuery(query, pageable);
         }
         List<GetPatientResponse> patientDtos = new ArrayList<>();
         for (Patient patient : patientsFromDb) {

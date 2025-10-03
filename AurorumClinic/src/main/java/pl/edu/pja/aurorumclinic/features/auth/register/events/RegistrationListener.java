@@ -31,7 +31,7 @@ public class RegistrationListener {
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void handleUserRegisteredEvent(UserRegisteredEvent event) {
+    public void handleUserRegisteredEvent(PatientRegisteredEvent event) {
         User user = event.user();
         Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
         String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue();

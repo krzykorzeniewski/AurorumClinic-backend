@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.users.controllers;
 
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -17,19 +18,26 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('DOCTOR')")
 public class DoctorController {
 
     private final DoctorService doctorService;
 
-    @GetMapping("")
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'PATIENT')")
-    public ResponseEntity<?> getAllDoctors(@RequestParam(required = false) String searchParam,
-                                           @RequestParam(defaultValue = "0") int page,
-                                           @RequestParam (defaultValue = "5") int size) throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(doctorService.getAllDoctors(searchParam, page, size)));
+    @PermitAll
+    @GetMapping("/search")
+    public ResponseEntity<?> searchAllDoctors(@RequestParam String query,
+                                              @RequestParam (defaultValue = "0") int page,
+                                              @RequestParam (defaultValue = "5") int size) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(doctorService.searchAllDoctors(query, page, size)));
     }
 
+    @PermitAll
+    @GetMapping("/recommended")
+    public ResponseEntity<?> getRecommendedDoctors(@RequestParam(defaultValue = "0") int page,
+                                              @RequestParam (defaultValue = "5") int size) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(doctorService.getRecommendedDoctors(page, size)));
+    }
+
+    @PreAuthorize("hasRole('DOCTOR')")
     @PostMapping("/me/profile-picture")
     public ResponseEntity<?> uploadProfilePicture(@RequestParam MultipartFile image,
                                                   @AuthenticationPrincipal Long doctorId) throws IOException {
@@ -37,12 +45,12 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @PreAuthorize("hasAnyRole('DOCTOR', 'EMPLOYEE', 'PATIENT')")
+    @PermitAll
     @GetMapping("/{id}/appointment-slots")
     public ResponseEntity<?> getAppointmentSlots(@PathVariable Long id,
                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAt,
                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime finishedAt,
-                          @RequestParam Integer serviceDuration) {
+                          @RequestParam int serviceDuration) {
         return ResponseEntity.ok(ApiResponse.success(doctorService.getAppointmentSlots(id, startedAt,
                 finishedAt, serviceDuration)));
     }

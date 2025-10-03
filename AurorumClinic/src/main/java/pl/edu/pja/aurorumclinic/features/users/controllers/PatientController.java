@@ -15,16 +15,15 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RestController
 @RequestMapping("/api/patients")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('EMPLOYEE')")
 public class PatientController {
 
     private final PatientService patientService;
 
     @GetMapping("")
-    public ResponseEntity<?> getAllPatients(@RequestParam(required = false) String searchParam,
+    public ResponseEntity<?> getAllPatients(@RequestParam(required = false) String query,
                                             @RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(patientService.getAllPatients(searchParam, page, size)));
+        return ResponseEntity.ok(ApiResponse.success(patientService.getAllPatients(query, page, size)));
     }
 
     @GetMapping("/me")
@@ -34,6 +33,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<?> updatePatient(@PathVariable Long id,
                                            @Valid @RequestBody PutPatientRequest requestDto) {
         GetPatientResponse responseDto = patientService.updatePatient(id, requestDto);
@@ -56,6 +56,7 @@ public class PatientController {
     }
 
     @GetMapping("/{id}/appointments")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'PATIENT')")
     public ResponseEntity<?> getPatientAppointments(@PathVariable("id") Long patientId) {
         return ResponseEntity.ok(ApiResponse.success(patientService.getPatientAppointments(patientId)));
     }

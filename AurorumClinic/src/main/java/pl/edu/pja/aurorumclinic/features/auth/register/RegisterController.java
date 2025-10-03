@@ -24,7 +24,7 @@ public class RegisterController {
     public ResponseEntity<?> registerEmployee(@Valid @RequestBody RegisterEmployeeRequest requestDto) {
         registerService.registerEmployee(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
-    }
+    } //czy pracownicy potrzebuja email verified?
 
     @PostMapping("/register-patient")
     public ResponseEntity<?> registerPatient(@Valid @RequestBody RegisterPatientRequest requestDto) {

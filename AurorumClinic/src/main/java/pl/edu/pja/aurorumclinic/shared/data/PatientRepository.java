@@ -21,6 +21,5 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
                       lower(p.pesel) like lower(concat('%', :query, '%')) or
                       lower(p.phoneNumber) like lower(concat('%', :query, '%'))
            """)
-    Page<Patient> searchAllBySearchParam(String query, Pageable pageable);
-
+    Page<Patient> searchAllByQuery(String query, Pageable pageable);
 }

@@ -8,8 +8,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Transient;
+import pl.edu.pja.aurorumclinic.shared.data.models.listeners.DoctorListener;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Data
@@ -22,6 +25,7 @@ import java.util.List;
                 name = "uk_doctor_pwz_number",
                 columnNames = {"PWZ_Number"}
         ))
+@EntityListeners(DoctorListener.class)
 public class Doctor extends User{
 
     @Column(name = "Description", columnDefinition = "nvarchar(500)")
@@ -59,4 +63,6 @@ public class Doctor extends User{
     @ToString.Exclude
     private List<Schedule> schedules;
 
+    @Transient
+    private Integer rating;
 }
