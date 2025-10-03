@@ -62,9 +62,6 @@ public class UserServiceImpl implements UserService{
         if (userRepository.existsByPhoneNumber(newNumber)) {
             throw new ApiConflictException("Phone number is already taken", "phoneNumber");
         }
-        if (!userFromDb.isPhoneNumberVerified()) {
-            throw new ApiException("Phone number is not verified", "phoneNumber");
-        }
         userFromDb.setPendingPhoneNumber(newNumber);
         applicationEventPublisher.publishEvent(new PendingPhoneNumberCreatedEvent(userFromDb));
     }
