@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.Transient;
 import pl.edu.pja.aurorumclinic.shared.data.models.listeners.DoctorListener;
 
 import java.util.List;
@@ -51,9 +50,8 @@ public class Doctor extends User{
     @NotBlank(message = "This field is required")
     private String experience;
 
-    @Column(name = "PWZ_Number", columnDefinition = "nvarchar(7)")
-    @Size(min = 7, max = 7, message = "Required length for this field is 7 characters")
-    @NotBlank(message = "This field is required")
+    @Column(name = "PWZ_Number", columnDefinition = "nvarchar(50)")
+    @Size( max = 50, message = "Maximum length for this field is 50 characters")
     private String pwzNumber;
 
     @OneToMany(mappedBy = "doctor")
