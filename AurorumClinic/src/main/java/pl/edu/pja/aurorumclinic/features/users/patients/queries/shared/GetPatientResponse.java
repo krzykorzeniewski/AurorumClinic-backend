@@ -1,6 +1,8 @@
-package pl.edu.pja.aurorumclinic.features.users.dtos.response;
+package pl.edu.pja.aurorumclinic.features.users.patients.queries.shared;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 
 import java.time.LocalDate;
 
@@ -16,5 +18,6 @@ public record GetPatientResponse(Long id,
                                  boolean newsletter,
                                  boolean emailVerified,
                                  boolean phoneNumberVerified,
-                                 String communicationPreferences) {
+                                 @JsonFormat(shape = JsonFormat.Shape.STRING) CommunicationPreference communicationPreferences) {
 }
+

@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EMPLOYEE')")
-public class EmployeeUpdateAppointment {
+public class RescheduleAppointment {
 
     private final AppointmentRepository appointmentRepository;
     private final AppointmentValidator appointmentValidator;

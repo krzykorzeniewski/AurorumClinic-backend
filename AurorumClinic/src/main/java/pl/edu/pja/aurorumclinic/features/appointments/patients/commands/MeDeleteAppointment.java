@@ -23,7 +23,7 @@ import java.util.Objects;
 @RequestMapping("/api/appointments/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('PATIENT')")
-public class PatientDeleteAppointment {
+public class MeDeleteAppointment {
 
     private final AppointmentRepository appointmentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;

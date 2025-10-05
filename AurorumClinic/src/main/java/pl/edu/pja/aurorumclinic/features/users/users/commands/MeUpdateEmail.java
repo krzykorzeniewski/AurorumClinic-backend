@@ -22,7 +22,7 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @PreAuthorize("isFullyAuthenticated()")
-public class UpdateEmail {
+public class MeUpdateEmail {
 
     private final UserRepository userRepository;
     private final TokenService tokenService;

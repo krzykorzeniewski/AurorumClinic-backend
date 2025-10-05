@@ -19,7 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EMPLOYEE')")
-public class EmployeeDeleteAppointment {
+public class DeleteAppointment {
 
     private final AppointmentRepository appointmentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;

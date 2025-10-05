@@ -27,7 +27,8 @@ public class GetRecommended {
 
     @PermitAll
     @GetMapping("/recommended")
-    public ResponseEntity<ApiResponse<Page<RecommendedDoctorResponse>>> getRecommendedDoctors(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<ApiResponse<Page<RecommendedDoctorResponse>>> getRecommendedDoctors(
+            @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam (defaultValue = "5") int size) throws IOException {
         return ResponseEntity.ok(ApiResponse.success(handle(page, size)));
     }

@@ -22,7 +22,7 @@ import java.io.IOException;
 @RequestMapping("/api/appointments/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('PATIENT')")
-public class PatientGetAllAppointments {
+public class MeGetAllAppointments {
 
     private final AppointmentRepository appointmentRepository;
     private final ObjectStorageService objectStorageService;

@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.dtos.response;
+package pl.edu.pja.aurorumclinic.features.users.patients.queries.shared;
 
 public record DoctorDto(Long id,
                         String name,
