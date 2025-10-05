@@ -100,38 +100,11 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public GetPatientAppointmentsResponse getPatientAppointments(Long patientId) {
-        Patient patientFromDb = patientRepository.findById(patientId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
-        );
-        GetPatientAppointmentsResponse response = GetPatientAppointmentsResponse.builder()
-                .id(patientFromDb.getId())
-                .name(patientFromDb.getName())
-                .surname(patientFromDb.getSurname())
-                .pesel(patientFromDb.getPesel())
-                .birthdate(patientFromDb.getBirthdate())
-                .email(patientFromDb.getEmail())
-                .phoneNumber(patientFromDb.getPhoneNumber())
-                .appointments(patientFromDb.getAppointments().stream()
-                        .map(a -> GetPatientAppointmentsResponse.AppointmentDto.builder()
-                                .id(a.getId())
-                                .startedAt(a.getStartedAt())
-                                .description(a.getDescription())
-                                .doctor(GetPatientAppointmentsResponse.DoctorDto.builder()
-                                        .id(a.getDoctor().getId())
-                                        .name(a.getDoctor().getName())
-                                        .surname(a.getDoctor().getSurname())
-                                        .profilePicture(a.getDoctor().getProfilePicture())
-                                        .build())
-                                .service(GetPatientAppointmentsResponse.ServiceDto.builder()
-                                        .id(a.getService().getId())
-                                        .name(a.getService().getName())
-                                        .price(a.getService().getPrice())
-                                        .build())
-                                .build())
-                        .toList())
-                .build();
-        return response;
+    public Page<GetPatientAppointmentResponse> getPatientAppointments(Long patientId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<GetPatientAppointmentResponse> patientsFromDb = patientRepository
+                .findPatientAppointmentsById(patientId, pageable);
+        return patientsFromDb;
     }
 
     private GetPatientResponse mapPatientToGetResponseDto(Patient patient) {
