@@ -19,13 +19,13 @@ public class ResetPasswordController {
     private final ResetPasswordService resetPasswordService;
 
     @PostMapping("/reset-password-token")
-    public ResponseEntity<?> getResetPasswordToken(@Valid @RequestBody ResetPasswordTokenRequest requestDto) {
+    public ResponseEntity<ApiResponse<?>> getResetPasswordToken(@Valid @RequestBody ResetPasswordTokenRequest requestDto) {
         resetPasswordService.sendResetPasswordEmail(requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest requestDto) {
+    public ResponseEntity<ApiResponse<?>> resetPassword(@Valid @RequestBody ResetPasswordRequest requestDto) {
         resetPasswordService.resetPassword(requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
