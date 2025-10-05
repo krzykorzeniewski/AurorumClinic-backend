@@ -6,6 +6,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -46,7 +47,8 @@ public class SecurityConfig {
                 .securityMatcher("/api/auth/refresh", "/api/auth/login", "/api/auth/register-employee",
                         "/api/auth/register-patient", "/api/auth/register-doctor", "/api/auth/reset-password-token",
                         "/api/auth/reset-password", "/api/auth/login-2fa", "/api/auth/login-2fa-token",
-                        "/api/auth/verify-email", "/api/auth/verify-email-token", "/api/appointments/guest")
+                        "/api/auth/verify-email", "/api/auth/verify-email-token", "/api/appointments/guest",
+                        "/api/doctors/search", "/api/doctors/recommended", "/api/services")
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -66,8 +68,6 @@ public class SecurityConfig {
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class);

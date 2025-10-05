@@ -22,8 +22,7 @@ import java.util.List;
                 name = "uk_doctor_pwz_number",
                 columnNames = {"PWZ_Number"}
         ))
-public class Doctor extends User{
-
+public class Doctor extends User {
     @Column(name = "Description", columnDefinition = "nvarchar(500)")
     @Size(max = 500, message = "Maximum length for this field is 500 characters")
     @NotBlank(message = "This field is required")
@@ -47,9 +46,8 @@ public class Doctor extends User{
     @NotBlank(message = "This field is required")
     private String experience;
 
-    @Column(name = "PWZ_Number", columnDefinition = "nvarchar(7)")
-    @Size(min = 7, max = 7, message = "Required length for this field is 7 characters")
-    @NotBlank(message = "This field is required")
+    @Column(name = "PWZ_Number", columnDefinition = "nvarchar(50)")
+    @Size( max = 50, message = "Maximum length for this field is 50 characters")
     private String pwzNumber;
 
     @OneToMany(mappedBy = "doctor")

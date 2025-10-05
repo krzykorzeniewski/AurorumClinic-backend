@@ -72,6 +72,7 @@ public class User implements UserDetails {
 
     @Column(name = "Password", columnDefinition = "nvarchar(200)")
     @Size(max = 200, message = "Maximum length for this field is 200 characters")
+    @NotBlank(message = "This field is required")
     private String password;
 
     @Column(name = "Phone_Number", columnDefinition = "nvarchar(9)")

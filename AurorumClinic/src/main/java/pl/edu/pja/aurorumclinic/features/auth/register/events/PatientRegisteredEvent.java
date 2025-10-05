@@ -2,5 +2,5 @@ package pl.edu.pja.aurorumclinic.features.auth.register.events;
 
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 
-public record UserRegisteredEvent(User user) {
+public record PatientRegisteredEvent(User user) {
 }

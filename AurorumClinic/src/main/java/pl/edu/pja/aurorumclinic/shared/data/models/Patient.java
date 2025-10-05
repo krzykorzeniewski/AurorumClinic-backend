@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@PrimaryKeyJoinColumn(name = "PK_User")
+@PrimaryKeyJoinColumn(name = "PK_Patient")
 public class Patient extends User{
 
     @Column(name = "Newsletter", columnDefinition = "bit")

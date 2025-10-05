@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.UserRegisteredEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
@@ -48,9 +48,9 @@ public class RegisterServiceImpl implements RegisterService{
                 .education(registerDoctorRequest.education())
                 .experience(registerDoctorRequest.experience())
                 .pwzNumber(registerDoctorRequest.pwzNumber())
+                .emailVerified(true)
                 .build();
         userRepository.save(doctor);
-        applicationEventPublisher.publishEvent(new UserRegisteredEvent(doctor));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class RegisterServiceImpl implements RegisterService{
                 .phoneNumber(registerPatientRequest.phoneNumber())
                 .build();
         userRepository.save(patient);
-        applicationEventPublisher.publishEvent(new UserRegisteredEvent(patient));
+        applicationEventPublisher.publishEvent(new PatientRegisteredEvent(patient));
     }
 
     @Override
@@ -89,9 +89,9 @@ public class RegisterServiceImpl implements RegisterService{
                 .birthdate(registerEmployeeRequest.birthDate())
                 .pesel(registerEmployeeRequest.pesel())
                 .phoneNumber(registerEmployeeRequest.phoneNumber())
+                .emailVerified(true)
                 .build();
         userRepository.save(employee);
-        applicationEventPublisher.publishEvent(new UserRegisteredEvent(employee));
     }
 
     @Override
