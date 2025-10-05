@@ -14,7 +14,7 @@ import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 @RestController
 @RequestMapping("/api/patients")
 @RequiredArgsConstructor
-public class MeGet {
+public class MeGetPatientById {
 
     private final PatientRepository patientRepository;
 

@@ -61,7 +61,7 @@ public class CreateSchedule {
         }
         if (scheduleRepository.scheduleExistsInIntervalForDoctor(request.startedAt(),
                 request.finishedAt(), request.doctorId())) {
-            throw new ApiException("Schedule overlapps with already existing one", "schedule");
+            throw new ApiException("Schedule overlaps with already existing one", "schedule");
         }
 
         Schedule schedule = Schedule.builder()

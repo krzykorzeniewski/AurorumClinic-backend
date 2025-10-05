@@ -7,6 +7,6 @@ import java.io.IOException;
 public interface ObjectStorageService {
 
     String uploadObject(MultipartFile file) throws IOException;
-    String generateSignedUrl(String fileName) throws IOException;
+    String generateSignedUrl(String fileName);
 
 }

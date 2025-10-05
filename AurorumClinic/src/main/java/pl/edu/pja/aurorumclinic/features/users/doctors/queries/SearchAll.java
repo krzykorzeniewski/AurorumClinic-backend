@@ -38,12 +38,8 @@ public class SearchAll {
         Page<SearchDoctorResponse> result =  doctorRepository.findAllByQuery(query, pageable);
         result.forEach(r -> {
             if (r.getProfilePicture() != null) {
-                try {
                     r.setProfilePicture(objectStorageService.
                             generateSignedUrl(r.getProfilePicture()));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
             }
         });
         return result;

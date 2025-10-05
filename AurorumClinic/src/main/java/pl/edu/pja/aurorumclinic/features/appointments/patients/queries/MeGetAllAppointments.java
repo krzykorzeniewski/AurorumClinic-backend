@@ -41,12 +41,8 @@ public class MeGetAllAppointments {
                 .getAllPatientAppointments(patientId, pageable);
         response.forEach(r -> {
             if (r.doctor().getProfilePicture() != null) {
-                try {
-                    r.doctor().setProfilePicture(objectStorageService.
-                            generateSignedUrl(r.doctor().getProfilePicture()));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                r.doctor().setProfilePicture(objectStorageService.
+                        generateSignedUrl(r.doctor().getProfilePicture()));
             }
         });
         return response;

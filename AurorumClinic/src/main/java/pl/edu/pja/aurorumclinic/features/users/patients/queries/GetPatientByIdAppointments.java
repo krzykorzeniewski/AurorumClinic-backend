@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 @RestController
 @RequestMapping("/api/patients")
 @RequiredArgsConstructor
-public class GetByIdAppointments {
+public class GetPatientByIdAppointments {
 
     private final PatientRepository patientRepository;
 
@@ -28,9 +29,13 @@ public class GetByIdAppointments {
     }
 
     private Page<GetPatientAppointmentResponse> handle(Long patientId, int page, int size) {
+        if (!patientRepository.existsById(patientId)) {
+            throw new ApiNotFoundException("Id not found", "id");
+        }
         Pageable pageable = PageRequest.of(page, size);
-        return patientRepository
+        Page<GetPatientAppointmentResponse> patientAppointmentsById = patientRepository
                 .findPatientAppointmentsById(patientId, pageable);
+        return patientAppointmentsById;
     }
 
 }

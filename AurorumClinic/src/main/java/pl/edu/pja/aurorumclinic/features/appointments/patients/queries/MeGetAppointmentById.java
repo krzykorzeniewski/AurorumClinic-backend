@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.io.IOException;
@@ -30,8 +31,11 @@ public class MeGetAppointmentById {
         return ResponseEntity.ok(ApiResponse.success(handle(appointmentId, userId)));
     }
 
-    private PatientGetAppointmentResponse handle(Long appointmentId, Long userId) throws IOException {
+    private PatientGetAppointmentResponse handle(Long appointmentId, Long userId) {
         PatientGetAppointmentResponse response = appointmentRepository.getPatientAppointmentById(userId, appointmentId);
+        if (response == null) {
+            throw new ApiNotFoundException("id not found", "id");
+        }
         if (response.doctor().getProfilePicture() != null) {
             response.doctor().setProfilePicture(objectStorageService.generateSignedUrl(response.doctor().getProfilePicture()));
         }

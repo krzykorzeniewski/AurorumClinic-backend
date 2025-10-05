@@ -16,7 +16,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     List<Patient> findByNewsletterTrue();
 
     @Query("""
-           select pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(
+           select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(
             p.id, p.name, p.surname, p.pesel, p.birthdate, p.email, p.phoneNumber, p.twoFactorAuth, p.newsletter,
             p.emailVerified, p.phoneNumberVerified, p.communicationPreferences)
               from Patient p where

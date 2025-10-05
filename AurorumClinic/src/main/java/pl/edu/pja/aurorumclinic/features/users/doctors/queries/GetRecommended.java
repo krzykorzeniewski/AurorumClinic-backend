@@ -29,7 +29,7 @@ public class GetRecommended {
     @GetMapping("/recommended")
     public ResponseEntity<ApiResponse<Page<RecommendedDoctorResponse>>> getRecommendedDoctors(
             @RequestParam(defaultValue = "0") int page,
-                                                   @RequestParam (defaultValue = "5") int size) throws IOException {
+            @RequestParam (defaultValue = "5") int size)  {
         return ResponseEntity.ok(ApiResponse.success(handle(page, size)));
     }
 
@@ -38,12 +38,8 @@ public class GetRecommended {
         Page<RecommendedDoctorResponse> doctorsFromDb = doctorRepository.findAllRecommendedDtos(pageable);
         doctorsFromDb.forEach(r -> {
             if (r.getProfilePicture() != null) {
-                try {
-                    r.setProfilePicture(objectStorageService.
-                            generateSignedUrl(r.getProfilePicture()));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                r.setProfilePicture(objectStorageService.
+                        generateSignedUrl(r.getProfilePicture()));
             }
         });
         return doctorsFromDb;
