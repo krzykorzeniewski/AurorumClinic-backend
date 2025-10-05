@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.events;
+package pl.edu.pja.aurorumclinic.features.users.users.events;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
