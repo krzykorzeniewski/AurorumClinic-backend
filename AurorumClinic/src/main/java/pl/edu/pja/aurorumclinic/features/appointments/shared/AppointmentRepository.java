@@ -82,6 +82,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         join a.doctor d
         join a.service s
         where a.patient.id = :patientId
+        order by a.status desc
     """)
     Page<PatientGetAppointmentResponse> getAllPatientAppointments(Long patientId, Pageable pageable);
 }
