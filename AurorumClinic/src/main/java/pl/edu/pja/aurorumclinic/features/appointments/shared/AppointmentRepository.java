@@ -1,8 +1,11 @@
 package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.appointments.patients.dtos.response.GetAppointmentPatientResponse;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.PatientGetAppointmentById;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 
 import java.time.LocalDateTime;
@@ -32,4 +35,54 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     boolean timeSlotExists(LocalDateTime startedAt, LocalDateTime finishedAt,
                            Long doctorId, Long serviceId);
 
+
+    @Query("""
+        select new pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse(
+            a.id,
+            a.status,
+            a.startedAt,
+            new pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.DoctorDto(
+                d.id,
+                d.name,
+                d.surname,
+                d.profilePicture,
+                d.specialization
+            ),
+            new pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.ServiceDto(
+                s.id,
+                s.name,
+                s.price
+            )
+        )
+        from Appointment a
+        join a.doctor d
+        join a.service s
+        where a.patient.id = :patientId and a.id = :appointmentId
+    """)
+    PatientGetAppointmentResponse getPatientAppointmentById(Long patientId, Long appointmentId);
+
+    @Query("""
+        select new pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse(
+            a.id,
+            a.status,
+            a.startedAt,
+            new pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.DoctorDto(
+                d.id,
+                d.name,
+                d.surname,
+                d.profilePicture,
+                d.specialization
+            ),
+            new pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.ServiceDto(
+                s.id,
+                s.name,
+                s.price
+            )
+        )
+        from Appointment a
+        join a.doctor d
+        join a.service s
+        where a.patient.id = :patientId
+    """)
+    Page<PatientGetAppointmentResponse> getAllPatientAppointments(Long patientId, Pageable pageable);
 }
