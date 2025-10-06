@@ -28,9 +28,12 @@ public class Payment {
     @Column(name = "Amount", columnDefinition = "numeric(10,2)")
     private BigDecimal amount;
 
-    @Column(name = "Placed_At", columnDefinition = "datetime2(2)")
+    @Column(name = "Created_At", columnDefinition = "datetime2(2)")
     @NotNull(message = "This field is required")
-    private LocalDateTime placedAt;
+    private LocalDateTime createdAt;
+
+    @Column(name = "Completed_At", columnDefinition = "datetime2(2)")
+    private LocalDateTime completedAt;
 
     @Enumerated(value = EnumType.STRING)
     @NotNull(message = "This field is required")
