@@ -18,13 +18,13 @@ public class VerifyPhoneNumberController {
     private final VerifyPhoneNumberService verifyPhoneNumberService;
 
     @PostMapping("/verify-phone-number-token")
-    public ResponseEntity<?> getVerifyPhoneNumberToken(@AuthenticationPrincipal Long id) {
+    public ResponseEntity<ApiResponse<?>> getVerifyPhoneNumberToken(@AuthenticationPrincipal Long id) {
         verifyPhoneNumberService.sendVerifyPhoneNumberSms(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PutMapping("/verify-phone-number")
-    public ResponseEntity<?> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto,
+    public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(@Valid @RequestBody VerifyPhoneNumberRequest requestDto,
                                                @AuthenticationPrincipal Long id) {
         verifyPhoneNumberService.verifyPhoneNumber(requestDto, id);
         return ResponseEntity.ok(ApiResponse.success(null));

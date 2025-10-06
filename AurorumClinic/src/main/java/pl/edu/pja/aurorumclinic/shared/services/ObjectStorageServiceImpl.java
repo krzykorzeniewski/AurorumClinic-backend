@@ -44,7 +44,7 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(5))
+                .signatureDuration(Duration.ofDays(1))
                 .getObjectRequest(objectRequest)
                 .build();
 

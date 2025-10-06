@@ -17,7 +17,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginUserRequest requestDto) {
+    public ResponseEntity<ApiResponse<LoginUserResponse>> loginUser(@Valid @RequestBody LoginUserRequest requestDto) {
         LoginUserResponse responseDto = loginService.login(requestDto);
         if (responseDto.twoFactorAuth()) {
             return ResponseEntity.ok()
@@ -37,7 +37,7 @@ public class LoginController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
+    public ResponseEntity<ApiResponse<LoginUserResponse>> refreshAccessToken(@CookieValue("Access-Token") String accessToken,
                                                 @CookieValue("Refresh-Token") String refreshToken) {
         @Valid RefreshAccessTokenRequest requestDto = new RefreshAccessTokenRequest(accessToken, refreshToken);
         LoginUserResponse responseDto = loginService.refresh(requestDto);
@@ -55,7 +55,7 @@ public class LoginController {
     }
 
     @PostMapping("/login-2fa")
-    public ResponseEntity<?> loginUserWith2fa(@Valid @RequestBody TwoFactorAuthLoginRequest requestDto) {
+    public ResponseEntity<ApiResponse<LoginUserResponse>> loginUserWith2fa(@Valid @RequestBody TwoFactorAuthLoginRequest requestDto) {
         LoginUserResponse responseDto = loginService.login2fa(requestDto);
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
@@ -71,13 +71,13 @@ public class LoginController {
     }
 
     @PostMapping("/login-2fa-token")
-    public ResponseEntity<?> get2faToken(@Valid @RequestBody TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
+    public ResponseEntity<ApiResponse<?>> get2faToken(@Valid @RequestBody TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
         loginService.send2fa(twoFactorAuthTokenRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<ApiResponse<?>> logoutUser() {
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", "")
                 .path("/")
                 .httpOnly(true)

@@ -4,7 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientAppointmentResponse;
+import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientAppointmentResponse;
+import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.util.List;
@@ -15,28 +16,31 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     List<Patient> findByNewsletterTrue();
 
     @Query("""
-           select p from Patient p where
-                      lower(p.name) like lower(concat('%', :query, '%')) or
-                      lower(p.surname) like lower(concat('%', :query, '%')) or
-                      lower(p.email) like lower(concat('%', :query, '%')) or
-                      lower(p.pesel) like lower(concat('%', :query, '%')) or
-                      lower(p.phoneNumber) like lower(concat('%', :query, '%'))
+           select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(
+            p.id, p.name, p.surname, p.pesel, p.birthdate, p.email, p.phoneNumber, p.twoFactorAuth, p.newsletter,
+            p.emailVerified, p.phoneNumberVerified, p.communicationPreferences)
+              from Patient p where
+              lower(p.name) like lower(concat('%', :query, '%')) or
+              lower(p.surname) like lower(concat('%', :query, '%')) or
+              lower(p.email) like lower(concat('%', :query, '%')) or
+              lower(p.pesel) like lower(concat('%', :query, '%')) or
+              lower(p.phoneNumber) like lower(concat('%', :query, '%'))
            """)
-    Page<Patient> searchAllByQuery(String query, Pageable pageable);
+    Page<GetPatientResponse> searchAllByQuery(String query, Pageable pageable);
 
     @Query("""
-        select new pl.edu.pja.aurorumclinic.features.users.dtos.response.GetPatientAppointmentResponse(
+        select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientAppointmentResponse(
             a.id,
             a.status,
             a.startedAt,
-            new pl.edu.pja.aurorumclinic.features.users.dtos.response.DoctorDto(
+            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.DoctorDto(
                 d.id,
                 d.name,
                 d.surname,
                 d.profilePicture,
                 d.specialization
             ),
-            new pl.edu.pja.aurorumclinic.features.users.dtos.response.ServiceDto(
+            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.ServiceDto(
                 s.id,
                 s.name,
                 s.price
@@ -48,4 +52,21 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
         where a.patient.id = :patientId
     """)
     Page<GetPatientAppointmentResponse> findPatientAppointmentsById(Long patientId, Pageable pageable);
+
+    @Query("""
+            select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(
+            p.id, p.name, p.surname, p.pesel, p.birthdate, p.email, p.phoneNumber, p.twoFactorAuth, p.newsletter,
+            p.emailVerified, p.phoneNumberVerified, p.communicationPreferences)
+            from Patient p
+            where p.id = :id
+            """)
+    GetPatientResponse getPatientById(Long id);
+
+    @Query("""
+            select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(
+            p.id, p.name, p.surname, p.pesel, p.birthdate, p.email, p.phoneNumber, p.twoFactorAuth, p.newsletter,
+            p.emailVerified, p.phoneNumberVerified, p.communicationPreferences)
+            from Patient p
+            """)
+    Page<GetPatientResponse> findAllGetPatientDtos(Pageable pageable);
 }

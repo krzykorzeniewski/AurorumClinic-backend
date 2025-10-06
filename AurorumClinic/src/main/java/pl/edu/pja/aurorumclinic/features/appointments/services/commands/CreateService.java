@@ -1,0 +1,56 @@
+package pl.edu.pja.aurorumclinic.features.appointments.services.commands;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.ServiceRepository;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+import pl.edu.pja.aurorumclinic.shared.data.models.Service;
+
+import java.math.BigDecimal;
+
+@RestController
+@RequestMapping("/api/services")
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+public class CreateService {
+
+    private final ServiceRepository serviceRepository;
+
+    @PostMapping("")
+    @Transactional
+    public ResponseEntity<ApiResponse<?>> createService(@RequestBody @Valid CreateServiceRequest createServiceRequest) {
+        handle(createServiceRequest);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    private void handle(CreateServiceRequest request) {
+        Service service = Service.builder()
+                .name(request.name())
+                .price(request.price())
+                .duration(request.duration())
+                .description(request.description())
+                .build();
+        serviceRepository.save(service);
+    }
+
+    public record CreateServiceRequest(@NotBlank @Size(max = 150) String name,
+                                       @NotNull Integer duration,
+                                       @NotNull @Digits(integer = 10, fraction = 2)
+                                       @NotNull @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal price,
+                                       @NotBlank @Size(max = 500) String description) {
+    }
+
+
+}
