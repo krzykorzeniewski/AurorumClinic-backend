@@ -11,6 +11,7 @@ public record GetPatientAppointmentResponse(Long id,
                                             @JsonFormat(shape = JsonFormat.Shape.STRING) AppointmentStatus status,
                                             LocalDateTime startedAt,
                                             DoctorDto doctor,
-                                            ServiceDto service) {
+                                            ServiceDto service,
+                                            PaymentDto payment) {
 
 }

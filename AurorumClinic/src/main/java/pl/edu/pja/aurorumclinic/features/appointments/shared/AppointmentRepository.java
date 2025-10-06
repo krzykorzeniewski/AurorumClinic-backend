@@ -51,11 +51,17 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 s.id,
                 s.name,
                 s.price
+            ),
+            new pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PaymentDto(
+                p.id,
+                p.amount,
+                p.status
             )
         )
         from Appointment a
         join a.doctor d
         join a.service s
+        join a.payment p
         where a.patient.id = :patientId and a.id = :appointmentId
     """)
     PatientGetAppointmentResponse getPatientAppointmentById(Long patientId, Long appointmentId);
@@ -76,11 +82,17 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 s.id,
                 s.name,
                 s.price
+            ),
+            new pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PaymentDto(
+                p.id,
+                p.amount,
+                p.status
             )
         )
         from Appointment a
         join a.doctor d
         join a.service s
+        join a.payment p
         where a.patient.id = :patientId
         order by a.status desc
     """)

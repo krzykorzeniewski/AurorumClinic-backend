@@ -23,7 +23,7 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 @Component
 @RequiredArgsConstructor
-public class AuthListener {
+public class AuthEventListener {
 
     private final TokenService tokenService;
     private final SmsService smsService;

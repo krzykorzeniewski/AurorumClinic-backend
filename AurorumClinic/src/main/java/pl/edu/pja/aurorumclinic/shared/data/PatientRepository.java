@@ -44,11 +44,17 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
                 s.id,
                 s.name,
                 s.price
-            )
+            ),
+            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.PaymentDto(
+                p.id,
+                p.amount,
+                p.status
+                )
         )
         from Appointment a
         join a.doctor d
         join a.service s
+        join a.payment p
         where a.patient.id = :patientId
     """)
     Page<GetPatientAppointmentResponse> findPatientAppointmentsById(Long patientId, Pageable pageable);

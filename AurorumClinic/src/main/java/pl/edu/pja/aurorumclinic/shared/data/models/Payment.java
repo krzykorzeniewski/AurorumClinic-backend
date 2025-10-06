@@ -36,7 +36,6 @@ public class Payment {
     private LocalDateTime completedAt;
 
     @Enumerated(value = EnumType.STRING)
-    @NotNull(message = "This field is required")
     @Column(name = "Method", length = 50, columnDefinition = "nvarchar(50)")
     private PaymentMethod method;
 
