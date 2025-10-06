@@ -91,6 +91,6 @@ insert into appointment (started_at, finished_at, status, description, fk_servic
 values ('2025-10-04T13:00:00', '2025-10-04T13:30:00', 'FINISHED', 'chłop za dużo gra w robloxa', 4, 3, 10, 9);
 
 --payments
-insert into payment (amount, placed_at, method, status, fk_appointment) values (250, '2025-10-04T07:52:31', 'OFFLINE', 'COMPLETED', 1);
-insert into payment (amount, placed_at, method, status, fk_appointment) values (350, '2025-10-04T09:58:18', 'OFFLINE', 'COMPLETED', 2);
-insert into payment (amount, placed_at, method, status, fk_appointment) values (300, '2025-10-04T12:31:52', 'BLIK', 'PENDING', 3);
+insert into payment (amount, created_at ,completed_at, method, status, fk_appointment) values (250, '2025-10-04T07:51:52', '2025-10-04T07:52:31', 'OFFLINE', 'COMPLETED', 1);
+insert into payment (amount, created_at ,completed_at, method, status, fk_appointment) values (350, '2025-10-04T09:31:52', '2025-10-04T09:58:18', 'OFFLINE', 'COMPLETED', 2);
+insert into payment (amount, created_at ,completed_at, method, status, fk_appointment) values (300, '2025-10-04T12:31:52' ,'2025-10-04T12:31:52', 'BLIK', 'COMPLETED', 3);
