@@ -102,4 +102,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> getAllByFinishedAtBeforeAndStatusEquals(
             LocalDateTime finishedAtBefore, AppointmentStatus status);
+
+    List<Appointment> getAllByStartedAtBetweenAndNotificationSentEquals(LocalDateTime startedAtAfter,
+                                                                        LocalDateTime startedAtBefore,
+                                                                        boolean notificationSent);
 }

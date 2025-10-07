@@ -3,6 +3,9 @@ package pl.edu.pja.aurorumclinic.features.appointments.shared;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -139,6 +142,33 @@ public class AppointmentNotificationListener {
         emailService.sendEmail(
                 noreplyEmailAddres, appointment.getPatient().getEmail(),
                 "Oceń wizytę", htmlPageAsText);
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handleAppointmentReminderEvent(AppointmentReminderEvent event) {
+        Appointment appointment = event.appointment();
+        Patient patient = appointment.getPatient();
+        String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
+        String deleteLink = deleteAppointmentLink + appointment.getId();
+        Context context = new Context();
+        context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
+        context.setVariable("rescheduleLink", rescheduleLink);
+        context.setVariable("deleteLink", deleteLink);
+
+        String htmlPageAsText = springTemplateEngine.process("appointment-reminder-email", context);
+
+        if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
+            emailService.sendEmail(
+                    noreplyEmailAddres, patient.getEmail(),
+                    "Przypomnienie o wizycie", htmlPageAsText);
+        } else {
+            String message = String.format("""
+                    Przypominamy o nadchodzącej wizycie w dniu: %s
+                    przełóż wizytę: %s
+                    odwołaj wizytę: %s""", appointment.getStartedAt().format(dateFormatter), rescheduleLink, deleteLink);
+            smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
+                    message);
+        }
     }
 
 }

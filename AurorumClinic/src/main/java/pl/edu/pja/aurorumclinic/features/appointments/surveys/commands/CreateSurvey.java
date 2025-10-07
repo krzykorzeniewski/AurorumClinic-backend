@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.SurveyRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentFinishedEvent;
@@ -21,8 +22,7 @@ public class CreateSurvey {
     private final SurveyRepository surveyRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleAppointmentFinishedEvent(AppointmentFinishedEvent event) {
         Appointment appointment = event.appointment();
         Survey survey = Survey.builder()
