@@ -37,10 +37,9 @@ public class SearchAll {
         Pageable pageable = PageRequest.of(page, size);
         Page<SearchDoctorResponse> result =  doctorRepository.findAllByQuery(query, pageable);
         result.forEach(r -> {
-            if (r.getProfilePicture() != null) {
-                    r.setProfilePicture(objectStorageService.
-                            generateSignedUrl(r.getProfilePicture()));
-            }
+            r.setProfilePicture(objectStorageService.
+                    generateSignedUrl(r.getProfilePicture()));
+
         });
         return result;
     }

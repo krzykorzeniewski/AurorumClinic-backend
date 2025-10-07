@@ -38,17 +38,32 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
 
     @Override
     public String generateSignedUrl(String fileName) {
-        GetObjectRequest objectRequest = GetObjectRequest.builder()
-                .bucket(s3BucketName)
-                .key(fileName)
-                .build();
+        if (fileName == null) {
+            GetObjectRequest objectRequest = GetObjectRequest.builder()
+                    .bucket(s3BucketName)
+                    .key("img.png")
+                    .build();
 
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofDays(1))
-                .getObjectRequest(objectRequest)
-                .build();
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofDays(1))
+                    .getObjectRequest(objectRequest)
+                    .build();
 
-        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
-        return presignedRequest.url().toExternalForm();
+            PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+            return presignedRequest.url().toExternalForm();
+        } else {
+            GetObjectRequest objectRequest = GetObjectRequest.builder()
+                    .bucket(s3BucketName)
+                    .key(fileName)
+                    .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofDays(1))
+                    .getObjectRequest(objectRequest)
+                    .build();
+
+            PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+            return presignedRequest.url().toExternalForm();
+        }
     }
 }

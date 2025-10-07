@@ -37,10 +37,8 @@ public class GetRecommended {
         Pageable pageable = PageRequest.of(page, size);
         Page<RecommendedDoctorResponse> doctorsFromDb = doctorRepository.findAllRecommendedDtos(pageable);
         doctorsFromDb.forEach(r -> {
-            if (r.getProfilePicture() != null) {
-                r.setProfilePicture(objectStorageService.
-                        generateSignedUrl(r.getProfilePicture()));
-            }
+            r.setProfilePicture(objectStorageService.
+                generateSignedUrl(r.getProfilePicture()));
         });
         return doctorsFromDb;
     }

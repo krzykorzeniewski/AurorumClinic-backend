@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
@@ -97,4 +99,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         order by a.status desc
     """)
     Page<PatientGetAppointmentResponse> getAllPatientAppointments(Long patientId, Pageable pageable);
+
+    List<Appointment> getAllByFinishedAtBeforeAndStatusEquals(
+            LocalDateTime finishedAtBefore, AppointmentStatus status);
 }

@@ -36,9 +36,7 @@ public class MeGetAppointmentById {
         if (response == null) {
             throw new ApiNotFoundException("id not found", "id");
         }
-        if (response.doctor().getProfilePicture() != null) {
-            response.doctor().setProfilePicture(objectStorageService.generateSignedUrl(response.doctor().getProfilePicture()));
-        }
+        response.doctor().setProfilePicture(objectStorageService.generateSignedUrl(response.doctor().getProfilePicture()));
         return response;
     }
 

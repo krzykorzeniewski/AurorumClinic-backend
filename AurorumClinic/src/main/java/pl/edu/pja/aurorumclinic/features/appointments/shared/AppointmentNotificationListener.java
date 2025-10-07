@@ -2,17 +2,19 @@ package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.events.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
+import pl.edu.pja.aurorumclinic.shared.data.models.Survey;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
+import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
 import java.time.format.DateTimeFormatter;
@@ -24,6 +26,7 @@ public class AppointmentNotificationListener {
 
     private final EmailService emailService;
     private final SmsService smsService;
+    private final ObjectStorageService objectStorageService;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
     private final SpringTemplateEngine springTemplateEngine;
 
@@ -32,6 +35,9 @@ public class AppointmentNotificationListener {
 
     @Value("${mail.frontend.appointment.reschedule-link}")
     private String rescheduleAppointmentLink;
+
+    @Value("${mail.frontend.appointment.survey-link}")
+    private String appointmentSurveyLink;
 
     @Value("${mail.backend.noreply-address}")
     private String noreplyEmailAddres;
@@ -113,6 +119,25 @@ public class AppointmentNotificationListener {
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
                     message);
         }
+    }
+
+    @TransactionalEventListener
+    public void handleSurveyCreatedEvent(SurveyCreatedEvent event) {
+        Survey survey = event.survey();
+        Appointment appointment = survey.getAppointment();
+        Doctor doctor = survey.getAppointment().getDoctor();
+        String profilePicture = objectStorageService.generateSignedUrl(doctor.getProfilePicture());
+        String surveyLink = appointmentSurveyLink + survey.getId();
+
+        Context context = new Context();
+        context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
+        context.setVariable("doctorProfilePicture", profilePicture);
+        context.setVariable("surveyLink", surveyLink);
+
+        String htmlPageAsText = springTemplateEngine.process("appointment-survey-email", context);
+        emailService.sendEmail(
+                noreplyEmailAddres, appointment.getPatient().getEmail(),
+                "Oceń wizytę", htmlPageAsText);
     }
 
 }

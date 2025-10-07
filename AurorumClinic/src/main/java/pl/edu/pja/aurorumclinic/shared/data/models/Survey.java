@@ -27,12 +27,11 @@ public class Survey {
     @Min(value = 1, message = "Minimum value for this field is 1")
     @Max(value = 5, message = "Maximum value for this field is 5")
     @Column(name = "Grade")
-    @NotNull(message = "This field is required")
-    private int grade;
+    private Integer grade;
 
-    @Column(name = "Sent_At", columnDefinition = "datetime2(2)")
+    @Column(name = "Created_At", columnDefinition = "datetime2(2)")
     @NotNull(message = "This field is required")
-    private LocalDateTime sentAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "Completed_At", columnDefinition = "datetime2(2)")
     private LocalDateTime completedAt;

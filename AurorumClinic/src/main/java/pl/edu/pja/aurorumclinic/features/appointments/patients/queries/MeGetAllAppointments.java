@@ -40,10 +40,8 @@ public class MeGetAllAppointments {
         Page<PatientGetAppointmentResponse> response = appointmentRepository
                 .getAllPatientAppointments(patientId, pageable);
         response.forEach(r -> {
-            if (r.doctor().getProfilePicture() != null) {
-                r.doctor().setProfilePicture(objectStorageService.
-                        generateSignedUrl(r.doctor().getProfilePicture()));
-            }
+            r.doctor().setProfilePicture(objectStorageService.
+                    generateSignedUrl(r.doctor().getProfilePicture()));
         });
         return response;
     }
