@@ -18,6 +18,7 @@ import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 
 @Component
@@ -27,7 +28,7 @@ public class AppointmentNotificationListener {
     private final EmailService emailService;
     private final SmsService smsService;
     private final ObjectStorageService objectStorageService;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+    private final DateTimeFormatter dateFormatter;
     private final SpringTemplateEngine springTemplateEngine;
 
     @Value("${mail.frontend.appointment.delete-link}")
@@ -133,6 +134,8 @@ public class AppointmentNotificationListener {
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
         context.setVariable("doctorProfilePicture", profilePicture);
         context.setVariable("surveyLink", surveyLink);
+        context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
+        context.setVariable("doctorSpecialization", doctor.getSpecialization());
 
         String htmlPageAsText = springTemplateEngine.process("appointment-survey-email", context);
         emailService.sendEmail(
