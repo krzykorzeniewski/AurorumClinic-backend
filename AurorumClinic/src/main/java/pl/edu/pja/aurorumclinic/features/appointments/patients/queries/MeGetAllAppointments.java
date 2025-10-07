@@ -16,8 +16,6 @@ import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentReposito
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/appointments/me")
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class MeGetAllAppointments {
                 .getAllPatientAppointments(patientId, pageable);
         response.forEach(r -> {
             r.doctor().setProfilePicture(objectStorageService.
-                    generateSignedUrl(r.doctor().getProfilePicture()));
+                    generateUrl(r.doctor().getProfilePicture()));
         });
         return response;
     }

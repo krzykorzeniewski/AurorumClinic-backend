@@ -2,7 +2,6 @@ package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
@@ -18,7 +17,6 @@ import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Objects;
 
 @Component
@@ -127,7 +125,7 @@ public class AppointmentNotificationListener {
         Survey survey = event.survey();
         Appointment appointment = survey.getAppointment();
         Doctor doctor = survey.getAppointment().getDoctor();
-        String profilePicture = objectStorageService.generateSignedUrl(doctor.getProfilePicture());
+        String profilePicture = objectStorageService.generateUrl(doctor.getProfilePicture());
         String surveyLink = appointmentSurveyLink + survey.getId();
 
         Context context = new Context();
