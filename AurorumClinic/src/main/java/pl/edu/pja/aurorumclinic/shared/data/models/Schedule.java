@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Data
@@ -32,4 +33,10 @@ public class Schedule {
     @ManyToOne
     @JoinColumn(name = "FK_Doctor")
     private Doctor doctor;
+
+    @ManyToMany
+    @JoinTable(name = "Service_Schedule",
+        joinColumns = @JoinColumn(name = "PK_Schedule"),
+        inverseJoinColumns = @JoinColumn(name = "PK_Service"))
+    private Set<Service> services;
 }

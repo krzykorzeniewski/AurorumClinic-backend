@@ -55,17 +55,17 @@ insert into doctor (pk_doctor, description, specialization, profile_picture, edu
      'Psychiatra dziecięcy', null, 'Uniwersytet Pomorski w Słupsku (chyba nie mają medycyny ale esz)', 'POZ na Piłsudskiego w Słupsku', 'PWZ123532');
 
 --schedules
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-04T08:00:00', '2025-10-04T17:00:00', 4)
-    insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-05T08:00:00', '2025-10-05T17:00:00', 4)
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-06T14:00:00', '2025-10-06T21:00:00', 4)
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-04T08:00:00', '2025-10-04T17:00:00', 4);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-05T08:00:00', '2025-10-05T17:00:00', 4);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-06T14:00:00', '2025-10-06T21:00:00', 4);
 
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-04T10:00:00', '2025-10-04T20:00:00', 5)
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-05T08:00:00', '2025-10-05T17:00:00', 5)
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-06T10:00:00', '2025-10-06T20:00:00', 5)
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-04T10:00:00', '2025-10-04T20:00:00', 5);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-05T08:00:00', '2025-10-05T17:00:00', 5);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-06T10:00:00', '2025-10-06T20:00:00', 5);
 
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-04T09:00:00', '2025-10-04T21:00:00', 10)
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-05T09:00:00', '2025-10-05T21:00:00', 10)
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-06T09:00:00', '2025-10-06T21:00:00', 10)
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-04T09:00:00', '2025-10-04T21:00:00', 10);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-05T09:00:00', '2025-10-05T21:00:00', 10);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-06T09:00:00', '2025-10-06T21:00:00', 10);
 
 --services
 insert into service (name, duration, price, description) values ('Konsultacja psychiatryczna dorosłych (pierwsza wizyta)', 45, 350, 'Ocena stanu psychicznego z indywidualnym planem leczenia');
@@ -74,6 +74,30 @@ insert into service (name, duration, price, description) values ('Konsultacja ps
 insert into service (name, duration, price, description) values ('Konsultacja psychiatryczna dzieci (kolejna wizyta)', 30, 300, 'Weryfikacja postępów, modyfikacja terapii oraz dalsze planowanie opieki');
 insert into service (name, duration, price, description) values ('Konsultacja psychologiczna dorosłych (pierwsza wizyta)', 60, 250, 'Krótka ocena psychologiczna, diagnoza oraz wstępny plan terapeutyczny');
 insert into service (name, duration, price, description) values ('Konsultacja psychologiczna dorosłych (kolejna wizyta)', 60, 200, 'Kontynuacja terapii');
+
+insert into service_schedule(pk_schedule, pk_service) values (1, 5);
+insert into service_schedule(pk_schedule, pk_service) values (1, 6);
+insert into service_schedule(pk_schedule, pk_service) values (2, 5);
+insert into service_schedule(pk_schedule, pk_service) values (2, 6);
+insert into service_schedule(pk_schedule, pk_service) values (3, 5);
+insert into service_schedule(pk_schedule, pk_service) values (3, 6);
+
+insert into service_schedule(pk_schedule, pk_service) values (4, 1);
+insert into service_schedule(pk_schedule, pk_service) values (4, 3);
+insert into service_schedule(pk_schedule, pk_service) values (5, 1);
+insert into service_schedule(pk_schedule, pk_service) values (5, 3);
+insert into service_schedule(pk_schedule, pk_service) values (6, 1);
+insert into service_schedule(pk_schedule, pk_service) values (6, 3);
+
+insert into service_schedule(pk_schedule, pk_service) values (7, 2);
+insert into service_schedule(pk_schedule, pk_service) values (7, 4);
+insert into service_schedule(pk_schedule, pk_service) values (8, 2);
+insert into service_schedule(pk_schedule, pk_service) values (8, 4);
+insert into service_schedule(pk_schedule, pk_service) values (9, 2);
+insert into service_schedule(pk_schedule, pk_service) values (9, 4);
+
+
+
 
 --opinions
 insert into opinion (rating, comment, answer, created_at) values (5, 'Bardzo miły psycholog', null, '2025-10-04T21:27:00');

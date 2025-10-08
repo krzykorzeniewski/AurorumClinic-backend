@@ -24,15 +24,15 @@ public class GetAppointmentSlotsById {
     public ResponseEntity<ApiResponse<List<LocalDateTime>>> getAppointmentSlots(@PathVariable Long id,
                                                                    @RequestParam LocalDateTime startedAt,
                                                                    @RequestParam LocalDateTime finishedAt,
-                                                                   @RequestParam int serviceDuration) {
-        return ResponseEntity.ok(ApiResponse.success(handle(id, startedAt, finishedAt, serviceDuration)));
+                                                                   @RequestParam Long serviceId) {
+        return ResponseEntity.ok(ApiResponse.success(handle(id, startedAt, finishedAt, serviceId)));
     }
 
-    private List<LocalDateTime> handle(Long id, LocalDateTime startedAt, LocalDateTime finishedAt, int serviceDuration) {
+    private List<LocalDateTime> handle(Long id, LocalDateTime startedAt, LocalDateTime finishedAt, Long serviceId) {
         doctorRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        return doctorRepository.appointmentSlots(startedAt, finishedAt, serviceDuration, Math.toIntExact(id))
+        return doctorRepository.appointmentSlots(startedAt, finishedAt, serviceId, id)
                 .stream()
                 .map(Timestamp::toLocalDateTime)
                 .toList();

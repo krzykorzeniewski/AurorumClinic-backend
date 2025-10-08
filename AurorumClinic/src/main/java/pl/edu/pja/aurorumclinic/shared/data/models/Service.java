@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -44,4 +45,7 @@ public class Service {
 
     @OneToMany(mappedBy = "service")
     private List<Appointment> appointments;
+
+    @ManyToMany(mappedBy = "services")
+    private Set<Schedule> schedules;
 }

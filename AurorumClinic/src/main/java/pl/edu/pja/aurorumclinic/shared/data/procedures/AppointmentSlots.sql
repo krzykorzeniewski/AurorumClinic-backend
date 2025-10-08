@@ -1,9 +1,11 @@
 alter procedure AppointmentSlots @StartedAt datetime2(5), @FinishedAt datetime2(5),
-    @ServiceDuration int, @PkDoctor int as
+    @PkService int, @PkDoctor int as
 begin
+declare @ServiceDuration int;
 create table #appoinment_slots (
                                    timeslot datetime2(5)
 );
+select @ServiceDuration = duration from service where pk_service = @PkService;
 while @StartedAt < @FinishedAt
 begin
             if not exists (
@@ -15,6 +17,7 @@ begin
             ) and exists (
                 select 1 from schedule s
                          join doctor d on d.pk_doctor = s.fk_doctor
+                         join service_schedule s2 on s2.pk_schedule = s.pk_schedule
                 where s.started_at < dateadd(minute, @ServiceDuration, @StartedAt)
                     and s.finished_at > @StartedAt
                     and d.pk_doctor = @PkDoctor

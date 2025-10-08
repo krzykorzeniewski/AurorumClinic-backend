@@ -12,15 +12,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-
     @Query("""
     select case
              when exists (
                  select 1
                  from Schedule s
+                 join s.services s2
                  where s.doctor.id = :doctorId
                    and s.startedAt <= :startedAt
                    and s.finishedAt >= :finishedAt
+                   and s2.id = :serviceId
              )
              and not exists (
                  select 1

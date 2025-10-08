@@ -12,14 +12,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.schedules.ScheduleRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
+import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -29,6 +33,7 @@ public class CreateSchedule {
 
     private final ScheduleRepository scheduleRepository;
     private final DoctorRepository doctorRepository;
+    private final ServiceRepository serviceRepository;
 
     @Value("${workday.start.hour}")
     private Integer startOfDay;
@@ -44,6 +49,10 @@ public class CreateSchedule {
     }
 
     private void handle(CreateScheduleRequest request) {
+        List<Service> servicesFromDb = serviceRepository.findAllById(request.serviceIds);
+        if (servicesFromDb.size() > request.serviceIds.size()) {
+            throw new ApiException("Some service ids are not found", "serviceIds");
+        }
         Doctor doctorFromDb = doctorRepository.findById(request.doctorId()).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
@@ -68,13 +77,15 @@ public class CreateSchedule {
                 .doctor(doctorFromDb)
                 .startedAt(request.startedAt())
                 .finishedAt(request.finishedAt())
+                .services(Set.copyOf(servicesFromDb))
                 .build();
         scheduleRepository.save(schedule);
     }
 
     public record CreateScheduleRequest(@NotNull LocalDateTime startedAt,
                                         @NotNull LocalDateTime finishedAt,
-                                        @NotNull Long doctorId) {
+                                        @NotNull Long doctorId,
+                                        @NotNull Set<Long> serviceIds) {
     }
 
 }

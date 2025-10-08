@@ -48,7 +48,7 @@ public class SecurityConfig {
                         "/api/auth/register-patient", "/api/auth/register-doctor", "/api/auth/reset-password-token",
                         "/api/auth/reset-password", "/api/auth/login-2fa", "/api/auth/login-2fa-token",
                         "/api/auth/verify-email", "/api/auth/verify-email-token", "/api/appointments/guest",
-                        "/api/doctors/search", "/api/doctors/recommended", "/api/services")
+                        "/api/doctors/search", "/api/doctors/recommended", "/api/services", "/api/doctors/{id}/appointment-slots")
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)

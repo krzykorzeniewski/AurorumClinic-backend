@@ -15,9 +15,8 @@ import java.util.List;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
-    @NativeQuery(value = "exec AppointmentSlots :startedAt, :finishedAt, :serviceDuration, :pkDoctor")
-    List<Timestamp> appointmentSlots(LocalDateTime startedAt, LocalDateTime finishedAt,
-                                     Integer serviceDuration, Integer pkDoctor);
+    @NativeQuery(value = "exec AppointmentSlots :startedAt, :finishedAt, :pkService, :pkDoctor")
+    List<Timestamp> appointmentSlots(LocalDateTime startedAt, LocalDateTime finishedAt, Long pkService, Long pkDoctor);
 
     @Query("""
            select new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.SearchDoctorResponse(
