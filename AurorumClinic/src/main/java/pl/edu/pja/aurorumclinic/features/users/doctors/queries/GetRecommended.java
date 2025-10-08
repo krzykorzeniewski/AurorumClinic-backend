@@ -15,8 +15,6 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
@@ -37,10 +35,8 @@ public class GetRecommended {
         Pageable pageable = PageRequest.of(page, size);
         Page<RecommendedDoctorResponse> doctorsFromDb = doctorRepository.findAllRecommendedDtos(pageable);
         doctorsFromDb.forEach(r -> {
-            if (r.getProfilePicture() != null) {
-                r.setProfilePicture(objectStorageService.
-                        generateSignedUrl(r.getProfilePicture()));
-            }
+            r.setProfilePicture(objectStorageService.
+                    generateUrl(r.getProfilePicture()));
         });
         return doctorsFromDb;
     }

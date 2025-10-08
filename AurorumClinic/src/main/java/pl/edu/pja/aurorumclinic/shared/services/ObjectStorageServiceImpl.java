@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Utilities;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -24,7 +26,6 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
     @Value("${cloud.aws.bucket.name}")
     private String s3BucketName;
 
-    private final S3Presigner s3Presigner;
 
     @Override
     public String uploadObject(MultipartFile file) throws IOException {
@@ -37,18 +38,19 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
     }
 
     @Override
-    public String generateSignedUrl(String fileName) {
-        GetObjectRequest objectRequest = GetObjectRequest.builder()
-                .bucket(s3BucketName)
-                .key(fileName)
-                .build();
-
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofDays(1))
-                .getObjectRequest(objectRequest)
-                .build();
-
-        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
-        return presignedRequest.url().toExternalForm();
+    public String generateUrl(String fileName) {
+        if (fileName == null) {
+            GetUrlRequest objectRequest = GetUrlRequest.builder()
+                    .bucket(s3BucketName)
+                    .key("img.png")
+                    .build();
+            return String.valueOf(s3Client.utilities().getUrl(objectRequest));
+        } else {
+            GetUrlRequest objectRequest = GetUrlRequest.builder()
+                    .bucket(s3BucketName)
+                    .key(fileName)
+                    .build();
+            return String.valueOf(s3Client.utilities().getUrl(objectRequest));
+        }
     }
 }

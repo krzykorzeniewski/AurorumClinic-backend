@@ -40,6 +40,9 @@ public class Appointment {
     @NotBlank(message = "This field is required")
     private String description;
 
+    @Column(name = "Notification_Sent", columnDefinition = "bit")
+    private boolean notificationSent = false;
+
     @OneToOne(mappedBy = "appointment")
     @ToString.Exclude
     private Payment payment;
