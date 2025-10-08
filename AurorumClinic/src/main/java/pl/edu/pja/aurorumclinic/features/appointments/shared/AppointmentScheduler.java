@@ -35,6 +35,9 @@ public class AppointmentScheduler {
         List<Appointment> appointmentsFromDb =
                 appointmentRepository.getAllByFinishedAtBeforeAndStatusEquals(LocalDateTime.now(),
                         AppointmentStatus.CREATED);
+        if (appointmentsFromDb.isEmpty()) {
+            return;
+        }
         for (Appointment appointment : appointmentsFromDb) {
             appointment.setStatus(AppointmentStatus.FINISHED);
             applicationEventPublisher.publishEvent(new AppointmentFinishedEvent(appointment));
@@ -50,7 +53,10 @@ public class AppointmentScheduler {
         LocalDateTime endOfTomorrowDate = endOfTodayDate.plusDays(1);
         List<Appointment> appointmentsFromDb =
                 appointmentRepository.getAllByStartedAtBetweenAndNotificationSentEquals(startOfTomorrowDate,
-                        endOfTomorrowDate.plusDays(1), false);
+                        endOfTomorrowDate, false);
+        if (appointmentsFromDb.isEmpty()) {
+            return;
+        }
         for (Appointment appointment : appointmentsFromDb) {
             appointment.setNotificationSent(true);
             applicationEventPublisher.publishEvent(new AppointmentReminderEvent(appointment));

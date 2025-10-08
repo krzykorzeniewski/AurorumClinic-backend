@@ -10,6 +10,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.*;
+import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
@@ -53,11 +54,17 @@ public class AppointmentNotificationListener {
         String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
         String deleteLink = deleteAppointmentLink + appointment.getId();
         Patient patient = event.getPatient();
+        Doctor doctor = appointment.getDoctor();
 
         Context context = new Context();
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
         context.setVariable("rescheduleLink", rescheduleLink);
         context.setVariable("deleteLink", deleteLink);
+        context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
+        context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
+        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("appointmentService", appointment.getService().getName());
+
         String htmlPageAsText = springTemplateEngine.process("appointment-created-email", context);
 
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
@@ -80,11 +87,16 @@ public class AppointmentNotificationListener {
         String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
         String deleteLink = deleteAppointmentLink + appointment.getId();
         Patient patient = event.getPatient();
+        Doctor doctor = appointment.getDoctor();
 
         Context context = new Context();
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
         context.setVariable("rescheduleLink", rescheduleLink);
         context.setVariable("deleteLink", deleteLink);
+        context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
+        context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
+        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("appointmentService", appointment.getService().getName());
         String htmlPageAsText = springTemplateEngine.process("appointment-rescheduled-email", context);
 
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
@@ -105,9 +117,15 @@ public class AppointmentNotificationListener {
     public void handleAppointmentDeletedEvent(AppointmentDeletedEvent event) {
         Patient patient = event.getPatient();
         Appointment appointment = event.getAppointment();
+        Doctor doctor = appointment.getDoctor();
 
         Context context = new Context();
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
+        context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
+        context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
+        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("appointmentService", appointment.getService().getName());
+
         String htmlPageAsText = springTemplateEngine.process("appointment-deleted-email", context);
 
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
@@ -128,15 +146,15 @@ public class AppointmentNotificationListener {
         Survey survey = event.survey();
         Appointment appointment = survey.getAppointment();
         Doctor doctor = survey.getAppointment().getDoctor();
-        String profilePicture = objectStorageService.generateUrl(doctor.getProfilePicture());
         String surveyLink = appointmentSurveyLink + survey.getId();
 
         Context context = new Context();
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
-        context.setVariable("doctorProfilePicture", profilePicture);
         context.setVariable("surveyLink", surveyLink);
+        context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
         context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("appointmentService", appointment.getService().getName());
 
         String htmlPageAsText = springTemplateEngine.process("appointment-survey-email", context);
         emailService.sendEmail(
@@ -147,13 +165,19 @@ public class AppointmentNotificationListener {
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleAppointmentReminderEvent(AppointmentReminderEvent event) {
         Appointment appointment = event.appointment();
+        Doctor doctor = appointment.getDoctor();
         Patient patient = appointment.getPatient();
         String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
         String deleteLink = deleteAppointmentLink + appointment.getId();
+
         Context context = new Context();
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
         context.setVariable("rescheduleLink", rescheduleLink);
         context.setVariable("deleteLink", deleteLink);
+        context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
+        context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
+        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("appointmentService", appointment.getService().getName());
 
         String htmlPageAsText = springTemplateEngine.process("appointment-reminder-email", context);
 
