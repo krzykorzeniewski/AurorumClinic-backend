@@ -47,8 +47,7 @@ public class CreateService {
 
     public record CreateServiceRequest(@NotBlank @Size(max = 150) String name,
                                        @NotNull Integer duration,
-                                       @NotNull @Digits(integer = 10, fraction = 2)
-                                       @NotNull @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal price,
+                                       @NotNull @Digits(integer = 10, fraction = 2) @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal price,
                                        @NotBlank @Size(max = 500) String description) {
     }
 
