@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 public record GetPatientAppointmentResponse(Long id,
                                             @JsonFormat(shape = JsonFormat.Shape.STRING) AppointmentStatus status,
                                             LocalDateTime startedAt,
+                                            String description,
                                             DoctorDto doctor,
                                             ServiceDto service,
                                             PaymentDto payment) {
-
 }

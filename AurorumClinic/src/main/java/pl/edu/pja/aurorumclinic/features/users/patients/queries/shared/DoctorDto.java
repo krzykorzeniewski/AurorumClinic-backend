@@ -1,8 +1,18 @@
 package pl.edu.pja.aurorumclinic.features.users.patients.queries.shared;
 
-public record DoctorDto(Long id,
-                        String name,
-                        String surname,
-                        String profilePicture,
-                        String specialization) {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Data
+public class DoctorDto {
+
+    private final Long id;
+    private final String name;
+    private final String surname;
+    private String profilePicture;
+    private final String specialization;
+
 }

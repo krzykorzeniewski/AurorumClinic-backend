@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared;
+package pl.edu.pja.aurorumclinic.features.appointments.shared.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
