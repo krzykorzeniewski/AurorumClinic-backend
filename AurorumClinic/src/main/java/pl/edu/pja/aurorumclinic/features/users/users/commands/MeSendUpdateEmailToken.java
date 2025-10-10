@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.users.users.commands;
 
+import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -25,6 +26,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @PreAuthorize("isFullyAuthenticated()")
+@RateLimiting(name = "sensitive")
 public class MeSendUpdateEmailToken {
 
     private final UserRepository userRepository;

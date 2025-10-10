@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.auth.verify_phone_number;
 
+import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RequestMapping("/api/auth/me")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
+@RateLimiting(name = "sensitive")
 public class VerifyPhoneNumberController {
 
     private final VerifyPhoneNumberService verifyPhoneNumberService;

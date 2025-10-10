@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.shared.exceptions;
 
+import com.giffing.bucket4j.spring.boot.starter.context.RateLimitException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -138,6 +139,12 @@ public class GlobalExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         return ApiResponse.fail(Map.of(ex.getParameterName(), "parameter is required"));
+    }
+
+    @ExceptionHandler(RateLimitException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ApiResponse<?> handleRateLimitException(RateLimitException ex) {
+        return ApiResponse.fail(null);
     }
 
 }

@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.auth.login;
 
+import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @PermitAll
+@RateLimiting(name = "sensitive")
 public class LoginController {
 
     private final LoginService loginService;
