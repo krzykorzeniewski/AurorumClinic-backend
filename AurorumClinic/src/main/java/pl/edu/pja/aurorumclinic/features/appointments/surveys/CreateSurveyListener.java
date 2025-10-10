@@ -5,7 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.SurveyRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.data.SurveyRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentFinishedEvent;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.SurveyCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;

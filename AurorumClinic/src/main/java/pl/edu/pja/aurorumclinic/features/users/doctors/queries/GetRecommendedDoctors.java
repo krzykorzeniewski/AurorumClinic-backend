@@ -10,38 +10,35 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.SearchDoctorResponse;
+import pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-public class SearchAll {
+public class GetRecommendedDoctors {
 
     private final DoctorRepository doctorRepository;
     private final ObjectStorageService objectStorageService;
 
     @PermitAll
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<SearchDoctorResponse>>> searchAllDoctors(@RequestParam String query,
-                                              @RequestParam (defaultValue = "0") int page,
-                                              @RequestParam (defaultValue = "5") int size) throws IOException {
-        return ResponseEntity.ok(ApiResponse.success(handle(query, page, size)));
+    @GetMapping("/recommended")
+    public ResponseEntity<ApiResponse<Page<GetDoctorResponse>>> getRecommendedDoctors(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam (defaultValue = "5") int size)  {
+        return ResponseEntity.ok(ApiResponse.success(handle(page, size)));
     }
 
-    private Page<SearchDoctorResponse> handle(String query, int page, int size) {
+    private Page<GetDoctorResponse> handle (int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<SearchDoctorResponse> result =  doctorRepository.findAllByQuery(query, pageable);
-        result.forEach(r -> {
+        Page<GetDoctorResponse> doctorsFromDb = doctorRepository.findAllByHighestRating(pageable);
+        doctorsFromDb.forEach(r -> {
             r.setProfilePicture(objectStorageService.
                     generateUrl(r.getProfilePicture()));
-
         });
-        return result;
+        return doctorsFromDb;
     }
 
 }

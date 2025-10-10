@@ -33,6 +33,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             a.id,
             a.status,
             a.startedAt,
+            a.description,
             new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.DoctorDto(
                 d.id,
                 d.name,

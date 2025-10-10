@@ -1,18 +1,19 @@
-package pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared;
+package pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Data
-public class DoctorDto {
+@RequiredArgsConstructor
+public class GetDoctorResponse {
 
     private final Long id;
     private final String name;
     private final String surname;
-    private String profilePicture;
     private final String specialization;
+    private String profilePicture;
+    private final int rating;
 
 }

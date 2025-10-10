@@ -11,6 +11,7 @@ import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatien
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
+import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -18,6 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 public class GetPatientByIdAppointments {
 
     private final PatientRepository patientRepository;
+    private final ObjectStorageService objectStorageService;
 
     @GetMapping("/{id}/appointments")
     @PreAuthorize("hasRole('EMPLOYEE')")
@@ -35,7 +37,9 @@ public class GetPatientByIdAppointments {
         Pageable pageable = PageRequest.of(page, size);
         Page<GetPatientAppointmentResponse> patientAppointmentsById = patientRepository
                 .findPatientAppointmentsById(patientId, pageable);
+        patientAppointmentsById.forEach(a -> {
+            a.doctor().setProfilePicture(objectStorageService.generateUrl(a.doctor().getProfilePicture()));
+        });
         return patientAppointmentsById;
     }
-
 }
