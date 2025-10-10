@@ -13,7 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @PermitAll
-@RateLimiting(name = "auth")
+@RateLimiting(name = "sensitive")
 public class LoginController {
 
     private final LoginService loginService;

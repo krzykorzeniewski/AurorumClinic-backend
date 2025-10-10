@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.users.users.commands;
 
+import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @PreAuthorize("isFullyAuthenticated()")
+@RateLimiting(name = "sensitive")
 public class MeSendUpdateMfaToken {
 
     private final UserRepository userRepository;
