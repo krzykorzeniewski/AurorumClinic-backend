@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
@@ -32,7 +32,7 @@ public class MeGetAppointmentById {
     }
 
     private GetAppointmentResponse handle(Long appointmentId, Long userId) {
-        GetAppointmentResponse response = appointmentRepository.getPatientAppointmentById(userId, appointmentId);
+        GetAppointmentResponse response = appointmentRepository.getAppointmentByPatientIdAndAppointmentId(userId, appointmentId);
         if (response == null) {
             throw new ApiNotFoundException("id not found", "id");
         }

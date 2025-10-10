@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 

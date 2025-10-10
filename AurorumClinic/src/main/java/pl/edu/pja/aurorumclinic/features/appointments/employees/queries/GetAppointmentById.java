@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -30,7 +30,7 @@ public class GetAppointmentById {
     }
 
     private GetAppointmentResponse handle(Long appointmentId) {
-        GetAppointmentResponse response = appointmentRepository.getAppointmentResponseById(appointmentId);
+        GetAppointmentResponse response = appointmentRepository.getAppointmentById(appointmentId);
         if (response == null) {
             throw new ApiNotFoundException("Id not found", "id");
         }

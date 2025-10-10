@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.services.queries.shared.GetServiceResponse;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.ServiceRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.data.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
 @RestController

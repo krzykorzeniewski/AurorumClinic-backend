@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.SurveyRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.data.SurveyRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Survey;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;

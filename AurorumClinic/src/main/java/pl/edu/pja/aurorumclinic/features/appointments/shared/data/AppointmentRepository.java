@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.shared;
+package pl.edu.pja.aurorumclinic.features.appointments.shared.data;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,6 +60,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 p.id,
                 p.amount,
                 p.status
+            ),
+            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PatientDto(
+                a.patient.id,
+                a.patient.name,
+                a.patient.surname
             )
         )
         from Appointment a
@@ -68,7 +73,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         join a.payment p
         where a.id = :appointmentId
     """)
-    GetAppointmentResponse getAppointmentResponseById(Long appointmentId);
+    GetAppointmentResponse getAppointmentById(Long appointmentId);
 
 
     @Query("""
@@ -93,6 +98,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 p.id,
                 p.amount,
                 p.status
+            ),
+            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PatientDto(
+                a.patient.id,
+                a.patient.name,
+                a.patient.surname
             )
         )
         from Appointment a
@@ -101,7 +111,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         join a.payment p
         where a.patient.id = :patientId and a.id = :appointmentId
     """)
-    GetAppointmentResponse getPatientAppointmentById(Long patientId, Long appointmentId);
+    GetAppointmentResponse getAppointmentByPatientIdAndAppointmentId(Long patientId, Long appointmentId);
 
     @Query("""
         select new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse(
@@ -125,6 +135,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 p.id,
                 p.amount,
                 p.status
+            ),
+            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PatientDto(
+                a.patient.id,
+                a.patient.name,
+                a.patient.surname
             )
         )
         from Appointment a

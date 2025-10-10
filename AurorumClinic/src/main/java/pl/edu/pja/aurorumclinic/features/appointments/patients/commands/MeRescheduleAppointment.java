@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.AppointmentValidator;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentRescheduledEvent;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;

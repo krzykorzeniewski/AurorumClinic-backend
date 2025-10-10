@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import pl.edu.pja.aurorumclinic.features.appointments.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.time.LocalDateTime;

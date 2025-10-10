@@ -11,5 +11,6 @@ public record GetAppointmentResponse(Long id,
                                      String description,
                                      DoctorDto doctor,
                                      ServiceDto service,
-                                     PaymentDto payment) {
+                                     PaymentDto payment,
+                                     PatientDto patient) {
 }
