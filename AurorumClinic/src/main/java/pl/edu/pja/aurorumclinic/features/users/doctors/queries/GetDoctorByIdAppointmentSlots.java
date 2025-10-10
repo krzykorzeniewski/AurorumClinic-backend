@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-public class GetAppointmentSlotsById {
+public class GetDoctorByIdAppointmentSlots {
 
     private final DoctorRepository doctorRepository;
 

@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @Data
 @RequiredArgsConstructor
-public class SearchDoctorResponse {
+public class GetDoctorResponse {
 
     private final Long id;
     private final String name;
