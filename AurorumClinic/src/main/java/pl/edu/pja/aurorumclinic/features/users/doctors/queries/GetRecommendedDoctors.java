@@ -13,7 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
+import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
+
+import java.util.Comparator;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/doctors")
@@ -33,12 +39,26 @@ public class GetRecommendedDoctors {
 
     private Page<GetDoctorResponse> handle (int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<GetDoctorResponse> doctorsFromDb = doctorRepository.findAllByHighestRating(pageable);
-        doctorsFromDb.forEach(r -> {
-            r.setProfilePicture(objectStorageService.
-                    generateUrl(r.getProfilePicture()));
-        });
-        return doctorsFromDb;
+        Page<Doctor> doctorsFromDb = doctorRepository.findAll(pageable);
+        Page<GetDoctorResponse> response = doctorsFromDb.map(doctor -> GetDoctorResponse.builder()
+                .id(doctor.getId())
+                .name(doctor.getName())
+                .surname(doctor.getSurname())
+                .specializations(doctor.getSpecializations().stream().map(
+                        specialization -> GetDoctorResponse.SpecializationDto.builder()
+                                .id(specialization.getId())
+                                .name(specialization.getName())
+                                .build()
+                ).toList())
+                .profilePicture(objectStorageService.generateUrl(doctor.getProfilePicture()))
+                .rating((int) doctor.getAppointments().stream()
+                        .map(Appointment::getOpinion)
+                        .filter(Objects::nonNull)
+                        .mapToInt(Opinion::getRating)
+                        .average()
+                        .orElse(0.0))
+                .build());
+        return (Page<GetDoctorResponse>) response.stream().sorted(Comparator.comparing(GetDoctorResponse::rating));
     }
 
 }

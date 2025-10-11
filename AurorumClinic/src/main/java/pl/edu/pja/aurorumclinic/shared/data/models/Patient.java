@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
@@ -26,6 +27,7 @@ public class Patient extends User{
     private CommunicationPreference communicationPreferences;
 
     @OneToMany(mappedBy = "patient", orphanRemoval = true)
+    @ToString.Exclude
     private List<Appointment> appointments;
 
 }

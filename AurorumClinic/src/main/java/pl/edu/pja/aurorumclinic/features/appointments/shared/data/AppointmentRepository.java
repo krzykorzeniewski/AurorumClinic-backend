@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 
@@ -37,131 +36,17 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     boolean timeSlotExists(LocalDateTime startedAt, LocalDateTime finishedAt,
                            Long doctorId, Long serviceId);
 
+    Appointment getAppointmentByIdAndPatientId(Long id, Long patientId);
 
     @Query("""
-        select new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse(
-            a.id,
-            a.status,
-            a.startedAt,
-            a.description,
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.DoctorDto(
-                d.id,
-                d.name,
-                d.surname,
-                d.profilePicture,
-                new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.SpecializationDto(
-                    s2.id,
-                    s2.name
-                    )
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.ServiceDto(
-                s.id,
-                s.name,
-                s.price
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PaymentDto(
-                p.id,
-                p.amount,
-                p.status
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PatientDto(
-                a.patient.id,
-                a.patient.name,
-                a.patient.surname
-            )
-        )
-        from Appointment a
-        join a.doctor d
-        join a.service s
-        join a.payment p
-        join d.specializations s2
-        where a.id = :appointmentId
-    """)
-    GetAppointmentResponse getAppointmentById(Long appointmentId);
-
-
-    @Query("""
-        select new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse(
-            a.id,
-            a.status,
-            a.startedAt,
-            a.description,
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.DoctorDto(
-                d.id,
-                d.name,
-                d.surname,
-                d.profilePicture,
-                new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.SpecializationDto(
-                    s2.id,
-                    s2.name
-                    )
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.ServiceDto(
-                s.id,
-                s.name,
-                s.price
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PaymentDto(
-                p.id,
-                p.amount,
-                p.status
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PatientDto(
-                a.patient.id,
-                a.patient.name,
-                a.patient.surname
-            )
-        )
-        from Appointment a
-        join a.doctor d
-        join a.service s
-        join a.payment p
-        join d.specializations s2
-        where a.patient.id = :patientId and a.id = :appointmentId
-    """)
-    GetAppointmentResponse getAppointmentByPatientIdAndAppointmentId(Long patientId, Long appointmentId);
-
-    @Query("""
-        select new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse(
-            a.id,
-            a.status,
-            a.startedAt,
-            a.description,
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.DoctorDto(
-                d.id,
-                d.name,
-                d.surname,
-                d.profilePicture,
-                new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.SpecializationDto(
-                    s2.id,
-                    s2.name
-                    )
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.ServiceDto(
-                s.id,
-                s.name,
-                s.price
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PaymentDto(
-                p.id,
-                p.amount,
-                p.status
-            ),
-            new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.PatientDto(
-                a.patient.id,
-                a.patient.name,
-                a.patient.surname
-            )
-        )
-        from Appointment a
-        join a.doctor d
-        join a.service s
-        join a.payment p
-        join d.specializations s2
-        where a.patient.id = :patientId
-        order by a.status desc
-    """)
-    Page<GetAppointmentResponse> getAllAppointments(Long patientId, Pageable pageable);
+            select a from Appointment a
+            left join fetch a.doctor d
+            left join fetch d.specializations
+            left join fetch a.service
+            left join fetch a.payment
+            where a.patient.id = :patientId
+            """)
+    Page<Appointment> findAllByPatientId(Long patientId, Pageable pageable);
 
     List<Appointment> getAllByFinishedAtBeforeAndStatusEquals(
             LocalDateTime finishedAtBefore, AppointmentStatus status);

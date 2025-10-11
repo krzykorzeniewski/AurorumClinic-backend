@@ -3,15 +3,13 @@ package pl.edu.pja.aurorumclinic.shared.data.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,6 +21,7 @@ import java.util.Set;
 public class Specialization {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PK_Specialization")
     private Long id;
 
@@ -32,12 +31,14 @@ public class Specialization {
     private String name;
 
     @ManyToMany
+    @ToString.Exclude
     @JoinTable(name = "Specialization_Doctor",
             joinColumns = @JoinColumn(name = "PK_Specialization"),
             inverseJoinColumns = @JoinColumn(name = "PK_Doctor"))
     private Set<Doctor> doctors;
 
     @ManyToMany
+    @ToString.Exclude
     @JoinTable(name = "Specialization_Service",
             joinColumns = @JoinColumn(name = "PK_Specialization"),
             inverseJoinColumns = @JoinColumn(name = "PK_Service"))

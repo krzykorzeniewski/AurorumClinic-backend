@@ -2,10 +2,7 @@ package pl.edu.pja.aurorumclinic.shared.data.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.PaymentMethod;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.PaymentStatus;
 
@@ -13,7 +10,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -44,7 +42,8 @@ public class Payment {
     @Column(name = "Status", length = 50, columnDefinition = "nvarchar(50)")
     private PaymentStatus status;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_appointment")
+    @ToString.Exclude
     private Appointment appointment;
 }

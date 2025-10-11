@@ -9,7 +9,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,13 +34,14 @@ public class Message {
     @NotNull(message = "This field is required")
     private LocalDateTime sentAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_User")
     @ToString.Exclude
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_Appointment")
+    @ToString.Exclude
     private Appointment appointment;
 
 

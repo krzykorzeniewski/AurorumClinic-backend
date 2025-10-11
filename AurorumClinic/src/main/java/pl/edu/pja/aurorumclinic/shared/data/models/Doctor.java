@@ -3,17 +3,15 @@ package pl.edu.pja.aurorumclinic.shared.data.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
@@ -47,6 +45,7 @@ public class Doctor extends User {
     private String pwzNumber;
 
     @OneToMany(mappedBy = "doctor")
+    @ToString.Exclude
     private List<Appointment> appointments;
 
     @OneToMany(mappedBy = "doctor")
@@ -54,6 +53,7 @@ public class Doctor extends User {
     private List<Schedule> schedules;
 
     @ManyToMany(mappedBy = "doctors")
+    @ToString.Exclude
     private Set<Specialization> specializations;
 
 }

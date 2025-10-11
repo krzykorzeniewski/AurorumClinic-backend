@@ -4,8 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientAppointmentResponse;
 import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse;
+import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.util.List;
@@ -28,41 +28,17 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
            """)
     Page<GetPatientResponse> searchAllByQuery(String query, Pageable pageable);
 
+    //TODO przeniesc do appointment repository i appointment repository do shared
     @Query("""
-        select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientAppointmentResponse(
-            a.id,
-            a.status,
-            a.startedAt,
-            a.description,
-            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.DoctorDto(
-                d.id,
-                d.name,
-                d.surname,
-                d.profilePicture,
-                new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.SpecializationDto(
-                    s2.id,
-                    s2.name
-                    )
-            ),
-            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.ServiceDto(
-                s.id,
-                s.name,
-                s.price
-            ),
-            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.PaymentDto(
-                p.id,
-                p.amount,
-                p.status
-                )
-        )
-        from Appointment a
-        join a.doctor d
-        join a.service s
-        join a.payment p
-        join d.specializations s2
-        where a.patient.id = :patientId
-    """)
-    Page<GetPatientAppointmentResponse> findPatientAppointmentsById(Long patientId, Pageable pageable);
+        from Patient p 
+            left join fetch p.appointments a
+            left join fetch a.doctor d
+            left join fetch d.specializations
+            left join fetch a.service
+            left join fetch a.payment
+            where p.id = :patientId
+        """)
+    Page<Appointment> getPatientAppointmentsById(Long patientId, Pageable pageable);
 
     @Query("""
             select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(

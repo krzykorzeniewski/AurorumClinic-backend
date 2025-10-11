@@ -44,15 +44,24 @@ insert into patient (pk_patient, communication_preferences, newsletter) values (
 insert into patient (pk_patient, communication_preferences, newsletter) values (11, 'EMAIL', 0);
 
 --doctors
-insert into doctor (pk_doctor, description, specialization, profile_picture, education, experience, pwz_number) values
-    (4, 'Pracuję indywidualnie z osobami dorosłymi w nurcie terapii poznawczo-behawioralnej.',
-     'Psycholog dorosłych', null, 'mgr psychologii', 'doświadczenie zawodowe zdobyte na stażach w IPiN w Warszawie', null);
-insert into doctor (pk_doctor, description, specialization, profile_picture, education, experience, pwz_number) values
-    (5, 'Psychiatra dorosłych, specjalizujący się w leczeniu zaburzeń dwubiegunowych oraz depresji',
-     'Psychiatra dorosłych', null, 'Pomorski Uniwersytet Medyczny w Szczecinie', 'Centrum Zdrowia Psychicznego w Słupsku', 'PWZ3318632');
-insert into doctor (pk_doctor, description, specialization, profile_picture, education, experience, pwz_number) values
-    (10, 'Psychiatra dziecięcy pracujący z najmłodszymi',
-     'Psychiatra dziecięcy', null, 'Uniwersytet Pomorski w Słupsku (chyba nie mają medycyny ale esz)', 'POZ na Piłsudskiego w Słupsku', 'PWZ123532');
+insert into doctor (pk_doctor, description, profile_picture, education, experience, pwz_number) values
+    (4, 'Pracuję indywidualnie z osobami dorosłymi w nurcie terapii poznawczo-behawioralnej.', null, 'mgr psychologii', 'doświadczenie zawodowe zdobyte na stażach w IPiN w Warszawie', null);
+insert into doctor (pk_doctor, description, profile_picture, education, experience, pwz_number) values
+    (5, 'Psychiatra dorosłych specjalizujący się w leczeniu zaburzeń dwubiegunowych oraz depresji', null, 'Pomorski Uniwersytet Medyczny w Szczecinie', 'Centrum Zdrowia Psychicznego w Słupsku', 'PWZ3318632');
+insert into doctor (pk_doctor, description, profile_picture, education, experience, pwz_number) values
+    (10, 'Psychiatra dziecięcy pracujący z najmłodszymi', null, 'Uniwersytet Pomorski w Słupsku (chyba nie mają medycyny ale esz)', 'POZ na Piłsudskiego w Słupsku', 'PWZ123532');
+
+--specializations
+insert into specialization (name) values ('Psycholog dorosłych');
+insert into specialization (name) values ('Psycholog dziecięcy');
+insert into specialization (name) values ('Psychiatra dorosłych');
+insert into specialization (name) values ('Psychiatra dziecięcy');
+insert into specialization (name) values ('Psychoterapeuta');
+
+insert into specialization_doctor (pk_doctor, pk_specialization) values (4, 1);
+insert into specialization_doctor (pk_doctor, pk_specialization) values (4, 5);
+insert into specialization_doctor (pk_doctor, pk_specialization) values (5, 3);
+insert into specialization_doctor (pk_doctor, pk_specialization) values (10, 4);
 
 --schedules
 insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-04T08:00:00', '2025-10-04T17:00:00', 4);
@@ -74,6 +83,13 @@ insert into service (name, duration, price, description) values ('Konsultacja ps
 insert into service (name, duration, price, description) values ('Konsultacja psychiatryczna dzieci (kolejna wizyta)', 30, 300, 'Weryfikacja postępów, modyfikacja terapii oraz dalsze planowanie opieki');
 insert into service (name, duration, price, description) values ('Konsultacja psychologiczna dorosłych (pierwsza wizyta)', 60, 250, 'Krótka ocena psychologiczna, diagnoza oraz wstępny plan terapeutyczny');
 insert into service (name, duration, price, description) values ('Konsultacja psychologiczna dorosłych (kolejna wizyta)', 60, 200, 'Kontynuacja terapii');
+
+insert into specialization_service (pk_service, pk_specialization) values (1, 3);
+insert into specialization_service (pk_service, pk_specialization) values (3, 3);
+insert into specialization_service (pk_service, pk_specialization) values (5, 1);
+insert into specialization_service (pk_service, pk_specialization) values (6, 1);
+insert into specialization_service (pk_service, pk_specialization) values (2, 4);
+insert into specialization_service (pk_service, pk_specialization) values (4, 4);
 
 insert into service_schedule(pk_schedule, pk_service) values (1, 5);
 insert into service_schedule(pk_schedule, pk_service) values (1, 6);
@@ -97,22 +113,20 @@ insert into service_schedule(pk_schedule, pk_service) values (9, 2);
 insert into service_schedule(pk_schedule, pk_service) values (9, 4);
 
 
-
-
 --opinions
 insert into opinion (rating, comment, answer, created_at) values (5, 'Bardzo miły psycholog', null, '2025-10-04T21:27:00');
 insert into opinion (rating, comment, answer, created_at) values (2, 'Lekarz przepisał lekarstwa, następnie poszedłem wykupić lekarstwa, gdzie Pani w aptece poinformowała mnie, że łączenie dwóch leków może wywołać interakcje. Nie kupiłem tych lekarstw. Napisałem do lekarza odpisał mi: dlaczego?', null, '2025-10-05T17:29:10');
 insert into opinion (rating, comment, answer, created_at) values (4, 'OK.', null, '2025-10-06T07:17:06');
 
 --appointments
-insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient)
-values ('2025-10-04T08:00:00', '2025-10-04T09:00:00', 'FINISHED', 'odczuwam chroniczny stres i mam napady lękowe', 5, 1, 4, 1);
+insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient, notification_sent)
+values ('2025-10-04T08:00:00', '2025-10-04T09:00:00', 'FINISHED', 'odczuwam chroniczny stres i mam napady lękowe', 5, 1, 4, 1, 1);
 
-insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient)
-values ('2025-10-04T10:00:00', '2025-10-04T10:40:00', 'FINISHED', 'chciałbym sobię zapalić nieco trawkę', 1, 2, 5, 8);
+insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient, notification_sent)
+values ('2025-10-04T10:00:00', '2025-10-04T10:40:00', 'FINISHED', 'chciałbym sobię zapalić nieco trawkę', 1, 2, 5, 8, 1);
 
-insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient)
-values ('2025-10-04T13:00:00', '2025-10-04T13:30:00', 'FINISHED', 'chłop za dużo gra w robloxa', 4, 3, 10, 9);
+insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient, notification_sent)
+values ('2025-10-04T13:00:00', '2025-10-04T13:30:00', 'FINISHED', 'chłop za dużo gra w robloxa', 4, 3, 10, 9, 1);
 
 --payments
 insert into payment (amount, created_at ,completed_at, method, status, fk_appointment) values (250, '2025-10-04T07:51:52', '2025-10-04T07:52:31', 'OFFLINE', 'COMPLETED', 1);

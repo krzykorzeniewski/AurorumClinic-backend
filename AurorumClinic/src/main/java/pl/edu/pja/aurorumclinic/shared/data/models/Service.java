@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -44,11 +45,14 @@ public class Service {
     private String description;
 
     @OneToMany(mappedBy = "service")
+    @ToString.Exclude
     private List<Appointment> appointments;
 
     @ManyToMany(mappedBy = "services")
+    @ToString.Exclude
     private Set<Schedule> schedules;
 
     @ManyToMany(mappedBy = "services")
+    @ToString.Exclude
     private Set<Specialization> specializations;
 }
