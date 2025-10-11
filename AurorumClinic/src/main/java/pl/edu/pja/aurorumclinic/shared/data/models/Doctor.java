@@ -10,6 +10,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -56,5 +57,8 @@ public class Doctor extends User {
     @OneToMany(mappedBy = "doctor")
     @ToString.Exclude
     private List<Schedule> schedules;
+
+    @ManyToMany(mappedBy = "doctors")
+    private Set<Specialization> specializations;
 
 }

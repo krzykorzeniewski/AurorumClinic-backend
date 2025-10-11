@@ -48,4 +48,7 @@ public class Service {
 
     @ManyToMany(mappedBy = "services")
     private Set<Schedule> schedules;
+
+    @ManyToMany(mappedBy = "services")
+    private Set<Specialization> specializations;
 }
