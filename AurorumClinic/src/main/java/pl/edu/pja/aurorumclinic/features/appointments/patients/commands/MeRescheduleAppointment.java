@@ -48,8 +48,8 @@ public class MeRescheduleAppointment {
         }
         LocalDateTime newStartedAt = request.startedAt();
         LocalDateTime newFinishedAt = newStartedAt.plusMinutes(appointmentFromDb.getService().getDuration());
-        appointmentValidator.validateTimeSlot(newStartedAt, newFinishedAt, appointmentFromDb.getDoctor().getId(),
-                appointmentFromDb.getService().getId());
+        appointmentValidator.validateTimeSlot(newStartedAt, newFinishedAt, appointmentFromDb.getDoctor(),
+                appointmentFromDb.getService());
 
         appointmentFromDb.setStartedAt(newStartedAt);
         appointmentFromDb.setFinishedAt(newFinishedAt);

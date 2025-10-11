@@ -19,42 +19,49 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
     @Query("""
            select new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse(
-                    d.id, d.name, d.surname, d.specialization, d.profilePicture,
-                                cast((coalesce(avg(o.rating), 0)) as int)
+                    d.id, d.name, d.surname,
+                               new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.SpecializationDto(
+                                          s.id, s.name),
+                    d.profilePicture, cast((coalesce(avg(o.rating), 0)) as int)
                 )
               from Doctor d
               left join d.appointments a
               left join a.opinion o
+              left join d.specializations s
               where
               lower(d.name) like lower(concat('%', :query, '%')) or
               lower(d.surname) like lower(concat('%', :query, '%')) or
-              lower(d.specialization) like lower(concat('%', :query, '%'))
-              group by d.id, d.name, d.surname, d.specialization, d.profilePicture
+              lower(s.name) like lower(concat('%', :query, '%'))
+              group by d.id, d.name, d.surname, d.profilePicture
            """)
     Page<GetDoctorResponse> findAllByQuery(String query, Pageable pageable);
 
     @Query("""
             select new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse(
-                d.id, d.name, d.surname, d.specialization, d.profilePicture,
-                cast(coalesce(avg(o.rating), 0) as int)
+                d.id, d.name, d.surname, new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.SpecializationDto(
+                                          s.id, s.name),
+                d.profilePicture, cast(coalesce(avg(o.rating), 0) as int)
             )
                 from Doctor d
                 left join d.appointments a
                 left join a.opinion o
-            group by d.id, d.name, d.surname, d.specialization, d.profilePicture
+                left join d.specializations s
+            group by d.id, d.name, d.surname, d.profilePicture
             order by avg(o.rating) desc
 """)
     Page<GetDoctorResponse> findAllByHighestRating(Pageable pageable);
 
     @Query("""
             select new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse(
-                d.id, d.name, d.surname, d.specialization, d.profilePicture,
-                cast(coalesce(avg(o.rating), 0) as int)
+                d.id, d.name, d.surname, new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.SpecializationDto(
+                                          s.id, s.name),
+                d.profilePicture, cast(coalesce(avg(o.rating), 0) as int)
             )
                 from Doctor d
                 left join d.appointments a
                 left join a.opinion o
-            group by d.id, d.name, d.surname, d.specialization, d.profilePicture
+                left join d.specializations s
+            group by d.id, d.name, d.surname, d.profilePicture
             """)
     Page<GetDoctorResponse> findAllResponseDtos(Pageable pageable);
 }

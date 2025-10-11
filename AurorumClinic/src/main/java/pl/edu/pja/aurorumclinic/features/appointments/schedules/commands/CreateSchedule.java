@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.schedules.ScheduleRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.schedules.ScheduleValidator;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.data.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
+import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
@@ -34,12 +36,7 @@ public class CreateSchedule {
     private final ScheduleRepository scheduleRepository;
     private final DoctorRepository doctorRepository;
     private final ServiceRepository serviceRepository;
-
-    @Value("${workday.start.hour}")
-    private Integer startOfDay;
-
-    @Value("${workday.end.hour}")
-    private Integer endOfDay;
+    private final ScheduleValidator scheduleValidator;
 
     @PostMapping("")
     @Transactional
@@ -56,22 +53,8 @@ public class CreateSchedule {
         Doctor doctorFromDb = doctorRepository.findById(request.doctorId()).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        if (request.startedAt().getHour() < startOfDay) {
-            throw new ApiException("Start date cannot be before work hours", "startedAt");
-        }
-        if (request.finishedAt().getHour() > endOfDay) {
-            throw new ApiException("End date cannot be after work hours", "finishedAt");
-        }
-        if (request.startedAt().isAfter(request.finishedAt())) {
-            throw new ApiException("Start date cannot be after end date", "startedAt");
-        }
-        if (request.finishedAt().isBefore(request.startedAt())) {
-            throw new ApiException("End date cannot be before start date", "finishedAt");
-        }
-        if (scheduleRepository.scheduleExistsInIntervalForDoctor(request.startedAt(),
-                request.finishedAt(), request.doctorId())) {
-            throw new ApiException("Schedule overlaps with already existing one", "schedule");
-        }
+
+        scheduleValidator.validateSchedule(request, doctorFromDb, servicesFromDb);
 
         Schedule schedule = Schedule.builder()
                 .doctor(doctorFromDb)

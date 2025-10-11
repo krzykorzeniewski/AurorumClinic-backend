@@ -39,7 +39,10 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
                 d.name,
                 d.surname,
                 d.profilePicture,
-                d.specialization
+                new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.SpecializationDto(
+                    s2.id,
+                    s2.name
+                    )
             ),
             new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.ServiceDto(
                 s.id,
@@ -56,6 +59,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
         join a.doctor d
         join a.service s
         join a.payment p
+        join d.specializations s2
         where a.patient.id = :patientId
     """)
     Page<GetPatientAppointmentResponse> findPatientAppointmentsById(Long patientId, Pageable pageable);

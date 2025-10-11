@@ -68,7 +68,7 @@ public class CreateAppointment {
                 .finishedAt(request.startedAt().plusMinutes(serviceFromDb.getDuration()))
                 .build();
         appointmentValidator.validateTimeSlot(newAppointment.getStartedAt(), newAppointment.getFinishedAt(),
-                newAppointment.getDoctor().getId(), newAppointment.getService().getId());
+                newAppointment.getDoctor(), newAppointment.getService());
 
         Appointment appointmentFromDb = appointmentRepository.save(newAppointment);
         applicationEventPublisher.publishEvent(

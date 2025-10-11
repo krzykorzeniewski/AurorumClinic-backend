@@ -49,7 +49,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 d.name,
                 d.surname,
                 d.profilePicture,
-                d.specialization
+                new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.SpecializationDto(
+                    s2.id,
+                    s2.name
+                    )
             ),
             new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.ServiceDto(
                 s.id,
@@ -71,6 +74,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         join a.doctor d
         join a.service s
         join a.payment p
+        join d.specializations s2
         where a.id = :appointmentId
     """)
     GetAppointmentResponse getAppointmentById(Long appointmentId);
@@ -87,7 +91,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 d.name,
                 d.surname,
                 d.profilePicture,
-                d.specialization
+                new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.SpecializationDto(
+                    s2.id,
+                    s2.name
+                    )
             ),
             new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.ServiceDto(
                 s.id,
@@ -109,6 +116,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         join a.doctor d
         join a.service s
         join a.payment p
+        join d.specializations s2
         where a.patient.id = :patientId and a.id = :appointmentId
     """)
     GetAppointmentResponse getAppointmentByPatientIdAndAppointmentId(Long patientId, Long appointmentId);
@@ -124,7 +132,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 d.name,
                 d.surname,
                 d.profilePicture,
-                d.specialization
+                new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.SpecializationDto(
+                    s2.id,
+                    s2.name
+                    )
             ),
             new pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.ServiceDto(
                 s.id,
@@ -146,6 +157,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         join a.doctor d
         join a.service s
         join a.payment p
+        join d.specializations s2
         where a.patient.id = :patientId
         order by a.status desc
     """)

@@ -58,7 +58,7 @@ public class AppointmentNotificationListener {
         context.setVariable("deleteLink", deleteLink);
         context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
-        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("doctorSpecialization", doctor.getSpecializations());
         context.setVariable("appointmentService", appointment.getService().getName());
 
         String htmlPageAsText = springTemplateEngine.process("appointment-created-email", context);
@@ -91,7 +91,7 @@ public class AppointmentNotificationListener {
         context.setVariable("deleteLink", deleteLink);
         context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
-        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("doctorSpecialization", doctor.getSpecializations());
         context.setVariable("appointmentService", appointment.getService().getName());
         String htmlPageAsText = springTemplateEngine.process("appointment-rescheduled-email", context);
 
@@ -119,7 +119,7 @@ public class AppointmentNotificationListener {
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
         context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
-        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("doctorSpecialization", doctor.getSpecializations());
         context.setVariable("appointmentService", appointment.getService().getName());
 
         String htmlPageAsText = springTemplateEngine.process("appointment-deleted-email", context);
@@ -149,7 +149,7 @@ public class AppointmentNotificationListener {
         context.setVariable("surveyLink", surveyLink);
         context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
-        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("doctorSpecialization", doctor.getSpecializations());
         context.setVariable("appointmentService", appointment.getService().getName());
 
         String htmlPageAsText = springTemplateEngine.process("appointment-survey-email", context);
@@ -172,7 +172,7 @@ public class AppointmentNotificationListener {
         context.setVariable("deleteLink", deleteLink);
         context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
-        context.setVariable("doctorSpecialization", doctor.getSpecialization());
+        context.setVariable("doctorSpecialization", doctor.getSpecializations());
         context.setVariable("appointmentService", appointment.getService().getName());
 
         String htmlPageAsText = springTemplateEngine.process("appointment-reminder-email", context);

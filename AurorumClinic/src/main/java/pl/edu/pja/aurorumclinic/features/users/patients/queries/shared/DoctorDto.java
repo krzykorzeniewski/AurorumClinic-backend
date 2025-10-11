@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Data
@@ -13,6 +15,6 @@ public class DoctorDto {
     private final String name;
     private final String surname;
     private String profilePicture;
-    private final String specialization;
+    private final List<SpecializationDto> specializations;
 
 }

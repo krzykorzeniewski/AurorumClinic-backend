@@ -2,10 +2,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.services.commands;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,9 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.data.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
+import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/services")
@@ -27,6 +29,7 @@ import java.math.BigDecimal;
 public class CreateService {
 
     private final ServiceRepository serviceRepository;
+    private final SpecializationRepository specializationRepository;
 
     @PostMapping("")
     @Transactional
@@ -36,11 +39,16 @@ public class CreateService {
     }
 
     private void handle(CreateServiceRequest request) {
+        List<Specialization> specializationsFromDb = specializationRepository.findAllById(request.specializationIds);
+        if (specializationsFromDb.size() > request.specializationIds().size()) {
+            throw new ApiException("Some specialization ids are not found", "specializationIds");
+        }
         Service service = Service.builder()
                 .name(request.name())
                 .price(request.price())
                 .duration(request.duration())
                 .description(request.description())
+                .specializations(Set.copyOf(specializationsFromDb))
                 .build();
         serviceRepository.save(service);
     }
@@ -48,7 +56,8 @@ public class CreateService {
     public record CreateServiceRequest(@NotBlank @Size(max = 150) String name,
                                        @NotNull Integer duration,
                                        @NotNull @Digits(integer = 10, fraction = 2) @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal price,
-                                       @NotBlank @Size(max = 500) String description) {
+                                       @NotBlank @Size(max = 500) String description,
+                                       @NotEmpty Set<Long> specializationIds) {
     }
 
 
