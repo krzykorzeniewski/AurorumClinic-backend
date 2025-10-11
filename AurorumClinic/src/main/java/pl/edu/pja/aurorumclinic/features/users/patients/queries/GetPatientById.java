@@ -23,7 +23,7 @@ public class GetPatientById {
     }
 
     private GetPatientResponse handle(Long patientId) {
-        GetPatientResponse response = patientRepository.getPatientById(patientId);
+        GetPatientResponse response = patientRepository.getPatientResponseDtoById(patientId);
         if (response == null) {
             throw new ApiNotFoundException("Id not found", "id");
         }

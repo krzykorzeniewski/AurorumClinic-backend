@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.shared.data;
+package pl.edu.pja.aurorumclinic.shared.data;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,14 +38,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     Appointment getAppointmentByIdAndPatientId(Long id, Long patientId);
 
-    @Query("""
-            select a from Appointment a
-            left join fetch a.doctor d
-            left join fetch d.specializations
-            left join fetch a.service
-            left join fetch a.payment
-            where a.patient.id = :patientId
-            """)
     Page<Appointment> findAllByPatientId(Long patientId, Pageable pageable);
 
     List<Appointment> getAllByFinishedAtBeforeAndStatusEquals(

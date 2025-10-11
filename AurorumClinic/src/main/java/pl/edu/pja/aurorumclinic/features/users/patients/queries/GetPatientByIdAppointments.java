@@ -9,9 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.appointments.employees.queries.shared.GetAppointmentResponse;
-import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.MeGetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
@@ -28,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetPatientByIdAppointments {
 
+    private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
     private final ObjectStorageService objectStorageService;
 
@@ -45,8 +45,8 @@ public class GetPatientByIdAppointments {
             throw new ApiNotFoundException("Id not found", "id");
         }
         Pageable pageable = PageRequest.of(page, size);
-        Page<Appointment> appointmentsFromDb = patientRepository
-                .getPatientAppointmentsById(patientId, pageable);
+        Page<Appointment> appointmentsFromDb = appointmentRepository
+                .findAllByPatientId(patientId, pageable);
         Page<GetPatientByIdAppointmentResponse> response = appointmentsFromDb.map(appointmentFromDb ->
                 GetPatientByIdAppointmentResponse.builder()
                 .id(appointmentFromDb.getId())

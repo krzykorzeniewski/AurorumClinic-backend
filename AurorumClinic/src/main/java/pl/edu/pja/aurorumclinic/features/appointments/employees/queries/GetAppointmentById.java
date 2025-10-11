@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.employees.queries.shared.GetAppointmentResponse;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.data.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -56,7 +56,6 @@ public class GetAppointmentById {
                         .name(appointmentFromDb.getService().getName())
                         .price(appointmentFromDb.getService().getPrice())
                         .build())
-
                 .payment(GetAppointmentResponse.PaymentDto.builder()
                         .id(appointmentFromDb.getPayment().getId())
                         .amount(appointmentFromDb.getPayment().getAmount())

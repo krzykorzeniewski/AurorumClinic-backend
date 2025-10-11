@@ -2,7 +2,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.data.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;

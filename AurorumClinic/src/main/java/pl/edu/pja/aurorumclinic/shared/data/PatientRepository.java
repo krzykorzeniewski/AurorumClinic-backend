@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse;
-import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.util.List;
@@ -28,18 +27,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
            """)
     Page<GetPatientResponse> searchAllByQuery(String query, Pageable pageable);
 
-    //TODO przeniesc do appointment repository i appointment repository do shared
-    @Query("""
-        from Patient p 
-            left join fetch p.appointments a
-            left join fetch a.doctor d
-            left join fetch d.specializations
-            left join fetch a.service
-            left join fetch a.payment
-            where p.id = :patientId
-        """)
-    Page<Appointment> getPatientAppointmentsById(Long patientId, Pageable pageable);
-
     @Query("""
             select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(
             p.id, p.name, p.surname, p.pesel, p.birthdate, p.email, p.phoneNumber, p.twoFactorAuth, p.newsletter,
@@ -47,7 +34,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             from Patient p
             where p.id = :id
             """)
-    GetPatientResponse getPatientById(Long id);
+    GetPatientResponse getPatientResponseDtoById(Long id);
 
     @Query("""
             select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(
