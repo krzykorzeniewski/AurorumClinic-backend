@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,18 +30,11 @@ public class Specialization {
     @NotBlank(message = "This field is required")
     private String name;
 
-    @ManyToMany
-    @ToString.Exclude
-    @JoinTable(name = "Specialization_Doctor",
-            joinColumns = @JoinColumn(name = "PK_Specialization"),
-            inverseJoinColumns = @JoinColumn(name = "PK_Doctor"))
-    private Set<Doctor> doctors;
+    @ManyToMany(mappedBy = "specializations")
+    private List<Doctor> doctors;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "specializations")
     @ToString.Exclude
-    @JoinTable(name = "Specialization_Service",
-            joinColumns = @JoinColumn(name = "PK_Specialization"),
-            inverseJoinColumns = @JoinColumn(name = "PK_Service"))
-    private Set<Service> services;
+    private List<Service> services;
 
 }

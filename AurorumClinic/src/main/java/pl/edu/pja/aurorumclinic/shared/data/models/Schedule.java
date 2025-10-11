@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -38,5 +39,5 @@ public class Schedule {
     @JoinTable(name = "Service_Schedule",
         joinColumns = @JoinColumn(name = "PK_Schedule"),
         inverseJoinColumns = @JoinColumn(name = "PK_Service"))
-    private Set<Service> services;
+    private List<Service> services;
 }

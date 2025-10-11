@@ -41,27 +41,6 @@ public class SecurityConfig {
     private String clientUrl;
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain authFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .securityMatcher("/api/auth/refresh", "/api/auth/login", "/api/auth/register-employee",
-                        "/api/auth/register-patient", "/api/auth/register-doctor", "/api/auth/reset-password-token",
-                        "/api/auth/reset-password", "/api/auth/login-2fa", "/api/auth/login-2fa-token",
-                        "/api/auth/verify-email", "/api/auth/verify-email-token", "/api/appointments/guest",
-                        "/api/doctors/search", "/api/doctors/recommended", "/api/services", "/api/doctors/{id}/appointment-slots")
-                .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler))
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .anyRequest().permitAll())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        return httpSecurity.build();
-    }
-
-    @Bean
-    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)

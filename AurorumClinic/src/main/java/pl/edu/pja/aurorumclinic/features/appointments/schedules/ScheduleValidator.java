@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.schedules;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.rsocket.RSocketProperties;
 import org.springframework.stereotype.Component;
 import pl.edu.pja.aurorumclinic.features.appointments.schedules.commands.CreateSchedule;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
@@ -29,17 +30,14 @@ public class ScheduleValidator {
     }
 
     private void validateSpecializations(Doctor doctor, List<Service> services) {
-        int counter = 0;
-        for (Specialization specialization : doctor.getSpecializations()) {
-            for (Service service : services) {
+        for (Service service: services) {
+            for (Specialization specialization: doctor.getSpecializations()) {
                 if(specialization.getServices().contains(service)) {
-                    counter++;
+                    return;
                 }
             }
         }
-        if (counter == 0) {
-            throw new ApiException("Doctor specialization is not assigned to this service", "specialization");
-        }
+        throw new ApiException("Doctor specialization is not assigned to this service", "specialization");
     }
 
     private void validateTimeSlot(CreateSchedule.CreateScheduleRequest request) {

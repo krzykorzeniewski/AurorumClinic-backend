@@ -50,9 +50,12 @@ public class Service {
 
     @ManyToMany(mappedBy = "services")
     @ToString.Exclude
-    private Set<Schedule> schedules;
+    private List<Schedule> schedules;
 
-    @ManyToMany(mappedBy = "services")
+    @ManyToMany
     @ToString.Exclude
-    private Set<Specialization> specializations;
+    @JoinTable(name = "Specialization_Service",
+            joinColumns = @JoinColumn(name = "PK_Service"),
+            inverseJoinColumns = @JoinColumn(name = "PK_Specialization"))
+    private List<Specialization> specializations;
 }

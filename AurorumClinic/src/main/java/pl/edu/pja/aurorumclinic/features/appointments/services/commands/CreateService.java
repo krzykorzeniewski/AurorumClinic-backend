@@ -48,7 +48,7 @@ public class CreateService {
                 .price(request.price())
                 .duration(request.duration())
                 .description(request.description())
-                .specializations(Set.copyOf(specializationsFromDb))
+                .specializations(specializationsFromDb)
                 .build();
         serviceRepository.save(service);
     }

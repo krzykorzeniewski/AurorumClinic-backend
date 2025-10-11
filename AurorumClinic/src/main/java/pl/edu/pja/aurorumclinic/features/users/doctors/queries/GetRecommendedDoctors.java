@@ -58,7 +58,7 @@ public class GetRecommendedDoctors {
                         .average()
                         .orElse(0.0))
                 .build());
-        return (Page<GetDoctorResponse>) response.stream().sorted(Comparator.comparing(GetDoctorResponse::rating));
+        return response;
     }
 
 }

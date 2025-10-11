@@ -22,18 +22,13 @@ public class AppointmentValidator {
             throw new ApiException("Timeslot is not available", "appointment");
         }
     }
-
     private void validateSpecialization(Doctor doctor, Service service) {
-        int counter = 0;
         for (Specialization specialization: doctor.getSpecializations()) {
             if (specialization.getServices().contains(service)) {
-                counter++;
+                return;
             }
         }
-        if (counter == 0) {
-            throw new ApiException("Doctor specialization is not assigned to this service", "specialization");
-        }
+        throw new ApiException("Doctor specialization is not assigned to this service", "specialization");
     }
-
 
 }
