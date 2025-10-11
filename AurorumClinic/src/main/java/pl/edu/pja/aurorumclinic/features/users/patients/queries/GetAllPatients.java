@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,13 +25,11 @@ public class GetAllPatients {
     @GetMapping("")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<ApiResponse<Page<GetPatientResponse>>> getAllPatients(@RequestParam(required = false) String query,
-                                                                                @RequestParam(defaultValue = "0") int page,
-                                                                                @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(handle(query, page, size)));
+                                                                                @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(handle(query, pageable)));
     }
 
-    private Page<GetPatientResponse> handle(String query, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    private Page<GetPatientResponse> handle(String query, Pageable pageable) {
         Page<GetPatientResponse> patientsFromDb;
         if (query == null) {
             patientsFromDb = patientRepository.findAllGetPatientDtos(pageable);

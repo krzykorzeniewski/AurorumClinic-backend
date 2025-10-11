@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,14 +29,12 @@ public class MeGetAllAppointments {
 
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<MeGetAppointmentResponse>>> getMyAppointments(
-                                                                    @AuthenticationPrincipal Long patientId,
-                                                                    @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(handle(patientId, page, size)));
+                                                            @AuthenticationPrincipal Long patientId,
+                                                            @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(handle(patientId, pageable)));
     }
 
-    private Page<MeGetAppointmentResponse> handle(Long patientId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    private Page<MeGetAppointmentResponse> handle(Long patientId, Pageable pageable) {
         Page<Appointment> appointmentsFromDb = appointmentRepository.findAllByPatientId(patientId, pageable);
         Page<MeGetAppointmentResponse> response = appointmentsFromDb.map(appointmentFromDb -> MeGetAppointmentResponse.builder()
                 .id(appointmentFromDb.getId())

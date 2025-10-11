@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -31,16 +33,15 @@ public class GetRecommendedDoctors {
 
     @PermitAll
     @GetMapping("/recommended")
-    public ResponseEntity<ApiResponse<Page<GetDoctorResponse>>> getRecommendedDoctors(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam (defaultValue = "5") int size)  {
-        return ResponseEntity.ok(ApiResponse.success(handle(page, size)));
+
+    public ResponseEntity<ApiResponse<List<GetDoctorResponse>>> getRecommendedDoctors(
+                        @PageableDefault(size = 6) Pageable pageable)  {
+        return ResponseEntity.ok(ApiResponse.success(handle(pageable)));
     }
 
-    private Page<GetDoctorResponse> handle (int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    private List<GetDoctorResponse> handle (Pageable pageable) {
         Page<Doctor> doctorsFromDb = doctorRepository.findAll(pageable);
-        Page<GetDoctorResponse> response = doctorsFromDb.map(doctor -> GetDoctorResponse.builder()
+        List<GetDoctorResponse> response = doctorsFromDb.map(doctor -> GetDoctorResponse.builder()
                 .id(doctor.getId())
                 .name(doctor.getName())
                 .surname(doctor.getSurname())
@@ -57,7 +58,7 @@ public class GetRecommendedDoctors {
                         .mapToInt(Opinion::getRating)
                         .average()
                         .orElse(0.0))
-                .build());
+                .build()).stream().sorted(Comparator.comparing(GetDoctorResponse::rating).reversed()).toList();
         return response;
     }
 

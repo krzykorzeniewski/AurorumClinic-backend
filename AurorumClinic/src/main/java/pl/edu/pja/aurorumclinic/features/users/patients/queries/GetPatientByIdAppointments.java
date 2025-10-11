@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -34,17 +35,15 @@ public class GetPatientByIdAppointments {
     @GetMapping("/{id}/appointments")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<ApiResponse<Page<GetPatientByIdAppointmentResponse>>> getPatientAppointments(
-                                                                             @PathVariable("id") Long patientId,
-                                                                           @RequestParam(defaultValue = "0") int page,
-                                                                           @RequestParam(defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(handle(patientId, page, size)));
+                                            @PathVariable("id") Long patientId,
+                                            @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(handle(patientId, pageable)));
     }
 
-    private Page<GetPatientByIdAppointmentResponse> handle(Long patientId, int page, int size) {
+    private Page<GetPatientByIdAppointmentResponse> handle(Long patientId, Pageable pageable) {
         if (!patientRepository.existsById(patientId)) {
             throw new ApiNotFoundException("Id not found", "id");
         }
-        Pageable pageable = PageRequest.of(page, size);
         Page<Appointment> appointmentsFromDb = appointmentRepository
                 .findAllByPatientId(patientId, pageable);
         Page<GetPatientByIdAppointmentResponse> response = appointmentsFromDb.map(appointmentFromDb ->

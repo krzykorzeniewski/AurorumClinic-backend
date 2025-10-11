@@ -16,4 +16,10 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
            """)
     Page<GetServiceResponse> findAllGetServiceDtos(Pageable pageable);
 
+    @Query("""
+           select s from Service s join s.specializations s2
+                      where s2.id = :specId
+           """)
+    Page<Service> getAllServicesBySpecializationId(Long specId, Pageable pageable);
+
 }
