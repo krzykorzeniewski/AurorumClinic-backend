@@ -29,11 +29,6 @@ public class Doctor extends User {
     @NotBlank(message = "This field is required")
     private String description;
 
-    @Column(name = "Specialization", columnDefinition = "nvarchar(100)")
-    @Size(max = 100, message = "Maximum length for this field is 100 characters")
-    @NotBlank(message = "This field is required")
-    private String specialization;
-
     @Column(name = "Profile_Picture", columnDefinition = "nvarchar(max)")
     private String profilePicture;
 
