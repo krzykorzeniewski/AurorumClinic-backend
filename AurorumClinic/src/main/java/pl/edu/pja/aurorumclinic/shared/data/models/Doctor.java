@@ -3,16 +3,15 @@ package pl.edu.pja.aurorumclinic.shared.data.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
@@ -27,11 +26,6 @@ public class Doctor extends User {
     @Size(max = 500, message = "Maximum length for this field is 500 characters")
     @NotBlank(message = "This field is required")
     private String description;
-
-    @Column(name = "Specialization", columnDefinition = "nvarchar(100)")
-    @Size(max = 100, message = "Maximum length for this field is 100 characters")
-    @NotBlank(message = "This field is required")
-    private String specialization;
 
     @Column(name = "Profile_Picture", columnDefinition = "nvarchar(max)")
     private String profilePicture;
@@ -51,10 +45,18 @@ public class Doctor extends User {
     private String pwzNumber;
 
     @OneToMany(mappedBy = "doctor")
+    @ToString.Exclude
     private List<Appointment> appointments;
 
     @OneToMany(mappedBy = "doctor")
     @ToString.Exclude
     private List<Schedule> schedules;
+
+    @ManyToMany
+    @ToString.Exclude
+    @JoinTable(name = "Specialization_Doctor",
+            joinColumns = @JoinColumn(name = "PK_Doctor"),
+            inverseJoinColumns = @JoinColumn(name = "PK_Specialization"))
+    private List<Specialization> specializations;
 
 }

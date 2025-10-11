@@ -1,19 +1,20 @@
 package pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 
-@AllArgsConstructor
-@Data
-@RequiredArgsConstructor
-public class GetDoctorResponse {
+import java.util.List;
 
-    private final Long id;
-    private final String name;
-    private final String surname;
-    private final String specialization;
-    private String profilePicture;
-    private final int rating;
+@Builder
+public record GetDoctorResponse(
+                    Long id,
+                    String name,
+                    String surname,
+                    List<SpecializationDto> specializations,
+                    String profilePicture,
+                    int rating) {
+    @Builder
+    public record SpecializationDto(Long id,
+                                    String name) {
+    }
 
 }

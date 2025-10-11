@@ -29,8 +29,10 @@
                         <div style="font-size:16px; font-weight:500; color:#333333; line-height:1.2;">
                             <span th:text="${doctorName}"></span>
                         </div>
+                        <div th:each="specialization: ${doctorSpecialization}" style="font-size:14px; color:#666666;">
+                            <span th:text="${specialization.getName()}"></span>
+                        </div>
                         <div style="font-size:14px; color:#666666;">
-                            <span th:text="${doctorSpecialization}"></span>
                             <span th:text="${appointmentService}" style="float: right"></span>
                         </div>
                     </td>

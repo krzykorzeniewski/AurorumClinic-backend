@@ -2,16 +2,15 @@ package pl.edu.pja.aurorumclinic.shared.data.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -32,11 +31,13 @@ public class Schedule {
 
     @ManyToOne
     @JoinColumn(name = "FK_Doctor")
+    @ToString.Exclude
     private Doctor doctor;
 
     @ManyToMany
+    @ToString.Exclude
     @JoinTable(name = "Service_Schedule",
         joinColumns = @JoinColumn(name = "PK_Schedule"),
         inverseJoinColumns = @JoinColumn(name = "PK_Service"))
-    private Set<Service> services;
+    private List<Service> services;
 }

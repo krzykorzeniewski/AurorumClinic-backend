@@ -8,16 +8,19 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
+import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
-import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +30,17 @@ public class RegisterServiceImpl implements RegisterService{
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final SpecializationRepository specializationRepository;
 
     @Override
     @Transactional
     public void registerDoctor(RegisterDoctorRequest registerDoctorRequest) {
-        if (userRepository.findByEmail(registerDoctorRequest.email()) != null) {
-            throw new ApiConflictException("Email already in use", "email");
+        List<Specialization> specializationsFromDb = specializationRepository.findAllById(
+                registerDoctorRequest.specializationIds());
+        if (specializationsFromDb.size() > registerDoctorRequest.specializationIds().size()) {
+            throw new ApiException("Some specialization ids are not found", "specializationIds");
         }
+        System.out.println(specializationsFromDb);
         Doctor doctor = Doctor.builder()
                 .name(registerDoctorRequest.name())
                 .surname(registerDoctorRequest.surname())
@@ -44,11 +51,11 @@ public class RegisterServiceImpl implements RegisterService{
                 .pesel(registerDoctorRequest.pesel())
                 .phoneNumber(registerDoctorRequest.phoneNumber())
                 .description(registerDoctorRequest.description())
-                .specialization(registerDoctorRequest.specialization())
                 .education(registerDoctorRequest.education())
                 .experience(registerDoctorRequest.experience())
                 .pwzNumber(registerDoctorRequest.pwzNumber())
                 .emailVerified(true)
+                .specializations(specializationsFromDb)
                 .build();
         userRepository.save(doctor);
     }
@@ -56,9 +63,6 @@ public class RegisterServiceImpl implements RegisterService{
     @Override
     @Transactional
     public void registerPatient(RegisterPatientRequest registerPatientRequest) {
-        if (userRepository.findByEmail(registerPatientRequest.email()) != null) {
-            throw new ApiConflictException("Email already in use", "email");
-        }
         Patient patient = Patient.builder()
                 .name(registerPatientRequest.name())
                 .surname(registerPatientRequest.surname())
@@ -77,9 +81,6 @@ public class RegisterServiceImpl implements RegisterService{
     @Override
     @Transactional
     public void registerEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
-        if (userRepository.findByEmail(registerEmployeeRequest.email()) != null) {
-            throw new ApiConflictException("Email already in use", "email");
-        }
         User employee = User.builder()
                 .name(registerEmployeeRequest.name())
                 .surname(registerEmployeeRequest.surname())

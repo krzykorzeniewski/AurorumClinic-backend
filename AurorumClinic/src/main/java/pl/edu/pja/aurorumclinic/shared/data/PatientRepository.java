@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientAppointmentResponse;
 import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
@@ -29,45 +28,13 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     Page<GetPatientResponse> searchAllByQuery(String query, Pageable pageable);
 
     @Query("""
-        select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientAppointmentResponse(
-            a.id,
-            a.status,
-            a.startedAt,
-            a.description,
-            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.DoctorDto(
-                d.id,
-                d.name,
-                d.surname,
-                d.profilePicture,
-                d.specialization
-            ),
-            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.ServiceDto(
-                s.id,
-                s.name,
-                s.price
-            ),
-            new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.PaymentDto(
-                p.id,
-                p.amount,
-                p.status
-                )
-        )
-        from Appointment a
-        join a.doctor d
-        join a.service s
-        join a.payment p
-        where a.patient.id = :patientId
-    """)
-    Page<GetPatientAppointmentResponse> findPatientAppointmentsById(Long patientId, Pageable pageable);
-
-    @Query("""
             select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(
             p.id, p.name, p.surname, p.pesel, p.birthdate, p.email, p.phoneNumber, p.twoFactorAuth, p.newsletter,
             p.emailVerified, p.phoneNumberVerified, p.communicationPreferences)
             from Patient p
             where p.id = :id
             """)
-    GetPatientResponse getPatientById(Long id);
+    GetPatientResponse getPatientResponseDtoById(Long id);
 
     @Query("""
             select new pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse(

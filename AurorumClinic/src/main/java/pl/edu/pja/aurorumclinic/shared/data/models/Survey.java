@@ -5,15 +5,13 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -40,8 +38,9 @@ public class Survey {
     @Column(name = "Comment", columnDefinition = "nvarchar(300)")
     private String comment;
 
-    @OneToOne(optional = false)
+    @OneToOne(mappedBy = "survey")
     @JoinColumn(name = "FK_Appointment")
+    @ToString.Exclude
     private Appointment appointment;
 
 }

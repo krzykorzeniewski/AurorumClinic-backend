@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
+import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
+
+import java.util.Objects;
 
 
 @RestController
@@ -27,25 +33,35 @@ public class GetAllDoctors {
     @PermitAll
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<GetDoctorResponse>>> searchAllDoctors(@RequestParam(required = false) String query,
-                                                                           @RequestParam (defaultValue = "0") int page,
-                                                                           @RequestParam (defaultValue = "5") int size) {
-        return ResponseEntity.ok(ApiResponse.success(handle(query, page, size)));
+                                                                                 @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(handle(query, pageable)));
     }
 
-    private Page<GetDoctorResponse> handle(String query, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<GetDoctorResponse> result;
+    private Page<GetDoctorResponse> handle(String query, Pageable pageable) {
+        Page<Doctor> doctorsFromDb;
         if (query == null) {
-            result = doctorRepository.findAllResponseDtos(pageable);
+            doctorsFromDb = doctorRepository.findAll(pageable);
         } else {
-            result =  doctorRepository.findAllByQuery(query, pageable);
+            doctorsFromDb =  doctorRepository.findAllByQuery(query, pageable);
         }
-        result.forEach(r -> {
-            r.setProfilePicture(objectStorageService.
-                    generateUrl(r.getProfilePicture()));
-
-        });
-        return result;
+        Page<GetDoctorResponse> response = doctorsFromDb.map(doctor -> GetDoctorResponse.builder()
+                .id(doctor.getId())
+                .name(doctor.getName())
+                .surname(doctor.getSurname())
+                .specializations(doctor.getSpecializations().stream().map(
+                        specialization -> GetDoctorResponse.SpecializationDto.builder()
+                                .id(specialization.getId())
+                                .name(specialization.getName())
+                                .build()
+                ).toList())
+                .profilePicture(objectStorageService.generateUrl(doctor.getProfilePicture()))
+                .rating((int) doctor.getAppointments().stream()
+                        .map(Appointment::getOpinion)
+                        .filter(Objects::nonNull)
+                        .mapToInt(Opinion::getRating)
+                        .average()
+                        .orElse(0.0))
+                .build());
+        return response;
     }
-
 }

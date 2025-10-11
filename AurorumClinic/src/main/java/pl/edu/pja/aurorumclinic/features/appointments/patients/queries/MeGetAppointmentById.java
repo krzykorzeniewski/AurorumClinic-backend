@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.dtos.GetAppointmentResponse;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.data.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.MeGetAppointmentResponse;
+import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
@@ -26,17 +27,46 @@ public class MeGetAppointmentById {
     private final ObjectStorageService objectStorageService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<GetAppointmentResponse>> getAppointment(@PathVariable("id") Long appointmentId,
-                                                                              @AuthenticationPrincipal Long userId) throws IOException {
+    public ResponseEntity<ApiResponse<MeGetAppointmentResponse>> getAppointment(@PathVariable("id") Long appointmentId,
+                                                                                @AuthenticationPrincipal Long userId) throws IOException {
         return ResponseEntity.ok(ApiResponse.success(handle(appointmentId, userId)));
     }
 
-    private GetAppointmentResponse handle(Long appointmentId, Long userId) {
-        GetAppointmentResponse response = appointmentRepository.getAppointmentByPatientIdAndAppointmentId(userId, appointmentId);
-        if (response == null) {
+    private MeGetAppointmentResponse handle(Long appointmentId, Long userId) {
+        Appointment appointmentFromDb = appointmentRepository.getAppointmentByIdAndPatientId(appointmentId, userId);
+        if (appointmentFromDb == null) {
             throw new ApiNotFoundException("id not found", "id");
         }
-        response.doctor().setProfilePicture(objectStorageService.generateUrl(response.doctor().getProfilePicture()));
+        MeGetAppointmentResponse response = MeGetAppointmentResponse.builder()
+                .id(appointmentFromDb.getId())
+                .status(appointmentFromDb.getStatus())
+                .startedAt(appointmentFromDb.getStartedAt())
+                .description(appointmentFromDb.getDescription())
+                .doctor(MeGetAppointmentResponse.DoctorDto.builder()
+                        .id(appointmentFromDb.getDoctor().getId())
+                        .name(appointmentFromDb.getDoctor().getName())
+                        .surname(appointmentFromDb.getDoctor().getSurname())
+                        .profilePicture(objectStorageService.generateUrl(appointmentFromDb.getDoctor()
+                                .getProfilePicture()))
+                        .specializations(appointmentFromDb.getDoctor().getSpecializations()
+                                .stream().map(spec -> MeGetAppointmentResponse.
+                                        DoctorDto.SpecializationDto.builder()
+                                        .id(spec.getId())
+                                        .name(spec.getName())
+                                        .build()).toList())
+                        .build())
+                .service(MeGetAppointmentResponse.ServiceDto.builder()
+                        .id(appointmentFromDb.getService().getId())
+                        .name(appointmentFromDb.getService().getName())
+                        .price(appointmentFromDb.getService().getPrice())
+                        .build())
+
+                .payment(MeGetAppointmentResponse.PaymentDto.builder()
+                        .id(appointmentFromDb.getPayment().getId())
+                        .amount(appointmentFromDb.getPayment().getAmount())
+                        .status(appointmentFromDb.getPayment().getStatus())
+                        .build())
+                .build();
         return response;
     }
 

@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -47,26 +48,26 @@ public class Appointment {
     @ToString.Exclude
     private Payment payment;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_Service")
     @ToString.Exclude
     private Service service;
 
-    @OneToOne(mappedBy = "appointment")
+    @OneToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
     private Survey survey;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_Opinion")
     @ToString.Exclude
     private Opinion opinion;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_Doctor")
     @ToString.Exclude
     private Doctor doctor;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_Patient")
     @ToString.Exclude
     private Patient patient;

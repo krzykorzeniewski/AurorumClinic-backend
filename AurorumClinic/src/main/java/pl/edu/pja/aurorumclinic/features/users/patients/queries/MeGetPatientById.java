@@ -25,7 +25,7 @@ public class MeGetPatientById {
     }
 
     private GetPatientResponse handle(Long id) {
-        return patientRepository.getPatientById(id);
+        return patientRepository.getPatientResponseDtoById(id);
     }
 
 }

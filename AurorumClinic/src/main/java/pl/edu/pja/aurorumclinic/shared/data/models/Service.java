@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -44,8 +45,17 @@ public class Service {
     private String description;
 
     @OneToMany(mappedBy = "service")
+    @ToString.Exclude
     private List<Appointment> appointments;
 
     @ManyToMany(mappedBy = "services")
-    private Set<Schedule> schedules;
+    @ToString.Exclude
+    private List<Schedule> schedules;
+
+    @ManyToMany
+    @ToString.Exclude
+    @JoinTable(name = "Specialization_Service",
+            joinColumns = @JoinColumn(name = "PK_Service"),
+            inverseJoinColumns = @JoinColumn(name = "PK_Specialization"))
+    private List<Specialization> specializations;
 }

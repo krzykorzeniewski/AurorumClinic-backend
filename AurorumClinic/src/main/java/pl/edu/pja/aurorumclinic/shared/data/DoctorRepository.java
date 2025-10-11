@@ -18,43 +18,13 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     List<Timestamp> appointmentSlots(LocalDateTime startedAt, LocalDateTime finishedAt, Long pkService, Long pkDoctor);
 
     @Query("""
-           select new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse(
-                    d.id, d.name, d.surname, d.specialization, d.profilePicture,
-                                cast((coalesce(avg(o.rating), 0)) as int)
-                )
-              from Doctor d
-              left join d.appointments a
-              left join a.opinion o
-              where
-              lower(d.name) like lower(concat('%', :query, '%')) or
-              lower(d.surname) like lower(concat('%', :query, '%')) or
-              lower(d.specialization) like lower(concat('%', :query, '%'))
-              group by d.id, d.name, d.surname, d.specialization, d.profilePicture
+           select d from Doctor d
+           left join fetch d.specializations s
+           where
+           lower(d.name) like lower(concat('%', :query, '%')) or
+           lower(d.surname) like lower(concat('%', :query, '%')) or
+           lower(s.name) like lower(concat('%', :query, '%'))
            """)
-    Page<GetDoctorResponse> findAllByQuery(String query, Pageable pageable);
+    Page<Doctor> findAllByQuery(String query, Pageable pageable);
 
-    @Query("""
-            select new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse(
-                d.id, d.name, d.surname, d.specialization, d.profilePicture,
-                cast(coalesce(avg(o.rating), 0) as int)
-            )
-                from Doctor d
-                left join d.appointments a
-                left join a.opinion o
-            group by d.id, d.name, d.surname, d.specialization, d.profilePicture
-            order by avg(o.rating) desc
-""")
-    Page<GetDoctorResponse> findAllByHighestRating(Pageable pageable);
-
-    @Query("""
-            select new pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse(
-                d.id, d.name, d.surname, d.specialization, d.profilePicture,
-                cast(coalesce(avg(o.rating), 0) as int)
-            )
-                from Doctor d
-                left join d.appointments a
-                left join a.opinion o
-            group by d.id, d.name, d.surname, d.specialization, d.profilePicture
-            """)
-    Page<GetDoctorResponse> findAllResponseDtos(Pageable pageable);
 }

@@ -1,11 +1,9 @@
 package pl.edu.pja.aurorumclinic.features.auth.register.dtos;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 public record RegisterDoctorRequest(@NotBlank @Size(max = 50) String name,
                                     @NotBlank @Size(max = 50) String surname,
@@ -18,5 +16,6 @@ public record RegisterDoctorRequest(@NotBlank @Size(max = 50) String name,
                                     @NotBlank @Size(max = 100) String specialization,
                                     @NotBlank @Size(max = 100) String education,
                                     @NotBlank @Size(max = 100) String experience,
-                                    @NotBlank @Size(min = 7, max = 7) String pwzNumber) {
+                                    @NotBlank @Size(min = 7, max = 7) String pwzNumber,
+                                    @NotEmpty Set<Long> specializationIds) {
 }
