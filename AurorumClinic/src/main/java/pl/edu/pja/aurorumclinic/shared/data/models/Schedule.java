@@ -39,5 +39,5 @@ public class Schedule {
     @JoinTable(name = "Service_Schedule",
         joinColumns = @JoinColumn(name = "PK_Schedule"),
         inverseJoinColumns = @JoinColumn(name = "PK_Service"))
-    private List<Service> services;
+    private Set<Service> services;
 }

@@ -17,6 +17,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +50,7 @@ public class UpdateService {
         serviceFromDb.setDuration(request.duration());
         serviceFromDb.setDescription(request.description());
         serviceFromDb.setPrice(request.price());
-        serviceFromDb.setSpecializations(specializationsFromDb);
+        serviceFromDb.setSpecializations(new HashSet<>(specializationsFromDb));
     }
 
     public record UpdateServiceRequest(@NotBlank @Size(max = 150) String name,

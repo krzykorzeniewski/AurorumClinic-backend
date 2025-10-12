@@ -19,6 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,7 +49,7 @@ public class CreateService {
                 .price(request.price())
                 .duration(request.duration())
                 .description(request.description())
-                .specializations(specializationsFromDb)
+                .specializations(new HashSet<>(specializationsFromDb))
                 .build();
         serviceRepository.save(service);
     }

@@ -20,6 +20,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -40,7 +41,6 @@ public class RegisterServiceImpl implements RegisterService{
         if (specializationsFromDb.size() > registerDoctorRequest.specializationIds().size()) {
             throw new ApiException("Some specialization ids are not found", "specializationIds");
         }
-        System.out.println(specializationsFromDb);
         Doctor doctor = Doctor.builder()
                 .name(registerDoctorRequest.name())
                 .surname(registerDoctorRequest.surname())
@@ -55,7 +55,7 @@ public class RegisterServiceImpl implements RegisterService{
                 .experience(registerDoctorRequest.experience())
                 .pwzNumber(registerDoctorRequest.pwzNumber())
                 .emailVerified(true)
-                .specializations(specializationsFromDb)
+                .specializations(new HashSet<>(specializationsFromDb))
                 .build();
         userRepository.save(doctor);
     }

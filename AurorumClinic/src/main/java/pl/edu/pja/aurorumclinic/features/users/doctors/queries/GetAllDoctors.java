@@ -3,7 +3,6 @@ package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -32,17 +31,19 @@ public class GetAllDoctors {
 
     @PermitAll
     @GetMapping("")
-    public ResponseEntity<ApiResponse<Page<GetDoctorResponse>>> searchAllDoctors(@RequestParam(required = false) String query,
-                                                                                 @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(handle(query, pageable)));
+    public ResponseEntity<ApiResponse<Page<GetDoctorResponse>>> searchAllDoctors(
+                                    @RequestParam(required = false) String query,
+                                    @RequestParam(required = true) Long serviceId,
+                                    @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(handle(query, pageable, serviceId)));
     }
 
-    private Page<GetDoctorResponse> handle(String query, Pageable pageable) {
+    private Page<GetDoctorResponse> handle(String query, Pageable pageable, Long serviceId) {
         Page<Doctor> doctorsFromDb;
         if (query == null) {
-            doctorsFromDb = doctorRepository.findAll(pageable);
+            doctorsFromDb = doctorRepository.findAllByServiceId(pageable, serviceId);
         } else {
-            doctorsFromDb =  doctorRepository.findAllByQuery(query, pageable);
+            doctorsFromDb =  doctorRepository.findAllByQueryAndServiceId(query, pageable, serviceId);
         }
         Page<GetDoctorResponse> response = doctorsFromDb.map(doctor -> GetDoctorResponse.builder()
                 .id(doctor.getId())

@@ -24,6 +24,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,7 +48,6 @@ public class CreateSchedule {
 
     private void handle(CreateScheduleRequest request) {
         List<Service> servicesFromDb = serviceRepository.findAllById(request.serviceIds);
-        System.err.println(servicesFromDb);
         if (servicesFromDb.size() > request.serviceIds.size()) {
             throw new ApiException("Some service ids are not found", "serviceIds");
         }
@@ -61,7 +61,7 @@ public class CreateSchedule {
                 .doctor(doctorFromDb)
                 .startedAt(request.startedAt())
                 .finishedAt(request.finishedAt())
-                .services(servicesFromDb)
+                .services(new HashSet<>(servicesFromDb))
                 .build();
         scheduleRepository.save(schedule);
     }
