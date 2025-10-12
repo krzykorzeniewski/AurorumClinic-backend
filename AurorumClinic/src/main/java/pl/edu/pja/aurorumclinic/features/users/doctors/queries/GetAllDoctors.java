@@ -41,7 +41,8 @@ public class GetAllDoctors {
     private Page<GetDoctorResponse> handle(String query, Pageable pageable, Long serviceId) {
         Page<Doctor> doctorsFromDb;
         if (query == null) {
-            doctorsFromDb = doctorRepository.findAllByServiceId(pageable, serviceId);
+//            doctorsFromDb = doctorRepository.findAllByServiceId(pageable, serviceId);
+            doctorsFromDb = doctorRepository.findBySpecializations_Services_Id(serviceId, pageable);
         } else {
             doctorsFromDb =  doctorRepository.findAllByQueryAndServiceId(query, pageable, serviceId);
         }
