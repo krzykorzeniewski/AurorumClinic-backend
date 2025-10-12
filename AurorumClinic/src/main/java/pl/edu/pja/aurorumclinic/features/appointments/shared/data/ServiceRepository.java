@@ -11,7 +11,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     @Query("""
            select new pl.edu.pja.aurorumclinic.features.appointments.services.queries.shared.GetServiceResponse(
-                      s.name, s.price, s.duration, s.description
+                      s.id, s.name, s.price, s.duration, s.description
                       ) from Service s
            """)
     Page<GetServiceResponse> findAllGetServiceDtos(Pageable pageable);
