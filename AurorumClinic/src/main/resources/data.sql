@@ -1,36 +1,36 @@
 --users
-insert into user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password) values
-    ('Michal', 'Laskowski', '12121212121', '1990-01-01', 's27626@pjwstk.edu.pl', '887153106' , 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+insert into user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at) values
+    ('Michal', 'Laskowski', '12121212121', '1990-01-01', 's27626@pjwstk.edu.pl', '887153106' , 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Anna', 'Kowalska', '90010112345', '1990-01-01', 'anna.kowalska@example.com', '601234567', 0, 'ADMIN', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Anna', 'Kowalska', '90010112345', '1990-01-01', 'anna.kowalska@example.com', '601234567', 0, 'ADMIN', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Marcin', 'Nowak', '85051234567', '1985-05-12', 'marcin.nowak@example.com', '601234568', 0, 'EMPLOYEE', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Marcin', 'Nowak', '85051234567', '1985-05-12', 'marcin.nowak@example.com', '601234568', 0, 'EMPLOYEE', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Piotr', 'Zieliński', '92030498765', '1992-03-04', 'piotr.zielinski@example.com', '601234569', 0, 'DOCTOR', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Piotr', 'Zieliński', '92030498765', '1992-03-04', 'piotr.zielinski@example.com', '601234569', 0, 'DOCTOR', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Ewa', 'Wiśniewska', '93040567891', '1993-04-05', 'ewa.wisniewska@example.com', '601234570', 0, 'DOCTOR', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Ewa', 'Wiśniewska', '93040567891', '1993-04-05', 'ewa.wisniewska@example.com', '601234570', 0, 'DOCTOR', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Tomasz', 'Lewandowski', '95060712345', '1995-06-07', 'tomasz.lewandowski@example.com', '601234571', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Tomasz', 'Lewandowski', '95060712345', '1995-06-07', 'tomasz.lewandowski@example.com', '601234571', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Anna', 'Wójcik', '87080934567', '1987-08-09', 'anna.wojcik@example.com', '601234572', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Anna', 'Wójcik', '87080934567', '1987-08-09', 'anna.wojcik@example.com', '601234572', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Kamil', 'Majewski', '86011056789', '1986-01-10', 'kamil.majewski@example.com', '601234573', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Kamil', 'Majewski', '86011056789', '1986-01-10', 'kamil.majewski@example.com', '601234573', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Maria', 'Jankowska', '80021234567', '1980-02-12', 'maria.jankowska@example.com', '601234574', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Maria', 'Jankowska', '80021234567', '1980-02-12', 'maria.jankowska@example.com', '601234574', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Paweł', 'Kowalczyk', '87041567890', '1987-04-15', 'pawel.kowalczyk@example.com', '601234575', 0, 'DOCTOR', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Paweł', 'Kowalczyk', '87041567890', '1987-04-15', 'pawel.kowalczyk@example.com', '601234575', 0, 'DOCTOR', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
-INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password)
-VALUES ('Dorota', 'Szymczak', '82061712345', '1982-06-17', 'dorota.szymczak@example.com', '601234576', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa');
+INSERT INTO user_ (name, surname, pesel, birthdate, email, phone_number, two_factor_authentication, role, password, created_at)
+VALUES ('Dorota', 'Szymczak', '82061712345', '1982-06-17', 'dorota.szymczak@example.com', '601234576', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00');
 
 update user_ set email_verified = 1;
 update user_ set phone_number_verified = 0;

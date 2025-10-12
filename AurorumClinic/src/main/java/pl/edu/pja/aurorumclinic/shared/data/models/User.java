@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -105,6 +106,10 @@ public class User implements UserDetails {
     @Size(min = 9, max = 9, message = "Required length for this field is 9 characters")
     private String pendingPhoneNumber;
 
+    @Column(name = "Created_At", columnDefinition = "datetime2(5)")
+    @NotNull(message = "This field is required")
+    private LocalDateTime createdAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Token> tokens;
 
@@ -116,5 +121,10 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return String.valueOf(id);
+    }
+
+    @PrePersist
+    private void prePersist() {
+        createdAt = LocalDateTime.now();
     }
 }
