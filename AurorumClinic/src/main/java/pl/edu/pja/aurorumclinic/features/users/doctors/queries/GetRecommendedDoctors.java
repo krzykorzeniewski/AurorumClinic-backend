@@ -1,17 +1,15 @@
 package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
 
 import jakarta.annotation.security.PermitAll;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.GetDoctorResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
@@ -34,19 +32,19 @@ public class GetRecommendedDoctors {
     @PermitAll
     @GetMapping("/recommended")
 
-    public ResponseEntity<ApiResponse<List<GetDoctorResponse>>> getRecommendedDoctors(
+    public ResponseEntity<ApiResponse<List<GetRecommendedDoctorResponse>>> getRecommendedDoctors(
                         @PageableDefault(size = 6) Pageable pageable)  {
         return ResponseEntity.ok(ApiResponse.success(handle(pageable)));
     }
 
-    private List<GetDoctorResponse> handle (Pageable pageable) {
+    private List<GetRecommendedDoctorResponse> handle (Pageable pageable) {
         Page<Doctor> doctorsFromDb = doctorRepository.findAll(pageable);
-        List<GetDoctorResponse> response = doctorsFromDb.map(doctor -> GetDoctorResponse.builder()
+        List<GetRecommendedDoctorResponse> response = doctorsFromDb.map(doctor -> GetRecommendedDoctorResponse.builder()
                 .id(doctor.getId())
                 .name(doctor.getName())
                 .surname(doctor.getSurname())
                 .specializations(doctor.getSpecializations().stream().map(
-                        specialization -> GetDoctorResponse.SpecializationDto.builder()
+                        specialization -> GetRecommendedDoctorResponse.SpecializationDto.builder()
                                 .id(specialization.getId())
                                 .name(specialization.getName())
                                 .build()
@@ -58,8 +56,23 @@ public class GetRecommendedDoctors {
                         .mapToInt(Opinion::getRating)
                         .average()
                         .orElse(0.0))
-                .build()).stream().sorted(Comparator.comparing(GetDoctorResponse::rating).reversed()).toList();
+                .build()).stream().sorted(Comparator.comparing(GetRecommendedDoctorResponse::rating).reversed()).toList();
         return response;
+    }
+
+    @Builder
+    record GetRecommendedDoctorResponse(
+            Long id,
+            String name,
+            String surname,
+            List<SpecializationDto> specializations,
+            String profilePicture,
+            int rating) {
+        @Builder
+        record SpecializationDto(Long id,
+                                 String name) {
+        }
+
     }
 
 }
