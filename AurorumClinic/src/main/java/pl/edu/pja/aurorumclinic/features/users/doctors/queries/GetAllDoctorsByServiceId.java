@@ -25,7 +25,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-public class GetAllDoctors {
+public class GetAllDoctorsByServiceId {
 
     private final DoctorRepository doctorRepository;
     private final ObjectStorageService objectStorageService;
@@ -51,7 +51,7 @@ public class GetAllDoctors {
                 .name(doctor.getName())
                 .surname(doctor.getSurname())
                 .specializations(doctor.getSpecializations().stream().map(
-                        specialization -> GetAllDoctors.GetDoctorResponse.SpecializationDto.builder()
+                        specialization -> GetAllDoctorsByServiceId.GetDoctorResponse.SpecializationDto.builder()
                                 .id(specialization.getId())
                                 .name(specialization.getName())
                                 .build()

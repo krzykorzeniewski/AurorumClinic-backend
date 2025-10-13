@@ -43,7 +43,7 @@ public class UpdateService {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         List<Specialization> specializationsFromDb = specializationRepository.findAllById(request.specializationIds);
-        if (specializationsFromDb.size() > request.specializationIds().size()) {
+        if (specializationsFromDb.size() != request.specializationIds().size()) {
             throw new ApiException("Some specialization ids are not found", "specializationIds");
         }
         serviceFromDb.setName(request.name());

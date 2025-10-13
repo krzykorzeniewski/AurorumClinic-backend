@@ -41,7 +41,7 @@ public class CreateService {
 
     private void handle(CreateServiceRequest request) {
         List<Specialization> specializationsFromDb = specializationRepository.findAllById(request.specializationIds);
-        if (specializationsFromDb.size() > request.specializationIds().size()) {
+        if (specializationsFromDb.size() != request.specializationIds().size()) {
             throw new ApiException("Some specialization ids are not found", "specializationIds");
         }
         Service service = Service.builder()
