@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.users.commands;
+package pl.edu.pja.aurorumclinic.features.users.users.commands.me;
 
 import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import jakarta.validation.Valid;
