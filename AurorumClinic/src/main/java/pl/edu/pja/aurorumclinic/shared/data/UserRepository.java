@@ -31,6 +31,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
             u.id, u.name, u.surname, u.pesel, u.birthdate, u.email, u.phoneNumber, u.twoFactorAuth, u.emailVerified,
             u.phoneNumberVerified, u.role, u.createdAt
                         ) from User u
+            where u.id = :userId
+            """)
+    GetUserResponse findUserResponseDtoById(Long userId);
+
+    @Query("""
+            select new pl.edu.pja.aurorumclinic.features.users.users.queries.shared.GetUserResponse(
+            u.id, u.name, u.surname, u.pesel, u.birthdate, u.email, u.phoneNumber, u.twoFactorAuth, u.emailVerified,
+            u.phoneNumberVerified, u.role, u.createdAt
+                        ) from User u
             where (:role is null or u.role = :role) and (
             lower(u.name) like lower(concat('%', :query, '%')) or
             lower(u.surname) like lower(concat('%', :query, '%')) or
