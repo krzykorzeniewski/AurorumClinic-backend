@@ -23,7 +23,7 @@ public class RegisterController {
 
     private final RegisterService registerService;
 
-    @PostMapping("/register-employee") //TODO generate password and send to employee email and ask to change, doctor same
+    @PostMapping("/register-employee")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> registerEmployee(@Valid @RequestBody RegisterEmployeeRequest requestDto) {
         registerService.registerEmployee(requestDto);
