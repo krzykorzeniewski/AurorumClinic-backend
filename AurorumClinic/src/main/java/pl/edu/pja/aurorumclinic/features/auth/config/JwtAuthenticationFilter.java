@@ -70,9 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         List<String> excludedPaths = List.of(
                 "/api/auth/refresh",
                 "/api/auth/login",
-                "/api/auth/register-employee",
                 "/api/auth/register-patient",
-                "/api/auth/register-doctor",
                 "/api/auth/reset-password-token",
                 "/api/auth/reset-password",
                 "/api/auth/login-2fa",

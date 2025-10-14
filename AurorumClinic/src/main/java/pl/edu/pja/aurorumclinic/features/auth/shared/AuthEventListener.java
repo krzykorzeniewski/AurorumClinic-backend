@@ -3,17 +3,22 @@ package pl.edu.pja.aurorumclinic.features.auth.shared;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaLoginRequestedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.reset_password.events.ResetPasswordRequestedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.verify_phone_number.events.PhoneNumberVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
@@ -47,13 +52,45 @@ public class AuthEventListener {
     public void handleMfaLoginAttemptedEvent(MfaLoginRequestedEvent event) {
         User user = event.user();
         Token token = tokenService.createOtpToken(user, TokenName.TWO_FACTOR_AUTH, 1);
-        System.err.println(token.getRawValue());
         smsService.sendSms("+48" + user.getPhoneNumber(), fromPhoneNumber,
                 "Kod logowania do Aurorum Clinic : " + token.getRawValue());
     }
 
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handleDoctorRegisteredEvent(DoctorRegisteredEvent event) {
+        Doctor doctor = event.doctor();
+
+        Context context = new Context();
+        context.setVariable("password", event.password());
+        String htmlPageAsText = springTemplateEngine.process("employee-registered-email", context);
+
+        emailService.sendEmail(
+                noreplyEmailAddres,
+                doctor.getEmail(),
+                "Twoje konto zostało utworzone",
+                htmlPageAsText
+        );
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handleEmployeeRegisteredEvent(EmployeeRegisteredEvent event) {
+        User employee = event.user();
+
+        Context context = new Context();
+        context.setVariable("password", event.password());
+        String htmlPageAsText = springTemplateEngine.process("employee-registered-email", context);
+
+        emailService.sendEmail(
+                noreplyEmailAddres,
+                employee.getEmail(),
+                "Twoje konto zostało utworzone",
+                htmlPageAsText
+        );
+    }
+
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Async
     public void handleUserRegisteredEvent(PatientRegisteredEvent event) {
         User user = event.user();
         Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
@@ -73,6 +110,7 @@ public class AuthEventListener {
 
     @EventListener
     @Transactional
+    @Async
     public void handleAccountVerifyMessageRequestedEvent(AccountVerificationRequestedEvent event) {
         User user = event.user();
         Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
@@ -92,6 +130,7 @@ public class AuthEventListener {
 
     @EventListener
     @Transactional
+    @Async
     public void handleResetPasswordMessageRequestEvent(ResetPasswordRequestedEvent event) {
         User user = event.user();
         Token token = tokenService.createToken(user, TokenName.PASSWORD_RESET, 15);
@@ -106,6 +145,7 @@ public class AuthEventListener {
 
     @EventListener
     @Transactional
+    @Async
     public void handleVerifyPhoneNumberRequestedEvent(PhoneNumberVerificationRequestedEvent event) {
         User user = event.user();
         Token token = tokenService.createOtpToken(user, TokenName.PHONE_NUMBER_VERIFICATION, 10);

@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.users.users.events;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class UserNotificationListener {
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Async
     public void handlePendingEmailCreatedEvent(PendingEmailCreatedEvent event) {
         User user = event.user();
         Token token = tokenService.createOtpToken(user, TokenName.EMAIL_UPDATE, 10);
@@ -47,6 +49,7 @@ public class UserNotificationListener {
 
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Async
     public void handlePendingPhoneNumberCreatedEvent(PendingPhoneNumberCreatedEvent event) {
         User user = event.user();
         Token token = tokenService.createOtpToken(user, TokenName.PHONE_NUMBER_UPDATE, 15);
@@ -56,6 +59,7 @@ public class UserNotificationListener {
 
     @EventListener
     @Transactional
+    @Async
     public void handleMfaUpdateRequestedEvent(MfaUpdateRequestedEvent event) {
         User user = event.user();
         Token token = tokenService.createOtpToken(user, TokenName.TWO_FACTOR_AUTH_UPDATE, 10);
