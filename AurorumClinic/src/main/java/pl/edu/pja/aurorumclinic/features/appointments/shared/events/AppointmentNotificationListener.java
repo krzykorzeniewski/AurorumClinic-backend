@@ -138,7 +138,7 @@ public class AppointmentNotificationListener {
         }
     }
 
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleSurveyCreatedEvent(SurveyCreatedEvent event) {
         Survey survey = event.survey();
         Appointment appointment = survey.getAppointment();
