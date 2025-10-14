@@ -49,6 +49,7 @@ public class AuthEventListener {
 
     @EventListener
     @Transactional
+    @Async
     public void handleMfaLoginAttemptedEvent(MfaLoginRequestedEvent event) {
         User user = event.user();
         Token token = tokenService.createOtpToken(user, TokenName.TWO_FACTOR_AUTH, 1);
