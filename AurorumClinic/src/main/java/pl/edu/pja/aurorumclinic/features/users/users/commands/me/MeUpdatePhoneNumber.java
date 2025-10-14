@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.users.commands;
+package pl.edu.pja.aurorumclinic.features.users.users.commands.me;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -22,30 +22,29 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @PreAuthorize("isFullyAuthenticated()")
-public class MeUpdateEmail {
+public class MeUpdatePhoneNumber {
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
 
-    @PutMapping("/me/email")
+    @PutMapping("/me/phone-number")
     @Transactional
-    public ResponseEntity<ApiResponse<?>> updateUserEmail(@AuthenticationPrincipal Long id,
-                                             @Valid @RequestBody UpdateUserEmailRequest requestDto) {
+    public ResponseEntity<ApiResponse<?>> updateUserPhoneNumber(@AuthenticationPrincipal Long id,
+                                                   @Valid @RequestBody UpdateUserPhoneNumberRequest requestDto) {
         handle(id, requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    private void handle(Long id, UpdateUserEmailRequest request) {
+    private void handle(Long id, UpdateUserPhoneNumberRequest request) {
         User userFromDb = userRepository.findById(id).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+                () -> new ApiNotFoundException("User not found", "id")
         );
         tokenService.validateAndDeleteToken(userFromDb, request.token());
-        userFromDb.setEmail(userFromDb.getPendingEmail());
-        userFromDb.setPendingEmail(null);
+        userFromDb.setPhoneNumber(userFromDb.getPendingPhoneNumber());
+        userFromDb.setPendingPhoneNumber(null);
     }
 
-    public record UpdateUserEmailRequest(@Size(max = 6) @NotBlank String token) {
+    public record UpdateUserPhoneNumberRequest(@Size(min = 6, max = 6) @NotBlank String token) {
     }
-
 
 }

@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.users.commands;
+package pl.edu.pja.aurorumclinic.features.users.users.commands.me;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

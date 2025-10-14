@@ -13,6 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
@@ -58,6 +59,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         newContext.setAuthentication(authenticationToken);
         SecurityContextHolder.setContext(newContext);
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+
+        List<String> excludedPaths = List.of(
+                "/api/auth/refresh",
+                "/api/auth/login",
+                "/api/auth/register-patient",
+                "/api/auth/reset-password-token",
+                "/api/auth/reset-password",
+                "/api/auth/login-2fa",
+                "/api/auth/login-2fa-token",
+                "/api/auth/verify-email",
+                "/api/auth/verify-email-token",
+                "/api/appointments/guest",
+                "/api/doctors",
+                "/api/doctors/recommended",
+                "/api/doctors/*/appointment-slots"
+        );
+        boolean isExcluded = excludedPaths.stream()
+                .anyMatch(pattern -> pathMatcher.match(pattern, path));
+
+        boolean isGetServices = pathMatcher.match("/api/services", path)
+                && method.equalsIgnoreCase("GET");
+        return isExcluded || isGetServices;
     }
 
 }

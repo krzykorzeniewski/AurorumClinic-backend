@@ -19,6 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,7 +41,7 @@ public class CreateService {
 
     private void handle(CreateServiceRequest request) {
         List<Specialization> specializationsFromDb = specializationRepository.findAllById(request.specializationIds);
-        if (specializationsFromDb.size() > request.specializationIds().size()) {
+        if (specializationsFromDb.size() != request.specializationIds().size()) {
             throw new ApiException("Some specialization ids are not found", "specializationIds");
         }
         Service service = Service.builder()
@@ -48,7 +49,7 @@ public class CreateService {
                 .price(request.price())
                 .duration(request.duration())
                 .description(request.description())
-                .specializations(specializationsFromDb)
+                .specializations(new HashSet<>(specializationsFromDb))
                 .build();
         serviceRepository.save(service);
     }

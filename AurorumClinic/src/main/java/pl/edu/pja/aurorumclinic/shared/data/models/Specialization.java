@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -31,10 +32,10 @@ public class Specialization {
     private String name;
 
     @ManyToMany(mappedBy = "specializations")
-    private List<Doctor> doctors;
+    private Set<Doctor> doctors;
 
     @ManyToMany(mappedBy = "specializations")
     @ToString.Exclude
-    private List<Service> services;
+    private Set<Service> services;
 
 }

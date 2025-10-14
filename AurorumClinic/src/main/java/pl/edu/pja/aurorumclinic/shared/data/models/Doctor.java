@@ -50,13 +50,13 @@ public class Doctor extends User {
 
     @OneToMany(mappedBy = "doctor")
     @ToString.Exclude
-    private List<Schedule> schedules;
+    private Set<Schedule> schedules;
 
     @ManyToMany
     @ToString.Exclude
     @JoinTable(name = "Specialization_Doctor",
             joinColumns = @JoinColumn(name = "PK_Doctor"),
             inverseJoinColumns = @JoinColumn(name = "PK_Specialization"))
-    private List<Specialization> specializations;
+    private Set<Specialization> specializations;
 
 }
