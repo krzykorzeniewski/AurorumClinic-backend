@@ -71,8 +71,4 @@ public class Appointment {
     @JoinColumn(name = "FK_Patient")
     @ToString.Exclude
     private Patient patient;
-
-    @OneToMany(mappedBy = "appointment")
-    @ToString.Exclude
-    private List<Message> messages;
 }

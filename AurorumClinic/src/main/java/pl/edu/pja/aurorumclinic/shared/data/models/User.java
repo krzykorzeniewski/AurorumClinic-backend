@@ -88,8 +88,11 @@ public class User implements UserDetails {
     @NotNull(message = "This field is required")
     private UserRole role;
 
-    @OneToMany(mappedBy = "user")
-    private List<Message> messages;
+    @OneToMany(mappedBy = "sender")
+    private List<Message> sentMessages;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Message> receivedMessages;
 
     @Column(name = "Email_Verified", columnDefinition = "bit")
     private boolean emailVerified = false;
