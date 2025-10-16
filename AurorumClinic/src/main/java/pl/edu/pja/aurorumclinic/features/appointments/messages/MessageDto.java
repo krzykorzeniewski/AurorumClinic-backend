@@ -8,5 +8,5 @@ import java.time.LocalDateTime;
 
 public record MessageDto(@NotEmpty @Size(max = 500) String text,
                          @NotNull LocalDateTime sentAt,
-                         @NotNull Long senderId) {
+                         @NotNull Long receiverId) {
 }

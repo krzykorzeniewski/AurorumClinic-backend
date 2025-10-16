@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.*;
 import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaLoginRequestedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
-import pl.edu.pja.aurorumclinic.features.auth.shared.JwtUtils;
+import pl.edu.pja.aurorumclinic.shared.JwtUtils;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;

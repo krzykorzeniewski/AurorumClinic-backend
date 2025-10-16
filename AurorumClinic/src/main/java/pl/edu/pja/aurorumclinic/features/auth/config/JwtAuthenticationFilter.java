@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -18,7 +17,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
-import pl.edu.pja.aurorumclinic.features.auth.shared.JwtUtils;
+import pl.edu.pja.aurorumclinic.shared.JwtUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -81,7 +80,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 "/api/appointments/guest",
                 "/api/doctors",
                 "/api/doctors/recommended",
-                "/api/doctors/*/appointment-slots"
+                "/api/doctors/*/appointment-slots",
+                "/ws",
+                "/ws/info"
         );
         boolean isExcluded = excludedPaths.stream()
                 .anyMatch(pattern -> pathMatcher.match(pattern, path));
