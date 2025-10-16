@@ -36,7 +36,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws")
                 .addInterceptors(jwtHandshakeInterceptor)
                 .setAllowedOrigins(clientUrl)
-                .withSockJS();
+                .withSockJS(); //TODO
     }
 
     @Override

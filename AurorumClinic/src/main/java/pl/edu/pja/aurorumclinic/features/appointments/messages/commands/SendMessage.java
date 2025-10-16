@@ -1,12 +1,13 @@
-package pl.edu.pja.aurorumclinic.features.appointments.messages;
+package pl.edu.pja.aurorumclinic.features.appointments.messages.commands;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.edu.pja.aurorumclinic.features.appointments.messages.MessageDto;
+import pl.edu.pja.aurorumclinic.features.appointments.messages.MessageRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Message;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
@@ -15,9 +16,8 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/messages")
 @RequiredArgsConstructor
-public class MessageController {
+public class SendMessage {
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
