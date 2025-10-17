@@ -1,0 +1,54 @@
+package pl.edu.pja.aurorumclinic.features.appointments.chats.queries;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
+import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
+import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
+
+import java.util.List;
+import java.util.Objects;
+
+@RestController
+@RequestMapping("/api/chats/me")
+@RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('PATIENT', 'DOCTOR')")
+public class MeGetAllChats {
+
+    private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
+    private final ObjectStorageService objectStorageService;
+
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<List<GetChatsResponse>>> getAllMyConversationDtos(
+            Authentication loggedInUser) {
+        return ResponseEntity.ok(ApiResponse.success(handle(loggedInUser)));
+    }
+
+    private List<GetChatsResponse> handle(Authentication loggedInUser) {
+        Long loggedInUserId = (Long) loggedInUser.getPrincipal();
+        SimpleGrantedAuthority role = (SimpleGrantedAuthority) loggedInUser.getAuthorities().toArray()[0];
+        UserRole roleAsEnum = UserRole.valueOf(role.getAuthority().substring(5));
+        List<GetChatsResponse> response = null;
+        if (Objects.equals(roleAsEnum, UserRole.PATIENT)) {
+           response = doctorRepository.
+                    findAllWhoHadConversationWithPatientId(loggedInUserId);
+        } else {
+            response = patientRepository.
+                    findAllWhoHadConversationWithDoctorId(loggedInUserId);
+        }
+        for (GetChatsResponse dto: response) {
+            dto.setProfilePicture(objectStorageService.generateUrl(dto.getProfilePicture()));
+        }
+        return response;
+    }
+
+}

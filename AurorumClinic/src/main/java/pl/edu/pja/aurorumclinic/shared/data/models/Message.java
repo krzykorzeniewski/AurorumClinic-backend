@@ -21,28 +21,23 @@ public class Message {
     @Column(name = "PK_Message")
     private Long id;
 
-    @Column(name = "Message", columnDefinition = "nvarchar(500)")
+    @Column(name = "Text", columnDefinition = "nvarchar(500)")
     @Size(max = 500, message = "Maximum length for this field is 500 characters")
     @NotBlank(message = "This field is required")
-    private String message;
-
-    @Column(name = "Response", columnDefinition = "nvarchar(500)")
-    @Size(max = 500, message = "Maximum length for this field is 500 characters")
-    private String response;
+    private String text;
 
     @Column(name = "Sent_At", columnDefinition = "datetime2(2)")
     @NotNull(message = "This field is required")
     private LocalDateTime sentAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FK_User")
+    @JoinColumn(name = "FK_Sender")
     @ToString.Exclude
-    private User user;
+    private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FK_Appointment")
+    @JoinColumn(name = "FK_Receiver")
     @ToString.Exclude
-    private Appointment appointment;
-
+    private User receiver;
 
 }
