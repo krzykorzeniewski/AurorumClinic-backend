@@ -12,6 +12,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
+import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +25,7 @@ public class MeGetAllChats {
 
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+    private final ObjectStorageService objectStorageService;
 
     @GetMapping("")
     public ResponseEntity<ApiResponse<List<GetChatsResponse>>> getAllMyConversationDtos(
@@ -42,6 +44,9 @@ public class MeGetAllChats {
         } else {
             response = patientRepository.
                     findAllWhoHadConversationWithDoctorId(loggedInUserId);
+        }
+        for (GetChatsResponse dto: response) {
+            dto.setProfilePicture(objectStorageService.generateUrl(dto.getProfilePicture()));
         }
         return response;
     }

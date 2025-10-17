@@ -1,13 +1,13 @@
 package pl.edu.pja.aurorumclinic.features.appointments.chats.queries;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @RequiredArgsConstructor
 @Builder
 @AllArgsConstructor
+@Getter
+@Setter
 public class GetChatsResponse {
 
     private final Long id;

@@ -21,10 +21,10 @@ public class Message {
     @Column(name = "PK_Message")
     private Long id;
 
-    @Column(name = "Message", columnDefinition = "nvarchar(500)")
+    @Column(name = "Text", columnDefinition = "nvarchar(500)")
     @Size(max = 500, message = "Maximum length for this field is 500 characters")
     @NotBlank(message = "This field is required")
-    private String message;
+    private String text;
 
     @Column(name = "Sent_At", columnDefinition = "datetime2(2)")
     @NotNull(message = "This field is required")

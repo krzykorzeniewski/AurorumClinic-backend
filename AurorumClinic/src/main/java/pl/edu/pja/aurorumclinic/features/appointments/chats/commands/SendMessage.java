@@ -41,11 +41,11 @@ public class SendMessage {
                 .sender(sender)
                 .receiver(receiver)
                 .sentAt(message.sentAt())
-                .message(message.text())
+                .text(message.text())
                 .build();
         messageRepository.save(newMessage);
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(receiver.getId()),
-                "/queue/messages", message.text);
+                "/queue/messages", message);
     }
 
     record SendMessageRequest(@NotEmpty @Size(max = 500) String text,
