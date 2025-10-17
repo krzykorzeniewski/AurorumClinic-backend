@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Builder
 @AllArgsConstructor
-public class GetConversationResponse {
+public class GetChatsResponse {
 
     private final Long id;
     private final String name;

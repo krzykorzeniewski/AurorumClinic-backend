@@ -17,25 +17,25 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/messages/me")
+@RequestMapping("/api/chats/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('PATIENT', 'DOCTOR')")
-public class MeGetAllConversations {
+public class MeGetAllChats {
 
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
 
     @GetMapping("")
-    public ResponseEntity<ApiResponse<List<GetConversationResponse>>> getAllMyConversationDtos(
+    public ResponseEntity<ApiResponse<List<GetChatsResponse>>> getAllMyConversationDtos(
             Authentication loggedInUser) {
         return ResponseEntity.ok(ApiResponse.success(handle(loggedInUser)));
     }
 
-    private List<GetConversationResponse> handle(Authentication loggedInUser) {
+    private List<GetChatsResponse> handle(Authentication loggedInUser) {
         Long loggedInUserId = (Long) loggedInUser.getPrincipal();
         SimpleGrantedAuthority role = (SimpleGrantedAuthority) loggedInUser.getAuthorities().toArray()[0];
         UserRole roleAsEnum = UserRole.valueOf(role.getAuthority().substring(5));
-        List<GetConversationResponse> response = null;
+        List<GetChatsResponse> response = null;
         if (Objects.equals(roleAsEnum, UserRole.PATIENT)) {
            response = doctorRepository.
                     findAllWhoHadConversationWithPatientId(loggedInUserId);

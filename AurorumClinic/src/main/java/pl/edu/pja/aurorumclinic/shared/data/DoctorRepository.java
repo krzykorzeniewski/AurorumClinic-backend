@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.appointments.chats.queries.GetConversationResponse;
+import pl.edu.pja.aurorumclinic.features.appointments.chats.queries.GetChatsResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 
 import java.sql.Timestamp;
@@ -40,5 +40,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
             join user_ u2 on u2.pk_user = message.fk_receiver
             join doctor d2 on d2.pk_doctor = u2.pk_user where u1.pk_user = :patientId
             """)
-    List<GetConversationResponse> findAllWhoHadConversationWithPatientId(Long patientId);
+    List<GetChatsResponse> findAllWhoHadConversationWithPatientId(Long patientId);
 }

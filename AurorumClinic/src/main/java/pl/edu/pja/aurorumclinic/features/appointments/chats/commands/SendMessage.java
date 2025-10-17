@@ -48,7 +48,7 @@ public class SendMessage {
                 "/queue/messages", message.text);
     }
 
-    public record SendMessageRequest(@NotEmpty @Size(max = 500) String text,
+    record SendMessageRequest(@NotEmpty @Size(max = 500) String text,
                                      @NotNull LocalDateTime sentAt,
                                      @NotNull Long receiverId) {
     }
