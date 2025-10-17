@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.messages.queries;
+package pl.edu.pja.aurorumclinic.features.appointments.chats.queries;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

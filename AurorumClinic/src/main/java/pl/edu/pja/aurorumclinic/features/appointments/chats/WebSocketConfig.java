@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.messages;
+package pl.edu.pja.aurorumclinic.features.appointments.chats;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.messages.commands;
+package pl.edu.pja.aurorumclinic.features.appointments.chats.commands;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -6,8 +6,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.appointments.messages.MessageDto;
-import pl.edu.pja.aurorumclinic.features.appointments.messages.MessageRepository;
+import pl.edu.pja.aurorumclinic.features.appointments.chats.MessageDto;
+import pl.edu.pja.aurorumclinic.features.appointments.chats.MessageRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Message;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;

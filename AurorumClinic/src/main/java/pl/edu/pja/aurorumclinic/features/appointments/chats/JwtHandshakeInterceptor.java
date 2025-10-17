@@ -1,6 +1,5 @@
-package pl.edu.pja.aurorumclinic.features.appointments.messages;
+package pl.edu.pja.aurorumclinic.features.appointments.chats;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +51,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         }
         return false;
     }
+
+
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
