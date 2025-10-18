@@ -1,7 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.newsletter;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,7 +23,7 @@ public class NewsletterScheduler {
     public void sendNewsletter() {
         List<Patient> patientsWhoSubscribed = patientRepository.findByNewsletterTrue();
         if (patientsWhoSubscribed.size() > 0) {
-            NewsletterMessage newsletterMessage = ChatClient.create(chatModel)
+            NewsletterEmailMessage newsletterEmailMessage = ChatClient.create(chatModel)
                     .prompt()
                     .user(u -> u.text("Napisz treść e-maila do newslettera kliniki psychiatrycznej Aurorum Clinic, w języku polskim.\n" +
                             "E-mail powinien:\n" +
@@ -43,12 +42,12 @@ public class NewsletterScheduler {
                             "\n" +
                             "Uwagi: nie podawaj nazw usług oferowanych przez klinikę, zachęcaj do zapoznania się z ofertą."))
                     .call()
-                    .entity(NewsletterMessage.class);
+                    .entity(NewsletterEmailMessage.class);
             for (Patient patient: patientsWhoSubscribed) {
                 emailService.sendEmail("support@aurorumclinic.pl",
                         patient.getEmail(),
-                        newsletterMessage.subject(),
-                        newsletterMessage.content());
+                        newsletterEmailMessage.subject(),
+                        newsletterEmailMessage.content());
             }
         }
     }
