@@ -116,6 +116,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Token> tokens;
 
+    @OneToMany(mappedBy = "reviewer")
+    private List<NewsletterMessage> reviewedNewsletterMessages;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
