@@ -38,15 +38,15 @@ public class NewsletterMessage {
     @NotNull
     private boolean approved = false;
 
+    @Column(name = "Sent_At", columnDefinition = "datetime2(5)")
+    private LocalDateTime sentAt;
+
     @Column(name = "Reviewed_At", columnDefinition = "datetime2(5)")
     private LocalDateTime reviewedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FK_Reviewer")
     private User reviewer;
-
-    @OneToMany(mappedBy = "newsletterMessage")
-    private List<PatientNewsletterMessage> patientNewsletterMessages;
 
 }
 
