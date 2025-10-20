@@ -26,15 +26,14 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                  select 1
                  from Appointment a
                  where a.doctor.id = :doctorId
-                   and a.startedAt <= :finishedAt
-                   and a.finishedAt >= :startedAt
+                   and a.startedAt < :finishedAt
+                   and a.finishedAt > :startedAt
              )
              then true
              else false
            end
     """)
-    boolean timeSlotExists(LocalDateTime startedAt, LocalDateTime finishedAt,
-                           Long doctorId, Long serviceId);
+    boolean isTimeSlotAvailable(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId, Long serviceId);
 
     Appointment getAppointmentByIdAndPatientId(Long id, Long patientId);
 

@@ -18,7 +18,7 @@ public class AppointmentValidator {
 
     public void validateTimeSlot(LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor, Service service) {
         validateSpecialization(doctor, service);
-        if (!appointmentRepository.timeSlotExists(startedAt, finishedAt, doctor.getId(), service.getId())) {
+        if (!appointmentRepository.isTimeSlotAvailable(startedAt, finishedAt, doctor.getId(), service.getId())) {
             throw new ApiException("Timeslot is not available", "appointment");
         }
     }

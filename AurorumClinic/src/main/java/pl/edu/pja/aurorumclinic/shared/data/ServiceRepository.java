@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.shared.data;
+package pl.edu.pja.aurorumclinic.shared.data;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
