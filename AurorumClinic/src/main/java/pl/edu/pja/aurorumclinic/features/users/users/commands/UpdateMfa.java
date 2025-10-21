@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.users.commands.me;
+package pl.edu.pja.aurorumclinic.features.users.users.commands;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -22,30 +22,28 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @PreAuthorize("isFullyAuthenticated()")
-public class MeUpdateEmail {
+public class UpdateMfa {
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
 
-    @PutMapping("/me/email")
+    @PutMapping("/me/2fa")
     @Transactional
-    public ResponseEntity<ApiResponse<?>> updateUserEmail(@AuthenticationPrincipal Long id,
-                                             @Valid @RequestBody UpdateUserEmailRequest requestDto) {
+    public ResponseEntity<ApiResponse<?>> setUser2fa(@AuthenticationPrincipal Long id,
+                                        @Valid @RequestBody UpdateUser2FARequest requestDto) {
         handle(id, requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    private void handle(Long id, UpdateUserEmailRequest request) {
+    private void handle(Long id, UpdateUser2FARequest request) {
         User userFromDb = userRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         tokenService.validateAndDeleteToken(userFromDb, request.token());
-        userFromDb.setEmail(userFromDb.getPendingEmail());
-        userFromDb.setPendingEmail(null);
+        userFromDb.setTwoFactorAuth(true);
     }
 
-    public record UpdateUserEmailRequest(@Size(max = 6) @NotBlank String token) {
+    public record UpdateUser2FARequest(@NotBlank @Size(min = 6, max = 6) String token) {
     }
-
 
 }

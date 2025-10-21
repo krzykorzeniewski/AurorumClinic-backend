@@ -21,7 +21,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-public class MeUploadProfilePicture {
+public class UploadProfilePicture {
 
     private final DoctorRepository doctorRepository;
     private final ObjectStorageService objectStorageService;

@@ -33,7 +33,7 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/appointments/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('PATIENT')")
-public class MeCreateAppointment {
+public class PatientCreateAppointment {
 
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;

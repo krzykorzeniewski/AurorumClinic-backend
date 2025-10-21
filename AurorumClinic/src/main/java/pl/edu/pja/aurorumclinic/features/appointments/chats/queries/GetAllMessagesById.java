@@ -19,7 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 @RequestMapping("/api/messages/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('PATIENT', 'DOCTOR')")
-public class MeGetAllMessagesById {
+public class GetAllMessagesById {
 
     private final MessageRepository messageRepository;
 

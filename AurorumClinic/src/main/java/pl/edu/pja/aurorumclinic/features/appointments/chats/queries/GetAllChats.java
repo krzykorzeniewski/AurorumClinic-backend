@@ -21,7 +21,7 @@ import java.util.Objects;
 @RequestMapping("/api/chats/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('PATIENT', 'DOCTOR')")
-public class MeGetAllChats {
+public class GetAllChats {
 
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;

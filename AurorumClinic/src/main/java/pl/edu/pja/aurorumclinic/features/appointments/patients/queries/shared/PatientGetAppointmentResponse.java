@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record MeGetAppointmentResponse(Long id,
-                                       @JsonFormat(shape = JsonFormat.Shape.STRING) AppointmentStatus status,
-                                       LocalDateTime startedAt,
-                                       String description,
-                                       DoctorDto doctor,
-                                       ServiceDto service,
-                                       PaymentDto payment) {
+public record PatientGetAppointmentResponse(Long id,
+                                            @JsonFormat(shape = JsonFormat.Shape.STRING) AppointmentStatus status,
+                                            LocalDateTime startedAt,
+                                            String description,
+                                            DoctorDto doctor,
+                                            ServiceDto service,
+                                            PaymentDto payment) {
     @Builder
     public record PaymentDto(Long id,
                              @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal amount,

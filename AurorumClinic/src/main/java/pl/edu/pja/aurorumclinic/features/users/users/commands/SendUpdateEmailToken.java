@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.users.commands.me;
+package pl.edu.pja.aurorumclinic.features.users.users.commands;
 
 import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import jakarta.validation.Valid;
@@ -27,7 +27,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RequiredArgsConstructor
 @PreAuthorize("isFullyAuthenticated()")
 @RateLimiting(name = "sensitive")
-public class MeSendUpdateEmailToken {
+public class SendUpdateEmailToken {
 
     private final UserRepository userRepository;
     private final ApplicationEventPublisher applicationEventPublisher;

@@ -16,7 +16,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RestController
 @RequestMapping("/api/patients")
 @RequiredArgsConstructor
-public class MeDeletePatient {
+public class DeletePatient {
 
     private final PatientRepository patientRepository;
 

@@ -1,23 +1,26 @@
 package pl.edu.pja.aurorumclinic.features.users.patients.commands;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -26,30 +29,26 @@ public class UpdatePatient {
 
     private final PatientRepository patientRepository;
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PatchMapping("/me")
+    @PreAuthorize("hasRole('PATIENT')")
     @Transactional
-    public ResponseEntity<ApiResponse<PutPatientResponse>> updatePatient(@PathVariable Long id,
-                                                                         @Valid @RequestBody PutPatientRequest requestDto) {
+    public ResponseEntity<ApiResponse<PatchPatientResponse>> partiallyUpdatePatient(@AuthenticationPrincipal Long id,
+                                                                  @Valid @RequestBody PatchPatientRequest requestDto) {
         return ResponseEntity.ok(ApiResponse.success(handle(id, requestDto)));
     }
 
-    private PutPatientResponse handle(Long id, PutPatientRequest request) {
+    private PatchPatientResponse handle(Long id, PatchPatientRequest request) {
         Patient patientFromDb = patientRepository.findById(id).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-
-        patientFromDb.setName(request.name());
-        patientFromDb.setSurname(request.surname());
-        patientFromDb.setPesel(request.pesel());
-        patientFromDb.setBirthdate(request.birthdate());
-        patientFromDb.setPhoneNumber(request.phoneNumber());
-        patientFromDb.setEmail(request.email());
+        if (!patientFromDb.isPhoneNumberVerified() &&
+                Objects.equals(request.communicationPreferences(), CommunicationPreference.PHONE_NUMBER)) {
+            throw new ApiException("phone number is not verified", "communicationPreferences");
+        }
         patientFromDb.setCommunicationPreferences(request.communicationPreferences());
         patientFromDb.setNewsletter(request.newsletter());
-        patientFromDb.setTwoFactorAuth(request.twoFactorAuth());
 
-        return PutPatientResponse.builder()
+        return PatchPatientResponse.builder()
                 .id(patientFromDb.getId())
                 .name(patientFromDb.getName())
                 .surname(patientFromDb.getSurname())
@@ -65,19 +64,13 @@ public class UpdatePatient {
                 .build();
     }
 
-    public record PutPatientRequest(@NotBlank @Size(max = 50) String name,
-                                    @NotBlank @Size(max = 50) String surname,
-                                    @NotBlank @Size(min = 11, max = 11) String pesel,
-                                    @NotNull LocalDate birthdate,
-                                    @Size(min = 9, max = 9) @NotBlank String phoneNumber,
-                                    @Email @NotBlank @Size(max = 100) String email,
-                                    @NotNull CommunicationPreference communicationPreferences,
-                                    boolean newsletter,
-                                    boolean twoFactorAuth) {
+    public record PatchPatientRequest(@NotNull CommunicationPreference communicationPreferences,
+                                      boolean newsletter
+    ) {
     }
 
     @Builder
-    public record PutPatientResponse(Long id,
+    public record PatchPatientResponse(Long id,
                                      String name,
                                      String surname,
                                      String pesel,

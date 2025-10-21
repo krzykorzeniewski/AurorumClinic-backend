@@ -25,7 +25,7 @@ import java.util.Objects;
 @RequestMapping("/api/appointments/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('PATIENT')")
-public class MeRescheduleAppointment {
+public class PatientRescheduleAppointment {
 
     private final AppointmentRepository appointmentRepository;
     private final AppointmentValidator appointmentValidator;
@@ -33,7 +33,7 @@ public class MeRescheduleAppointment {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<ApiResponse<?>> updateAppointment(@RequestBody @Valid MeRescheduleAppointment.PatientUpdateAppointmentRequest request,
+    public ResponseEntity<ApiResponse<?>> updateAppointment(@RequestBody @Valid PatientRescheduleAppointment.PatientUpdateAppointmentRequest request,
                                                @AuthenticationPrincipal Long userId,
                                                @PathVariable("id") Long appointmentId) {
         handle(request, userId, appointmentId);

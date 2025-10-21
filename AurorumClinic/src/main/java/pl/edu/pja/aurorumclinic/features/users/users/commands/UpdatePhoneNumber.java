@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.users.commands.me;
+package pl.edu.pja.aurorumclinic.features.users.users.commands;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +22,7 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @PreAuthorize("isFullyAuthenticated()")
-public class MeUpdatePhoneNumber {
+public class UpdatePhoneNumber {
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
