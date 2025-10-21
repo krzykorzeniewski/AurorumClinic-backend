@@ -30,6 +30,11 @@ public class NewsletterMessage {
     @NotEmpty(message = "This field is required")
     private String text;
 
+    @Column(name = "Subject", columnDefinition = "nvarchar(100)")
+    @Size(max = 100, message = "Required length for this field is 100 characters")
+    @NotEmpty(message = "This field is required")
+    private String subject;
+
     @Column(name = "Created_At", columnDefinition = "datetime2(5)")
     @NotNull(message = "This field is required")
     private LocalDateTime createdAt;

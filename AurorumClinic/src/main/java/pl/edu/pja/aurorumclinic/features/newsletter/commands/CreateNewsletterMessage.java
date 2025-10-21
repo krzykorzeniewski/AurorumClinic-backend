@@ -37,28 +37,37 @@ public class CreateNewsletterMessage {
     }
 
     private CreateNewsletterMessageResponse handle(String prompt) {
-        String content = ChatClient.create(chatModel)
+        CreateNewsletterMessagePromptResponse response = ChatClient.create(chatModel)
                 .prompt()
                 .user(u -> u.text(prompt != null ? prompt : defaultPrompt))
                 .call()
-                .entity(String.class);
+                .entity(CreateNewsletterMessagePromptResponse.class);
+
         NewsletterMessage newMessage = new NewsletterMessage();
         newMessage.setCreatedAt(LocalDateTime.now());
         newMessage.setApproved(false);
-        newMessage.setText(content);
+        newMessage.setText(response.text);
+        newMessage.setSubject(response.subject);
         NewsletterMessage savedMessage = newsletterMessageRepository.save(newMessage);
+
         return CreateNewsletterMessageResponse.builder()
                 .id(savedMessage.getId())
                 .text(savedMessage.getText())
                 .createdAt(savedMessage.getCreatedAt())
+                .subject(savedMessage.getSubject())
                 .approved(savedMessage.isApproved())
                 .build();
     }
+
     @Builder
     record CreateNewsletterMessageResponse(Long id,
+                                           String subject,
                                            String text,
                                            LocalDateTime createdAt,
                                            boolean approved) {
+    }
+
+    record CreateNewsletterMessagePromptResponse(String subject, String text) {
     }
 
 }

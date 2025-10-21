@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.newsletter.NewsletterController;
 import pl.edu.pja.aurorumclinic.features.newsletter.NewsletterMessageRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
@@ -48,12 +47,14 @@ public class ReviewNewsletterMessage {
         );
         newsletterMessFromDb.setText(request.text);
         newsletterMessFromDb.setApproved(request.approved);
+        newsletterMessFromDb.setSubject(request.subject);
         newsletterMessFromDb.setReviewer(reviewer);
         newsletterMessFromDb.setReviewedAt(LocalDateTime.now());
     }
 
 
     record UpdateNewsletterMessageRequest(@NotEmpty @Size(max = 500) String text,
+                                          @NotEmpty @Size(max = 100) String subject,
                                           @NotNull Boolean approved) {
     }
 }
