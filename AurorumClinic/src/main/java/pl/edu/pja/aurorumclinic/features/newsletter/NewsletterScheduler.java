@@ -10,7 +10,6 @@ import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.NewsletterMessage;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,8 +21,7 @@ public class NewsletterScheduler {
     private final NewsletterMessageRepository newsletterMessageRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-//    @Scheduled(cron = "0 0 19 1 * *")
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 0 19 1 * *")
     @Transactional
     public void sendNewsletter() {
         List<Patient> patientsWhoSubscribed = patientRepository.findByNewsletterTrue();
@@ -33,7 +31,7 @@ public class NewsletterScheduler {
                NewsletterMessage messageToBeSent = approvedNewsletterMessages.get(0);
                messageToBeSent.setSentAt(LocalDateTime.now());
                NewsletterEmailMessage newsletterEmailMessage = NewsletterEmailMessage.builder()
-                        .subject("Proste kroki do lepszego samopoczucia — praktyczne wskazówki od Aurorum Clinic")
+                        .subject(messageToBeSent.getSubject())
                         .content(messageToBeSent.getText())
                         .patient(patient)
                         .build();

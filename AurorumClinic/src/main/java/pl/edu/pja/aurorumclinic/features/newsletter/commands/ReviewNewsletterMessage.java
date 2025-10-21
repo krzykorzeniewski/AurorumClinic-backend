@@ -52,7 +52,6 @@ public class ReviewNewsletterMessage {
         newsletterMessFromDb.setReviewedAt(LocalDateTime.now());
     }
 
-
     record UpdateNewsletterMessageRequest(@NotEmpty @Size(max = 500) String text,
                                           @NotEmpty @Size(max = 100) String subject,
                                           @NotNull Boolean approved) {
