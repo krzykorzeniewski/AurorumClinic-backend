@@ -36,7 +36,7 @@ update user_ set email_verified = 1;
 update user_ set phone_number_verified = 0;
 
 --patients
-insert into patient (pk_patient, communication_preferences, newsletter) values (1, 'EMAIL', 0);
+insert into patient (pk_patient, communication_preferences, newsletter) values (1, 'EMAIL', 1);
 insert into patient (pk_patient, communication_preferences, newsletter) values (6, 'EMAIL', 0);
 insert into patient (pk_patient, communication_preferences, newsletter) values (7, 'EMAIL', 0);
 insert into patient (pk_patient, communication_preferences, newsletter) values (8, 'EMAIL', 0);

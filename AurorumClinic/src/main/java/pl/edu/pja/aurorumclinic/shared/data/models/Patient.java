@@ -19,7 +19,8 @@ import java.util.Set;
 public class Patient extends User{
 
     @Column(name = "Newsletter", columnDefinition = "bit")
-    private boolean newsletter;
+    @NotNull
+    private boolean newsletter = false;
 
     @Column(name = "Communication_Preferences", length = 50, columnDefinition = "nvarchar(50)")
     @Enumerated(value = EnumType.STRING)
