@@ -22,6 +22,7 @@ import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
+import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
@@ -54,7 +55,7 @@ public class CreateAppointment {
         Doctor doctorFromDb = doctorRepository.findById(request.doctorId()).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        pl.edu.pja.aurorumclinic.shared.data.models.Service serviceFromDb = serviceRepository.findById(
+        Service serviceFromDb = serviceRepository.findById(
                 request.serviceId()).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
@@ -67,7 +68,7 @@ public class CreateAppointment {
                 .startedAt(request.startedAt())
                 .finishedAt(request.startedAt().plusMinutes(serviceFromDb.getDuration()))
                 .build();
-        appointmentValidator.validateTimeSlot(newAppointment.getStartedAt(), newAppointment.getFinishedAt(),
+        appointmentValidator.validateAppointment(newAppointment.getStartedAt(), newAppointment.getFinishedAt(),
                 newAppointment.getDoctor(), newAppointment.getService());
 
         Appointment appointmentFromDb = appointmentRepository.save(newAppointment);

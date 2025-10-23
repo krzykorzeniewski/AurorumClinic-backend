@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.services.commands;
+package pl.edu.pja.aurorumclinic.features.services.commands;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
@@ -7,14 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.shared.data.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
-import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -25,36 +27,35 @@ import java.util.Set;
 @RequestMapping("/api/services")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-public class UpdateService {
+public class CreateService {
 
     private final ServiceRepository serviceRepository;
     private final SpecializationRepository specializationRepository;
 
-    @PutMapping("/{id}")
+    @PostMapping("")
     @Transactional
-    public ResponseEntity<ApiResponse<?>> updateService(@PathVariable("id") Long serviceId,
-                                                        @RequestBody @Valid UpdateServiceRequest request) {
-        handle(serviceId, request);
+    public ResponseEntity<ApiResponse<?>> createService(@RequestBody @Valid CreateServiceRequest createServiceRequest) {
+        handle(createServiceRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    private void handle(Long serviceId, UpdateServiceRequest request) {
-        Service serviceFromDb = serviceRepository.findById(serviceId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
-        );
+    private void handle(CreateServiceRequest request) {
         List<Specialization> specializationsFromDb = specializationRepository.findAllById(request.specializationIds);
         if (specializationsFromDb.size() != request.specializationIds().size()) {
             throw new ApiException("Some specialization ids are not found", "specializationIds");
         }
-        serviceFromDb.setName(request.name());
-        serviceFromDb.setDuration(request.duration());
-        serviceFromDb.setDescription(request.description());
-        serviceFromDb.setPrice(request.price());
-        serviceFromDb.setSpecializations(new HashSet<>(specializationsFromDb));
+        Service service = Service.builder()
+                .name(request.name())
+                .price(request.price())
+                .duration(request.duration())
+                .description(request.description())
+                .specializations(new HashSet<>(specializationsFromDb))
+                .build();
+        serviceRepository.save(service);
     }
 
-    public record UpdateServiceRequest(@NotBlank @Size(max = 150) String name,
-                                       @NotNull int duration,
+    public record CreateServiceRequest(@NotBlank @Size(max = 150) String name,
+                                       @NotNull Integer duration,
                                        @NotNull @Digits(integer = 10, fraction = 2) @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal price,
                                        @NotBlank @Size(max = 500) String description,
                                        @NotEmpty Set<Long> specializationIds) {

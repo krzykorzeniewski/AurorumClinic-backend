@@ -69,7 +69,7 @@ public class PatientCreateAppointment {
                 .startedAt(request.startedAt())
                 .finishedAt(request.startedAt().plusMinutes(serviceFromDb.getDuration()))
                 .build();
-        appointmentValidator.validateTimeSlot(newAppointment.getStartedAt(), newAppointment.getFinishedAt(),
+        appointmentValidator.validateAppointment(newAppointment.getStartedAt(), newAppointment.getFinishedAt(),
                 newAppointment.getDoctor(), newAppointment.getService());
 
         Appointment appointmentFromDb = appointmentRepository.save(newAppointment);

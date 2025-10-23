@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.schedules;
+package pl.edu.pja.aurorumclinic.features.schedules;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

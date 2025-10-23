@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.specializations.queries.shared;
+package pl.edu.pja.aurorumclinic.features.specializations.queries.shared;
 
 import lombok.Builder;
 

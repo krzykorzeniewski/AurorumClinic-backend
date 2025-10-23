@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.services.queries.shared;
+package pl.edu.pja.aurorumclinic.features.services.queries.shared;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

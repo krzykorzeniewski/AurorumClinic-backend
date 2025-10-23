@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.services.commands;
+package pl.edu.pja.aurorumclinic.features.services.commands;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

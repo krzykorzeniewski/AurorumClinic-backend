@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.specializations.queries;
+package pl.edu.pja.aurorumclinic.features.specializations.queries;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.annotation.security.PermitAll;

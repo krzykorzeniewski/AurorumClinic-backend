@@ -1,10 +1,9 @@
-package pl.edu.pja.aurorumclinic.features.appointments.schedules;
+package pl.edu.pja.aurorumclinic.features.schedules;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.rsocket.RSocketProperties;
 import org.springframework.stereotype.Component;
-import pl.edu.pja.aurorumclinic.features.appointments.schedules.commands.CreateSchedule;
+import pl.edu.pja.aurorumclinic.features.schedules.commands.CreateSchedule;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
