@@ -5,11 +5,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
-import pl.edu.pja.aurorumclinic.features.appointments.chats.queries.GetChatsResponse;
+import pl.edu.pja.aurorumclinic.features.chats.queries.GetChatsResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {

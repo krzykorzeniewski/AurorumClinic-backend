@@ -45,4 +45,17 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> getAllByStartedAtBetweenAndNotificationSentEquals(LocalDateTime startedAtAfter,
                                                                         LocalDateTime startedAtBefore,
                                                                         boolean notificationSent);
+
+    @Query("""
+           select case
+                 when exists (
+                        select 1 from Appointment a
+                        where (a.doctor.id = :participantId and a.patient.id = :secParticipantId)
+                        or (a.doctor.id = :secParticipantId and a.patient.id = :participantId)
+                 )
+                 then true
+                 else false
+           end
+           """)
+    boolean existsBetweenUsers(Long participantId, Long secParticipantId);
 }

@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.chats.queries;
+package pl.edu.pja.aurorumclinic.features.chats.queries;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.appointments.chats;
+package pl.edu.pja.aurorumclinic.features.chats.config;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
