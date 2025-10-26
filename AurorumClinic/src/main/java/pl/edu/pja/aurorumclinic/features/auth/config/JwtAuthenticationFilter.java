@@ -82,9 +82,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 "/api/doctors/recommended",
                 "/api/doctors/*/appointment-slots",
                 "/ws",
-                "/ws/info",
-                "/actuator/**"
+                "/ws/info"
         );
+
         boolean isExcluded = excludedPaths.stream()
                 .anyMatch(pattern -> pathMatcher.match(pattern, path));
 
