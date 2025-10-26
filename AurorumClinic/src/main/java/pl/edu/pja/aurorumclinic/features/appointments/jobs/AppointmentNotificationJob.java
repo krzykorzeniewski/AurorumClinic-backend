@@ -11,7 +11,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 @Component
 @RequiredArgsConstructor
-public class NotificationAppointmentJob {
+public class AppointmentNotificationJob {
 
     private final AppointmentRepository appointmentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;

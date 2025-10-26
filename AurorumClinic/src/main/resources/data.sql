@@ -64,17 +64,18 @@ insert into specialization_doctor (pk_doctor, pk_specialization) values (5, 3);
 insert into specialization_doctor (pk_doctor, pk_specialization) values (10, 4);
 
 --schedules
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-13T08:00:00', '2025-10-13T17:00:00', 4);
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-14T08:00:00', '2025-10-14T17:00:00', 4);
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-15T14:00:00', '2025-10-15T21:00:00', 4);
+-- schedules
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-24T08:00:00', '2025-10-24T17:00:00', 4);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-25T08:00:00', '2025-10-25T17:00:00', 4);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-26T14:00:00', '2025-10-26T21:00:00', 4);
 
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-13T10:00:00', '2025-10-13T20:00:00', 5);
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-14T08:00:00', '2025-10-14T17:00:00', 5);
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-15T10:00:00', '2025-10-15T20:00:00', 5);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-24T10:00:00', '2025-10-24T20:00:00', 5);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-25T08:00:00', '2025-10-25T20:00:00', 5);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-26T10:00:00', '2025-10-26T20:00:00', 5);
 
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-13T09:00:00', '2025-10-13T21:00:00', 10);
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-14T09:00:00', '2025-10-14T21:00:00', 10);
-insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-15T09:00:00', '2025-10-15T21:00:00', 10);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-24T09:00:00', '2025-10-24T21:00:00', 10);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-25T09:00:00', '2025-10-25T21:00:00', 10);
+insert into schedule (started_at, finished_at, fk_doctor) values ('2025-10-26T09:00:00', '2025-10-26T21:00:00', 10);
 
 --services
 insert into service (name, duration, price, description) values ('Konsultacja psychiatryczna dorosłych (pierwsza wizyta)', 45, 350, 'Ocena stanu psychicznego z indywidualnym planem leczenia');

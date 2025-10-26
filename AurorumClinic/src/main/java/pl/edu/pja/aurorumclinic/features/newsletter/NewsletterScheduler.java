@@ -22,7 +22,7 @@ public class NewsletterScheduler {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Scheduled(cron = "0 0 19 1 * *")
-    @Transactional
+    @Transactional //TODO
     public void sendNewsletter() {
         List<Patient> patientsWhoSubscribed = patientRepository.findByNewsletterTrue();
         List<NewsletterMessage> approvedNewsletterMessages = newsletterMessageRepository.findBySentAtNullAndApprovedTrue();
