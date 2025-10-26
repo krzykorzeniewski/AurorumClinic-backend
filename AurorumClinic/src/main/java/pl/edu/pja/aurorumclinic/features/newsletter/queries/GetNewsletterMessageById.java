@@ -17,8 +17,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RequestMapping("/api/newsletter-messages")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-public class GetNewsletterMessageById { //zeschedulowane do wyslania, wyslane, wygenerowane niezatwierdzone,
-    //mozliwosc ponownego wygenerowania i zatwierdzenia
+public class GetNewsletterMessageById {
 
     private final NewsletterMessageRepository newsletterMessageRepository;
 
@@ -41,6 +40,7 @@ public class GetNewsletterMessageById { //zeschedulowane do wyslania, wyslane, w
                         .approved(newsletterMessFromDb.isApproved())
                         .reviewedAt(newsletterMessFromDb.getReviewedAt())
                         .sentAt(newsletterMessFromDb.getSentAt())
+                        .scheduledAt(newsletterMessFromDb.getScheduledAt())
                         .reviewer(newsletterMessFromDb.getReviewer() == null
                                 ? null : GetNewsletterMessageResponse.ReviewerDto.builder()
                                 .id(newsletterMessFromDb.getReviewer().getId())

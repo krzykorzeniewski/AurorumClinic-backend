@@ -40,6 +40,7 @@ public class GetAllNewsletterMessages {
                         .approved(newsletterMessage.isApproved())
                         .reviewedAt(newsletterMessage.getReviewedAt())
                         .sentAt(newsletterMessage.getSentAt())
+                        .scheduledAt(newsletterMessage.getScheduledAt())
                         .reviewer(newsletterMessage.getReviewer() == null
                                 ? null : GetNewsletterMessageResponse.ReviewerDto.builder()
                                 .id(newsletterMessage.getReviewer().getId())
