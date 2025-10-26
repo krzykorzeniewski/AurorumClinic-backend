@@ -7,12 +7,11 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.newsletter.NewsletterMessageRepository;
+import pl.edu.pja.aurorumclinic.features.newsletter.shared.NewsletterMessageRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.NewsletterMessage;
 
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/newsletter")
+@RequestMapping("/api/newsletter/messages")
 @PreAuthorize("hasRole('ADMIN')")
 public class CreateNewsletterMessage {
 

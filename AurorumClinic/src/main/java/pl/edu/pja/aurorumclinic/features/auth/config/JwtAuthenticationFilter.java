@@ -84,6 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 "/ws",
                 "/ws/info"
         );
+
         boolean isExcluded = excludedPaths.stream()
                 .anyMatch(pattern -> pathMatcher.match(pattern, path));
 

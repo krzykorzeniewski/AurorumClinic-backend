@@ -11,6 +11,7 @@ public record GetNewsletterMessageResponse(LocalDateTime createdAt,
                                     Boolean approved,
                                     LocalDateTime reviewedAt,
                                     LocalDateTime sentAt,
+                                    LocalDateTime scheduledAt,
                                     GetNewsletterMessageResponse.ReviewerDto reviewer) {
     @Builder
     public record ReviewerDto(Long id,
