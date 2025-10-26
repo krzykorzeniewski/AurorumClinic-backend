@@ -44,7 +44,7 @@ public class Appointment {
     @Column(name = "Notification_Sent", columnDefinition = "bit")
     private boolean notificationSent = false;
 
-    @OneToOne(mappedBy = "appointment")
+    @OneToOne(mappedBy = "appointment", cascade = CascadeType.REMOVE)
     @ToString.Exclude
     private Payment payment;
 
@@ -53,11 +53,11 @@ public class Appointment {
     @ToString.Exclude
     private Service service;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @ToString.Exclude
     private Survey survey;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "FK_Opinion")
     @ToString.Exclude
     private Opinion opinion;
