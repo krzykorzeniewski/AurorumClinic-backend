@@ -14,7 +14,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.NewsletterMessage;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 @RestController
-@RequestMapping("/api/newsletter-messages")
+@RequestMapping("/api/newsletter/messages")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class GetNewsletterMessageById {

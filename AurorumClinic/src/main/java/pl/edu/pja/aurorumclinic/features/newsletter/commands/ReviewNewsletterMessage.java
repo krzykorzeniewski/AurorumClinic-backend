@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/newsletter")
+@RequestMapping("/api/newsletter/messages")
 @PreAuthorize("hasRole('ADMIN')")
 public class ReviewNewsletterMessage {
 
