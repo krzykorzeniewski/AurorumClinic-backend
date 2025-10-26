@@ -2,16 +2,20 @@ package pl.edu.pja.aurorumclinic.features.newsletter.events;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class NewsletterListener {
+public class NewsletterEmailListener {
 
     private final EmailService emailService;
     private final SpringTemplateEngine springTemplateEngine;
@@ -26,7 +30,8 @@ public class NewsletterListener {
     public void handleNewsletterEmailMessageCreatedEvent(NewsletterEmailMessageCreated event) {
         String subject = event.newsletterEmailMessage().subject();
         String content = event.newsletterEmailMessage().content();
-        String email = event.newsletterEmailMessage().patient().getEmail();
+        List<String> emails = event.newsletterEmailMessage().subscribedPatients().stream().map(Patient::getEmail)
+                .toList();
 
         Context context = new Context();
         context.setVariable("subject", subject);
@@ -34,7 +39,10 @@ public class NewsletterListener {
         context.setVariable("unsubscribeLink", unsubscribeLink);
 
         String htmlPageAsText = springTemplateEngine.process("newsletter-message-email", context);
-        emailService.sendEmail(newsletterEmailAddress, email, subject, htmlPageAsText);
+
+        for (String email : emails) {
+            emailService.sendEmail(newsletterEmailAddress, email, subject, htmlPageAsText);
+        }
     }
 
 }

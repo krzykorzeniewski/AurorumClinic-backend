@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.newsletter.NewsletterMessageRepository;
+import pl.edu.pja.aurorumclinic.features.newsletter.shared.NewsletterMessageRepository;
 import pl.edu.pja.aurorumclinic.features.newsletter.queries.shared.GetNewsletterMessageResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.NewsletterMessage;
@@ -17,7 +17,8 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RequestMapping("/api/newsletter-messages")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-public class GetNewsletterMessageById {
+public class GetNewsletterMessageById { //zeschedulowane do wyslania, wyslane, wygenerowane niezatwierdzone,
+    //mozliwosc ponownego wygenerowania i zatwierdzenia
 
     private final NewsletterMessageRepository newsletterMessageRepository;
 
