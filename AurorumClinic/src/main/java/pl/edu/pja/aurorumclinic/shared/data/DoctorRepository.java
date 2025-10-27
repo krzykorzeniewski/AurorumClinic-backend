@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.features.chats.queries.GetChatsResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
+import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
@@ -36,4 +38,12 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
             join doctor d2 on d2.pk_doctor = u2.pk_user where u1.pk_user = :patientId
             """)
     List<GetChatsResponse> findAllWhoHadConversationWithPatientId(Long patientId);
+
+    @Query("""
+           select sch from Schedule sch
+           where sch.doctor.id = :doctorId and
+                      (sch.startedAt < :finishedAt
+                      and sch.finishedAt > :startedAt)
+           """)
+    Page<Schedule> findSchedulesByDoctorIdAndDateRange(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt, Pageable pageable);
 }

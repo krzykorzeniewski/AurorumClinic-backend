@@ -1,6 +1,8 @@
-package pl.edu.pja.aurorumclinic.features.schedules;
+package pl.edu.pja.aurorumclinic.shared.data;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
@@ -18,4 +20,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             """)
     boolean scheduleExistsInIntervalForDoctor(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId);
 
+    @Query("""
+           select s
+                from Schedule s
+                join fetch s.services
+                where s.doctor.id = :doctorId
+                  and s.startedAt < :finishedAt
+                  and s.finishedAt > :startedAt
+           """)
+    Page<Schedule> findAllByDoctorIdAndBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt, Pageable pageable);
 }
