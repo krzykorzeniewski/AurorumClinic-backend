@@ -78,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 "/api/auth/verify-email",
                 "/api/auth/verify-email-token",
                 "/api/appointments/guest",
-                "/api/doctors",
+                "/api/doctors/search",
                 "/api/doctors/recommended",
                 "/api/doctors/*/appointment-slots",
                 "/ws",

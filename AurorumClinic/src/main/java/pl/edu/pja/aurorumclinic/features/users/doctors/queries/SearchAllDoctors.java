@@ -25,13 +25,13 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-public class GetAllDoctorsByServiceId {
+public class SearchAllDoctors {
 
     private final DoctorRepository doctorRepository;
     private final ObjectStorageService objectStorageService;
 
     @PermitAll
-    @GetMapping("")
+    @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<GetDoctorResponse>>> searchAllDoctors(
                                     @RequestParam(required = false) String query,
                                     @RequestParam(required = true) Long serviceId,
@@ -51,7 +51,7 @@ public class GetAllDoctorsByServiceId {
                 .name(doctor.getName())
                 .surname(doctor.getSurname())
                 .specializations(doctor.getSpecializations().stream().map(
-                        specialization -> GetAllDoctorsByServiceId.GetDoctorResponse.SpecializationDto.builder()
+                        specialization -> SearchAllDoctors.GetDoctorResponse.SpecializationDto.builder()
                                 .id(specialization.getId())
                                 .name(specialization.getName())
                                 .build()
