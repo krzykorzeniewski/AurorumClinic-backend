@@ -2,7 +2,6 @@ package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -27,22 +26,20 @@ public class GetDoctorByIdSchedules {
     private final ScheduleRepository scheduleRepository;
 
     @GetMapping("/{id}/schedules")
-    public ResponseEntity<ApiResponse<Page<GetDoctorSchedulesResponse>>> getDoctorSchedules(
+    public ResponseEntity<ApiResponse<List<GetDoctorSchedulesResponse>>> getDoctorSchedules(
             @PathVariable("id") Long doctorId,
-            @PageableDefault Pageable pageable,
             @RequestParam LocalDateTime startedAt,
             @RequestParam LocalDateTime finishedAt) {
-            return ResponseEntity.ok(ApiResponse.success(handle(doctorId, startedAt, finishedAt, pageable)));
+            return ResponseEntity.ok(ApiResponse.success(handle(doctorId, startedAt, finishedAt)));
     }
 
-    private Page<GetDoctorSchedulesResponse> handle(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt,
-                                  Pageable pageable) {
+    private List<GetDoctorSchedulesResponse> handle(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt) {
         doctorRepository.findById(doctorId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        Page<Schedule> doctorsSchedules = scheduleRepository.findAllByDoctorIdAndBetween(
-                doctorId, startedAt, finishedAt, pageable);
-        return doctorsSchedules.map(schedule -> GetDoctorSchedulesResponse.builder()
+        List<Schedule> doctorsSchedules = scheduleRepository.findAllByDoctorIdAndBetween(
+                doctorId, startedAt, finishedAt);
+        return doctorsSchedules.stream().map(schedule -> GetDoctorSchedulesResponse.builder()
                 .id(schedule.getId())
                 .startedAt(schedule.getStartedAt())
                 .finishedAt(schedule.getFinishedAt())
@@ -52,7 +49,7 @@ public class GetDoctorByIdSchedules {
                                 .name(service.getName())
                                 .build()
                 ).toList())
-                .build());
+                .build()).toList();
     }
 
     @Builder

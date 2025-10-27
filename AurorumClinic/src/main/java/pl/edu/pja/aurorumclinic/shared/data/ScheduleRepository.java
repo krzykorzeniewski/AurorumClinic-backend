@@ -1,6 +1,5 @@
 package pl.edu.pja.aurorumclinic.shared.data;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
@@ -28,5 +28,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
                   and s.startedAt < :finishedAt
                   and s.finishedAt > :startedAt
            """)
-    Page<Schedule> findAllByDoctorIdAndBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt, Pageable pageable);
+    List<Schedule> findAllByDoctorIdAndBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
+
+    @Query("""
+            select s
+                from Schedule s
+                where s.startedAt >= :startedAt
+                  and s.finishedAt <= :finishedAt
+            """)
+    Page<Schedule> findAllSchedulesBetweenDates(LocalDateTime startedAt, LocalDateTime finishedAt, Pageable pageable);
 }
