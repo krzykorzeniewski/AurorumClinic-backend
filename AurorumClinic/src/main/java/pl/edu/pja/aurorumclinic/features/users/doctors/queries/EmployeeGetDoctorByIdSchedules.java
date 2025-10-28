@@ -2,8 +2,6 @@ package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +15,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/doctors")
+@RequestMapping("/api/doctors") //todo endpoint for logged in doctor
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EMPLOYEE')")
-public class GetDoctorByIdSchedules {
+public class EmployeeGetDoctorByIdSchedules {
 
     private final DoctorRepository doctorRepository;
     private final ScheduleRepository scheduleRepository;
