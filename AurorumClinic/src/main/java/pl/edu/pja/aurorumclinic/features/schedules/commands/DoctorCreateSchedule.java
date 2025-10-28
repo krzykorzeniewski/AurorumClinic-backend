@@ -5,16 +5,17 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.features.schedules.ScheduleValidator;
-import pl.edu.pja.aurorumclinic.shared.data.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
+import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
+import pl.edu.pja.aurorumclinic.shared.data.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
@@ -29,31 +30,32 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('DOCTOR', 'EMPLOYEE')")
-public class CreateSchedule {
+@PreAuthorize("hasRole('DOCTOR')")
+public class DoctorCreateSchedule {
 
     private final ScheduleRepository scheduleRepository;
     private final DoctorRepository doctorRepository;
     private final ServiceRepository serviceRepository;
     private final ScheduleValidator scheduleValidator;
 
-    @PostMapping("")
+    @PostMapping("/me")
     @Transactional
-    public ResponseEntity<ApiResponse<?>> createSchedule(@RequestBody @Valid CreateScheduleRequest createScheduleRequest) {
-        handle(createScheduleRequest);
+    public ResponseEntity<ApiResponse<?>> createSchedule(@RequestBody @Valid CreateScheduleRequest createScheduleRequest,
+                                                         @AuthenticationPrincipal Long doctorId) {
+        handle(createScheduleRequest, doctorId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    private void handle(CreateScheduleRequest request) {
+    private void handle(CreateScheduleRequest request, Long doctorId) {
         List<Service> servicesFromDb = serviceRepository.findAllById(request.serviceIds);
         if (servicesFromDb.size() > request.serviceIds.size()) {
             throw new ApiException("Some service ids are not found", "serviceIds");
         }
-        Doctor doctorFromDb = doctorRepository.findById(request.doctorId()).orElseThrow(
+        Doctor doctorFromDb = doctorRepository.findById(doctorId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
 
-        scheduleValidator.validateSchedule(request, doctorFromDb, servicesFromDb);
+        scheduleValidator.validateSchedule(request.startedAt, request.finishedAt, doctorFromDb, servicesFromDb);
 
         Schedule schedule = Schedule.builder()
                 .doctor(doctorFromDb)
@@ -66,7 +68,6 @@ public class CreateSchedule {
 
     public record CreateScheduleRequest(@NotNull LocalDateTime startedAt,
                                         @NotNull LocalDateTime finishedAt,
-                                        @NotNull Long doctorId,
                                         @NotNull Set<Long> serviceIds) {
     }
 
