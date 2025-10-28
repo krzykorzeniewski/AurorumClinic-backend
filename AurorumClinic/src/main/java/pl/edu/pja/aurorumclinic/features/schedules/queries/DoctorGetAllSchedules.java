@@ -1,11 +1,14 @@
-package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
+package pl.edu.pja.aurorumclinic.features.schedules.queries;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
@@ -16,15 +19,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/doctors")
+@RequestMapping("/api/schedules")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('DOCTOR')")
-public class DocGetDoctorByIdSchedules {
+public class DoctorGetAllSchedules {
 
     private final DoctorRepository doctorRepository;
     private final ScheduleRepository scheduleRepository;
 
-    @GetMapping("/me/schedules")
+    @GetMapping("/me")
     public ResponseEntity<ApiResponse<List<GetDoctorSchedulesResponse>>> getDoctorSchedules(
             @RequestParam LocalDateTime startedAt,
             @RequestParam LocalDateTime finishedAt,
@@ -43,7 +46,7 @@ public class DocGetDoctorByIdSchedules {
                 .startedAt(schedule.getStartedAt())
                 .finishedAt(schedule.getFinishedAt())
                 .services(schedule.getServices().stream().map(
-                        service -> DocGetDoctorByIdSchedules.GetDoctorSchedulesResponse.ServiceDto.builder()
+                        service -> GetDoctorSchedulesResponse.ServiceDto.builder()
                                 .id(service.getId())
                                 .name(service.getName())
                                 .build()
@@ -63,5 +66,4 @@ public class DocGetDoctorByIdSchedules {
 
         }
     }
-
 }

@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EMPLOYEE')")
-public class GetAllSchedules {
+public class EmployeeGetAllSchedules {
 
     private final ScheduleRepository scheduleRepository;
     private final ObjectStorageService objectStorageService;
