@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/doctors") //todo endpoint for logged in doctor
+@RequestMapping("/api/doctors")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EMPLOYEE')")
 public class EmployeeGetDoctorByIdSchedules {

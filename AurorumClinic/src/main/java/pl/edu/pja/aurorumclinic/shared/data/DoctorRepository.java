@@ -39,11 +39,4 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
             """)
     List<GetChatsResponse> findAllWhoHadConversationWithPatientId(Long patientId);
 
-    @Query("""
-           select sch from Schedule sch
-           where sch.doctor.id = :doctorId and
-                      (sch.startedAt < :finishedAt
-                      and sch.finishedAt > :startedAt)
-           """)
-    Page<Schedule> findSchedulesByDoctorIdAndDateRange(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt, Pageable pageable);
 }
