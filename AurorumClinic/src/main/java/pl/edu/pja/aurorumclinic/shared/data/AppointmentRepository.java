@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.features.statistics.DoctorAppointmentStatsResponse;
+import pl.edu.pja.aurorumclinic.features.statistics.GetAppointmentStatsResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 
@@ -65,10 +66,35 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("""
             select new pl.edu.pja.aurorumclinic.features.statistics.DoctorAppointmentStatsResponse(
-                        count(a1.id), count (a2.id))
+                        count(a1.id), sum(case when a1.status = 'FINISHED' then 1 else 0 end))
             from Appointment a1
-            left join Appointment a2 on (a1.id = a2.id) and (a2.status = 'FINISHED')
             where a1.doctor.id = :doctorId and (a1.startedAt < :finishedAt and a1.finishedAt > :startedAt)
             """)
     DoctorAppointmentStatsResponse getDoctorAppointmentStatistics(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
+
+
+    @Query("""
+            select new pl.edu.pja.aurorumclinic.features.statistics.GetAppointmentStatsResponse(
+            count(a.id),
+            sum(case when a.status = 'FINISHED' then 1 else 0 end),
+            avg(case when a.status = 'FINISHED' then a.service.duration else null end),
+            avg(case when a.status = 'FINISHED' then a.opinion.rating else null end)
+            ) from Appointment a
+            left join a.opinion
+            left join a.service
+            where (a.startedAt < :finishedAt and a.finishedAt > :startedAt)
+            """)
+    GetAppointmentStatsResponse getAllAppointmentStatisticsBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
+
+    @Query("""
+    select new pl.edu.pja.aurorumclinic.features.statistics.GetAppointmentStatsResponse(
+        count(a.id),
+        sum(case when a.status = 'FINISHED' then 1 else 0 end),
+        avg(case when a.status = 'FINISHED' then a.service.duration else null end),
+        avg(case when a.status = 'FINISHED' then a.opinion.rating else null end)
+    ) from Appointment a
+    left join a.opinion
+    left join a.service
+    """)
+    GetAppointmentStatsResponse getAllAppointmentStatistics();
 }
