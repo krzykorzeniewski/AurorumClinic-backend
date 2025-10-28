@@ -48,7 +48,10 @@ public class DoctorGetAppointmentStats {
         return DoctorAppointmentStatsResponse.builder()
                 .totalScheduled((Long) doctorTotalAppointmentStats.get(0).get("scheduled"))
                 .totalFinished((Long) doctorTotalAppointmentStats.get(0).get("finished"))
-                .services(doctorAppointmentsStatsByService.stream().map(tuple -> DoctorAppointmentStatsResponse.ServiceAppointmentStatsDto.builder()
+                .avgDuration((Double) doctorTotalAppointmentStats.get(0).get("avgDuration"))
+                .avgRating((Double) doctorTotalAppointmentStats.get(0).get("avgRating"))
+                .services(doctorAppointmentsStatsByService.stream().map(tuple ->
+                        DoctorAppointmentStatsResponse.ServiceAppointmentStatsDto.builder()
                         .scheduled((Long) tuple.get("scheduled"))
                         .finished((Long) tuple.get("finished"))
                         .avgDuration((Double) tuple.get("avgDuration"))
@@ -63,8 +66,10 @@ public class DoctorGetAppointmentStats {
     }
 
     @Builder
-    record DoctorAppointmentStatsResponse(Long totalScheduled, //TODO dodac total avgDuration i totalAvgRating i totalHours i filtering, zeby pobrac tylko te 1 4 albo wszytstkie, tak samo jak w employee
+    record DoctorAppointmentStatsResponse(Long totalScheduled,
                                           Long totalFinished,
+                                          Double avgDuration,
+                                          Double avgRating,
                                           List<ServiceAppointmentStatsDto> services) {
         @Builder
         record ServiceAppointmentStatsDto(Long scheduled,

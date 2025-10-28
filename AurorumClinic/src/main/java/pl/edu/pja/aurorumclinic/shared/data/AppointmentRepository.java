@@ -63,8 +63,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Page<Appointment> findByService_Schedules_Id(Pageable pageable, Long scheduleId);
 
     @Query("""
-            select count(a1.id) as scheduled, sum(case when a1.status = 'FINISHED' then 1 else 0 end) as finished
+            select count(a1.id) as scheduled,
+            sum(case when a1.status = 'FINISHED' then 1 else 0 end) as finished,
+            avg (case when a1.status = 'FINISHED' then a1.service.duration else null end) as avgDuration,
+            avg (case when a1.status = 'FINISHED' then a1.opinion.rating else null end) as avgRating
             from Appointment a1
+                    left join a1.opinion
+                    left join a1.service
             where a1.doctor.id = :doctorId and (a1.startedAt < :finishedAt and a1.finishedAt > :startedAt)
             """)
     List<Tuple> getDoctorAppointmentStatsBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
@@ -87,19 +92,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("""
             select
-                count(a.id),
-                sum(case when a.status = 'FINISHED' then 1 else 0 end),
-                avg(case when a.status = 'FINISHED' then a.service.duration else null end),
-                avg(case when a.status = 'FINISHED' then a.opinion.rating else null end)
-                 from Appointment a
-                    left join a.opinion
-                    left join a.service
-            where (a.startedAt < :finishedAt and a.finishedAt > :startedAt)
-            """)
-    List<Tuple> getAllAppointmentStatisticsPerDoctorBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
-
-    @Query("""
-            select
                 count(a.id) as scheduled,
                 sum(case when a.status = 'FINISHED' then 1 else 0 end) as finished,
                 avg(case when a.status = 'FINISHED' then a.service.duration else null end) as avgDuration,
@@ -109,6 +101,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             left join a.service
             where (a.startedAt < :finishedAt and a.finishedAt > :startedAt)
     """)
-    List<Tuple> getAllAppointmentStatisticsBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
+    List<Tuple> getAllAppointmentStatsBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
 
 }
