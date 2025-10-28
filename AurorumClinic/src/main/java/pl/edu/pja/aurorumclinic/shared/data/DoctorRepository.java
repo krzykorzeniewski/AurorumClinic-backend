@@ -36,4 +36,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
             join doctor d2 on d2.pk_doctor = u2.pk_user where u1.pk_user = :patientId
             """)
     List<GetChatsResponse> findAllWhoHadConversationWithPatientId(Long patientId);
+
 }
