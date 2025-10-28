@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.statistics;
 
+import jakarta.persistence.Tuple;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/stats/appointments")
@@ -39,8 +41,43 @@ public class DoctorGetAppointmentStats {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
 
-        return appointmentRepository.getDoctorAppointmentStatistics(doctorId, startedAt,
-                finishedAt);
+        List<Tuple> doctorTotalAppointmentStats = appointmentRepository
+                .getDoctorAppointmentStatsBetween(doctorId, startedAt, finishedAt);
+        List<Tuple> doctorAppointmentsStatsByService = appointmentRepository
+                .getDoctorAppointmentStatsPerServiceBetween(doctorId, startedAt, finishedAt);
+        return DoctorAppointmentStatsResponse.builder()
+                .totalScheduled((Long) doctorTotalAppointmentStats.get(0).get("scheduled"))
+                .totalFinished((Long) doctorTotalAppointmentStats.get(0).get("finished"))
+                .services(doctorAppointmentsStatsByService.stream().map(tuple -> DoctorAppointmentStatsResponse.ServiceAppointmentStatsDto.builder()
+                        .scheduled((Long) tuple.get("scheduled"))
+                        .finished((Long) tuple.get("finished"))
+                        .avgDuration((Double) tuple.get("avgDuration"))
+                        .avgRating((Double) tuple.get("avgRating"))
+                        .service(DoctorAppointmentStatsResponse.ServiceAppointmentStatsDto.ServiceDto.builder()
+                                .id((Long) tuple.get("servId"))
+                                .name((String) tuple.get("servName"))
+                                .build())
+
+                        .build()).toList())
+                .build();
+    }
+
+    @Builder
+    record DoctorAppointmentStatsResponse(Long totalScheduled, //TODO dodac total avgDuration i totalAvgRating i totalHours i filtering, zeby pobrac tylko te 1 4 albo wszytstkie, tak samo jak w employee
+                                          Long totalFinished,
+                                          List<ServiceAppointmentStatsDto> services) {
+        @Builder
+        record ServiceAppointmentStatsDto(Long scheduled,
+                                          Long finished,
+                                          Double avgDuration,
+                                          Double avgRating,
+                                          ServiceDto service) {
+            @Builder
+            record ServiceDto(Long id,
+                              String name) {
+
+            }
+        }
     }
 
 
