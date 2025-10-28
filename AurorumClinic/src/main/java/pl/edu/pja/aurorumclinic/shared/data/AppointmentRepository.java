@@ -3,7 +3,9 @@ package pl.edu.pja.aurorumclinic.shared.data;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
+import pl.edu.pja.aurorumclinic.features.statistics.DoctorAppointmentStatsResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 
@@ -60,4 +62,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     boolean existsBetweenUsers(Long participantId, Long secParticipantId);
 
     Page<Appointment> findByService_Schedules_Id(Pageable pageable, Long scheduleId);
+
+    @Query("""
+            select new pl.edu.pja.aurorumclinic.features.statistics.DoctorAppointmentStatsResponse(
+                        count(a1.id), count (a2.id))
+            from Appointment a1
+            left join Appointment a2 on (a1.id = a2.id) and (a2.status = 'FINISHED')
+            where a1.doctor.id = :doctorId and (a1.startedAt < :finishedAt and a1.finishedAt > :startedAt)
+            """)
+    DoctorAppointmentStatsResponse getDoctorAppointmentStatistics(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
 }
