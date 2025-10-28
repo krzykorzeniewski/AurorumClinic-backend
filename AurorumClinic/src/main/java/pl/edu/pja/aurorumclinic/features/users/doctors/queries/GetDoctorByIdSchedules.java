@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('EMPLOYEE')")
-public class EmployeeGetDoctorByIdSchedules {
+public class GetDoctorByIdSchedules {
 
     private final DoctorRepository doctorRepository;
     private final ScheduleRepository scheduleRepository;
