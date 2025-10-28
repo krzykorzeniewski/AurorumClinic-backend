@@ -25,7 +25,7 @@ public class DoctorDeleteSchedule {
 
     private final ScheduleRepository scheduleRepository;
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/me/{id}")
     @Transactional
     public ResponseEntity<ApiResponse<?>> updateSchedule(@PathVariable("id") Long scheduleId,
                                                          @AuthenticationPrincipal Long doctorId) {
