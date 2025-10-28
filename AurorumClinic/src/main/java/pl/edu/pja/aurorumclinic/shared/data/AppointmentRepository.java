@@ -58,4 +58,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            end
            """)
     boolean existsBetweenUsers(Long participantId, Long secParticipantId);
+
+    Page<Appointment> findByService_Schedules_Id(Pageable pageable, Long scheduleId);
 }
