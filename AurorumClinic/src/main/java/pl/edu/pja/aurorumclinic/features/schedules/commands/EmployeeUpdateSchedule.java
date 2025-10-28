@@ -24,22 +24,22 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('EMPLOYEE', 'DOCTOR')")
-public class UpdateSchedule {
+@PreAuthorize("hasRole('EMPLOYEE')")
+public class EmployeeUpdateSchedule {
 
     private final ScheduleRepository scheduleRepository;
     private final ScheduleValidator scheduleValidator;
     private final ServiceRepository serviceRepository;
 
-    @PutMapping("/{id}") //todo reschedule all appointments also within this schedule
+    @PutMapping("/{id}") //todo reschedule all appointments within this schedule, same for delete
     @Transactional
     public ResponseEntity<ApiResponse<?>> updateSchedule(@PathVariable("id") Long scheduleId,
-                                                         @RequestBody @Valid UpdateScheduleRequest request) {
+                                                         @RequestBody @Valid EmpUpdateScheduleRequest request) {
         handle(scheduleId, request);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    private void handle(Long scheduleId, UpdateScheduleRequest request) {
+    private void handle(Long scheduleId, EmpUpdateScheduleRequest request) {
         Schedule scheduleFromDb = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
@@ -55,9 +55,9 @@ public class UpdateSchedule {
         scheduleFromDb.setServices(new HashSet<>(servicesFromDb));
     }
 
-    record UpdateScheduleRequest(@NotNull LocalDateTime startedAt,
-                                 @NotNull LocalDateTime finishedAt,
-                                 @NotNull Set<Long> serviceIds) {
+    record EmpUpdateScheduleRequest(@NotNull LocalDateTime startedAt,
+                                    @NotNull LocalDateTime finishedAt,
+                                    @NotNull Set<Long> serviceIds) {
     }
 
 }

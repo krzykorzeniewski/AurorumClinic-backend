@@ -7,12 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('EMPLOYEE', 'DOCTOR')")
-public class DeleteSchedule {
+@PreAuthorize("hasRole('EMPLOYEE')")
+public class EmployeeDeleteSchedule {
 
     private final ScheduleRepository scheduleRepository;
 
@@ -24,7 +26,10 @@ public class DeleteSchedule {
     }
 
     private void handle(Long scheduleId) {
-
+        Schedule scheduleFromDb = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        scheduleRepository.delete(scheduleFromDb);
     }
 
 }
