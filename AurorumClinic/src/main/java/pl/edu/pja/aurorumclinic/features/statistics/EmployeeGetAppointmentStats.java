@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.statistics;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Tuple;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/stats/appointments")
@@ -32,58 +34,70 @@ public class EmployeeGetAppointmentStats {
     @GetMapping
     public ResponseEntity<ApiResponse<AllAppointmentStatsResponse>> getAppointmentStatistics(
             @RequestParam LocalDateTime startedAt,
-            @RequestParam LocalDateTime finishedAt
+            @RequestParam LocalDateTime finishedAt,
+            @RequestParam(required = false) String fetch
             ) {
-        return ResponseEntity.ok(ApiResponse.success(handle(startedAt, finishedAt)));
+        return ResponseEntity.ok(ApiResponse.success(handle(startedAt, finishedAt, fetch)));
     }
 
-    private AllAppointmentStatsResponse handle(LocalDateTime startedAt, LocalDateTime finishedAt) {
+    private AllAppointmentStatsResponse handle(LocalDateTime startedAt, LocalDateTime finishedAt, String fetch) {
         List<Tuple> allAppointmentStatsBetween = appointmentRepository
                 .getAllAppointmentStatsBetween(startedAt, finishedAt);
-        AllAppointmentStatsResponse.AllAppointmentStatsResponseBuilder allAppointmentStatsResponseBuilder = AllAppointmentStatsResponse.builder()
-                .totalScheduled((Long) allAppointmentStatsBetween.get(0).get("scheduled"))
-                .totalFinished((Long) allAppointmentStatsBetween.get(0).get("finished"))
-                .avgDuration((Double) allAppointmentStatsBetween.get(0).get("avgDuration"))
-                .avgRating((Double) allAppointmentStatsBetween.get(0).get("avgRating"))
-                .doctors(new ArrayList<>());
-        List<Doctor> doctorsFromDb = doctorRepository.findAll();
-        for (Doctor doctor : doctorsFromDb) {
-            List<Tuple> doctorTotalAppointmentStats = appointmentRepository
-                    .getDoctorAppointmentStatsBetween(doctor.getId(), startedAt, finishedAt);
-            List<Tuple> doctorAppointmentsStatsByService = appointmentRepository
-                    .getDoctorAppointmentStatsPerServiceBetween(doctor.getId(), startedAt, finishedAt);
-            allAppointmentStatsResponseBuilder.doctors.add(AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto
-                    .builder()
-                            .doctorId(doctor.getId())
-                            .name(doctor.getName())
-                            .surname(doctor.getSurname())
-                            .profilePicture(objectStorageService.generateUrl(doctor.getProfilePicture()))
-                            .specializations(doctor.getSpecializations().stream().map(specialization -> AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto.SpecializationDto.builder()
-                                    .id(specialization.getId())
-                                    .name(specialization.getName())
-                                    .build()).toList())
-                    .total(List.of(AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto.DoctorAppointmentStats.builder()
-                            .totalScheduled((Long) doctorTotalAppointmentStats.get(0).get("scheduled"))
-                            .totalFinished((Long) doctorTotalAppointmentStats.get(0).get("finished"))
-                            .avgDuration((Double) doctorTotalAppointmentStats.get(0).get("avgDuration"))
-                            .avgRating((Double) doctorTotalAppointmentStats.get(0).get("avgRating"))
-                            .services(doctorAppointmentsStatsByService.stream().map(tuple ->
-                                            AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto.DoctorAppointmentStats.ServiceAppointmentStatsDto.builder()
-                                                    .scheduled((Long) tuple.get("scheduled"))
-                                                    .finished((Long) tuple.get("finished"))
-                                                    .avgDuration((Double) tuple.get("avgDuration"))
-                                                    .avgRating((Double) tuple.get("avgRating"))
-                                                    .service(AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto
-                                                            .DoctorAppointmentStats.ServiceAppointmentStatsDto.ServiceDto.builder()
-                                                            .id((Long) tuple.get("servId"))
-                                                            .name((String) tuple.get("servName"))
-                                                            .build())
-                                                    .build())
-                                    .toList())
-                            .build()))
-                    .build());
+
+        if (Objects.equals(fetch, "all")) {
+            AllAppointmentStatsResponse.AllAppointmentStatsResponseBuilder allAppointmentStatsResponseBuilder = AllAppointmentStatsResponse.builder()
+                    .totalScheduled((Long) allAppointmentStatsBetween.get(0).get("scheduled"))
+                    .totalFinished((Long) allAppointmentStatsBetween.get(0).get("finished"))
+                    .avgDuration((Double) allAppointmentStatsBetween.get(0).get("avgDuration"))
+                    .avgRating((Double) allAppointmentStatsBetween.get(0).get("avgRating"))
+                    .doctors(new ArrayList<>());
+            List<Doctor> doctorsFromDb = doctorRepository.findAll();
+            for (Doctor doctor : doctorsFromDb) {
+                List<Tuple> doctorTotalAppointmentStats = appointmentRepository
+                        .getDoctorAppointmentStatsBetween(doctor.getId(), startedAt, finishedAt);
+                List<Tuple> doctorAppointmentsStatsByService = appointmentRepository
+                        .getDoctorAppointmentStatsPerServiceBetween(doctor.getId(), startedAt, finishedAt);
+                allAppointmentStatsResponseBuilder.doctors.add(AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto
+                        .builder()
+                        .doctorId(doctor.getId())
+                        .name(doctor.getName())
+                        .surname(doctor.getSurname())
+                        .profilePicture(objectStorageService.generateUrl(doctor.getProfilePicture()))
+                        .specializations(doctor.getSpecializations().stream().map(specialization -> AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto.SpecializationDto.builder()
+                                .id(specialization.getId())
+                                .name(specialization.getName())
+                                .build()).toList())
+                        .total(List.of(AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto.DoctorAppointmentStats.builder()
+                                .totalScheduled((Long) doctorTotalAppointmentStats.get(0).get("scheduled"))
+                                .totalFinished((Long) doctorTotalAppointmentStats.get(0).get("finished"))
+                                .avgDuration((Double) doctorTotalAppointmentStats.get(0).get("avgDuration"))
+                                .avgRating((Double) doctorTotalAppointmentStats.get(0).get("avgRating"))
+                                .services(doctorAppointmentsStatsByService.stream().map(tuple ->
+                                                AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto.DoctorAppointmentStats.ServiceAppointmentStatsDto.builder()
+                                                        .scheduled((Long) tuple.get("scheduled"))
+                                                        .finished((Long) tuple.get("finished"))
+                                                        .avgDuration((Double) tuple.get("avgDuration"))
+                                                        .avgRating((Double) tuple.get("avgRating"))
+                                                        .service(AllAppointmentStatsResponse.AppointmentStatsPerDoctorDto
+                                                                .DoctorAppointmentStats.ServiceAppointmentStatsDto.ServiceDto.builder()
+                                                                .id((Long) tuple.get("servId"))
+                                                                .name((String) tuple.get("servName"))
+                                                                .build())
+                                                        .build())
+                                        .toList())
+                                .build()))
+                        .build());
+            }
+            return allAppointmentStatsResponseBuilder.build();
+        } else {
+            return AllAppointmentStatsResponse.builder()
+                    .totalScheduled((Long) allAppointmentStatsBetween.get(0).get("scheduled"))
+                    .totalFinished((Long) allAppointmentStatsBetween.get(0).get("finished"))
+                    .avgDuration((Double) allAppointmentStatsBetween.get(0).get("avgDuration"))
+                    .avgRating((Double) allAppointmentStatsBetween.get(0).get("avgRating"))
+                    .doctors(null)
+                    .build();
         }
-        return allAppointmentStatsResponseBuilder.build();
     }
 
     @Builder
@@ -91,7 +105,7 @@ public class EmployeeGetAppointmentStats {
                                        Long totalFinished,
                                        Double avgDuration,
                                        Double avgRating,
-                                       List<AppointmentStatsPerDoctorDto> doctors) {
+                                       @JsonInclude(JsonInclude.Include.NON_NULL) List<AppointmentStatsPerDoctorDto> doctors) {
         @Builder
         record AppointmentStatsPerDoctorDto(Long doctorId,
                                             String name,
