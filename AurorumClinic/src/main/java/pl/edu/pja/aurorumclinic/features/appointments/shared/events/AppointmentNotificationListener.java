@@ -146,7 +146,6 @@ public class AppointmentNotificationListener {
     @Async
     @EventListener
     public void handleSurveyCreatedEvent(SurveyCreatedEvent event) {
-        System.out.println("IM INVOKED");
         Survey survey = event.survey();
         Appointment appointment = survey.getAppointment();
         Doctor doctor = survey.getAppointment().getDoctor();

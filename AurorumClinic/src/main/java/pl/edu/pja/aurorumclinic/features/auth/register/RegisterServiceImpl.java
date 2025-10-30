@@ -13,11 +13,9 @@ import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificatio
 import pl.edu.pja.aurorumclinic.shared.PasswordValidator;
 import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
-import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
-import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
-import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
-import pl.edu.pja.aurorumclinic.shared.data.models.User;
+import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -82,7 +80,8 @@ public class RegisterServiceImpl implements RegisterService{
                 .phoneNumber(registerPatientRequest.phoneNumber())
                 .build();
         userRepository.save(patient);
-        applicationEventPublisher.publishEvent(new PatientRegisteredEvent(patient));
+        Token emailVerificationtoken = tokenService.createToken(patient, TokenName.EMAIL_VERIFICATION, 15);
+        applicationEventPublisher.publishEvent(new PatientRegisteredEvent(patient, emailVerificationtoken));
     }
 
     @Override

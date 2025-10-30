@@ -79,7 +79,7 @@ public class AuthEventListener {
         Context context = new Context();
         context.setVariable("password", event.password());
         String htmlPageAsText = springTemplateEngine.process("employee-registered-email", context);
-        System.out.println("creating employee");
+
         emailService.sendEmail(
                 noreplyEmailAddres,
                 employee.getEmail(),
@@ -88,13 +88,12 @@ public class AuthEventListener {
         );
     }
 
-    @TransactionalEventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Async
+    @TransactionalEventListener
     public void handleUserRegisteredEvent(PatientRegisteredEvent event) {
         User user = event.user();
-        Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
-        String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue();
+        Token emailVerificationToken = event.token();
+        String verificationLink = mailVerificationLink + emailVerificationToken.getRawValue();
 
         Context context = new Context();
         context.setVariable("verificationLink", verificationLink);
