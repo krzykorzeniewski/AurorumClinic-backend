@@ -10,6 +10,7 @@ import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEv
 import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.shared.PasswordValidator;
 import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
@@ -34,6 +35,7 @@ public class RegisterServiceImpl implements RegisterService{
     private final TokenService tokenService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final SpecializationRepository specializationRepository;
+    private final PasswordValidator passwordValidator;
 
     @Override
     @Transactional
@@ -67,6 +69,7 @@ public class RegisterServiceImpl implements RegisterService{
     @Override
     @Transactional
     public void registerPatient(RegisterPatientRequest registerPatientRequest) {
+        passwordValidator.validatePassword(registerPatientRequest.password());
         Patient patient = Patient.builder()
                 .name(registerPatientRequest.name())
                 .surname(registerPatientRequest.surname())
