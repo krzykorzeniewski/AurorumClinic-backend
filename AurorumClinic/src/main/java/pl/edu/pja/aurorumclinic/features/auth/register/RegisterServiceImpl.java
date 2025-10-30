@@ -9,7 +9,7 @@ import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.EmailVerificationTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.PasswordValidator;
 import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
@@ -104,7 +104,7 @@ public class RegisterServiceImpl implements RegisterService{
     }
 
     @Override
-    public void sendVerifyEmail(VerifyEmailTokenRequest verifyEmailTokenRequest) {
+    public void createVerifyEmailToken(VerifyEmailTokenRequest verifyEmailTokenRequest) {
         User userFromDb = userRepository.findByEmail(verifyEmailTokenRequest.email());
         if (userFromDb == null) {
             throw new ApiNotFoundException("Email not found", "email");
@@ -112,7 +112,8 @@ public class RegisterServiceImpl implements RegisterService{
         if (userFromDb.isEmailVerified()) {
             throw new ApiException("Email is already verified", "email");
         }
-        applicationEventPublisher.publishEvent(new AccountVerificationRequestedEvent(userFromDb));
+        Token emailVerificationtoken = tokenService.createToken(userFromDb, TokenName.EMAIL_VERIFICATION, 15);
+        applicationEventPublisher.publishEvent(new EmailVerificationTokenCreatedEvent(userFromDb, emailVerificationtoken));
     }
 
     @Override

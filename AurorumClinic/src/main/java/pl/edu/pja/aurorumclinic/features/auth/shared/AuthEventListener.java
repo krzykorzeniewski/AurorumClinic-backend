@@ -5,23 +5,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaTokenCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.EmailVerificationTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.reset_password.events.ResetPasswordRequestedEvent;
-import pl.edu.pja.aurorumclinic.features.auth.verify_phone_number.events.PhoneNumberVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.reset_password.events.ResetPasswordTokenCreatedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.verify_phone_number.events.PhoneNumberVerificationTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
-import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
@@ -49,7 +45,7 @@ public class AuthEventListener {
 
     @Async
     @EventListener
-    public void handleMfaLoginAttemptedEvent(MfaTokenCreatedEvent event) {
+    public void onMfaTokenCreatedEvent(MfaTokenCreatedEvent event) {
         Token token = event.token();
         smsService.sendSms("+48" + event.user().getPhoneNumber(), fromPhoneNumber,
                 "Kod logowania do Aurorum Clinic : " + token.getRawValue());
@@ -57,7 +53,7 @@ public class AuthEventListener {
 
     @Async
     @TransactionalEventListener
-    public void handleDoctorRegisteredEvent(DoctorRegisteredEvent event) {
+    public void onDoctorRegisteredEvent(DoctorRegisteredEvent event) {
         Doctor doctor = event.doctor();
 
         Context context = new Context();
@@ -73,7 +69,7 @@ public class AuthEventListener {
 
     @Async
     @TransactionalEventListener
-    public void handleEmployeeRegisteredEvent(EmployeeRegisteredEvent event) {
+    public void onEmployeeRegisteredEvent(EmployeeRegisteredEvent event) {
         User employee = event.user();
 
         Context context = new Context();
@@ -90,7 +86,7 @@ public class AuthEventListener {
 
     @Async
     @TransactionalEventListener
-    public void handleUserRegisteredEvent(PatientRegisteredEvent event) {
+    public void onPatientRegisteredEvent(PatientRegisteredEvent event) {
         User user = event.user();
         Token emailVerificationToken = event.token();
         String verificationLink = mailVerificationLink + emailVerificationToken.getRawValue();
@@ -107,12 +103,11 @@ public class AuthEventListener {
         );
     }
 
-    @EventListener
-    @Transactional
     @Async
-    public void handleAccountVerifyMessageRequestedEvent(AccountVerificationRequestedEvent event) {
+    @EventListener
+    public void onEmailVerificationTokenCreatedEvent(EmailVerificationTokenCreatedEvent event) {
         User user = event.user();
-        Token emailVerificationtoken = tokenService.createToken(user, TokenName.EMAIL_VERIFICATION, 15);
+        Token emailVerificationtoken = event.token();
         String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue();
 
         Context context = new Context();
@@ -127,12 +122,11 @@ public class AuthEventListener {
         );
     }
 
-    @EventListener
-    @Transactional
     @Async
-    public void handleResetPasswordMessageRequestEvent(ResetPasswordRequestedEvent event) {
+    @EventListener
+    public void onResetPasswordTokenCreatedEvent(ResetPasswordTokenCreatedEvent event) {
         User user = event.user();
-        Token token = tokenService.createToken(user, TokenName.PASSWORD_RESET, 15);
+        Token token = event.token();
         String resetLink = resetPasswordLink + token.getRawValue();
 
         Context context = new Context();
@@ -142,13 +136,11 @@ public class AuthEventListener {
         emailService.sendEmail(noreplyEmailAddres, user.getEmail(), "Ustaw nowe hasło", htmlAsText);
     }
 
-    @EventListener
-    @Transactional
     @Async
-    public void handleVerifyPhoneNumberRequestedEvent(PhoneNumberVerificationRequestedEvent event) {
+    @EventListener
+    public void onPhoneNumVerificationTokenCreatedEvent(PhoneNumberVerificationTokenCreatedEvent event) {
         User user = event.user();
-        Token token = tokenService.createOtpToken(user, TokenName.PHONE_NUMBER_VERIFICATION, 10);
-        System.err.println(token.getRawValue());
+        Token token = event.token();
         smsService.sendSms("+48"+user.getPhoneNumber(), fromPhoneNumber,
                 "Kod weryfikacyjny numeru telefonu w Aurorum Clinic: " + token.getRawValue());
     }

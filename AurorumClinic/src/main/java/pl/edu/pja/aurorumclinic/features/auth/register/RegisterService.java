@@ -7,6 +7,6 @@ public interface RegisterService {
     void registerDoctor(RegisterDoctorRequest registerDoctorRequest);
     void registerPatient(RegisterPatientRequest registerPatientRequest);
     void registerEmployee(RegisterEmployeeRequest registerEmployeeRequest);
-    void sendVerifyEmail( VerifyEmailTokenRequest verifyEmailTokenRequest);
+    void createVerifyEmailToken(VerifyEmailTokenRequest verifyEmailTokenRequest);
     void verifyEmail(VerifyEmailRequest verifyEmailRequest);
 }

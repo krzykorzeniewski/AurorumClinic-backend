@@ -110,7 +110,7 @@ public class LoginServiceImpl implements LoginService{
     }
 
     @Override
-    public void send2fa (TwoFactorAuthTokenRequest twoFactorAuthTokenRequest){
+    public void createMfaToken(TwoFactorAuthTokenRequest twoFactorAuthTokenRequest){
         User userFromDb = userRepository.findByEmail(twoFactorAuthTokenRequest.email());
         if (userFromDb == null) {
             throw new ApiAuthenticationException("Email not found", "email");
