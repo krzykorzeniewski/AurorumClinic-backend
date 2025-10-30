@@ -11,7 +11,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaLoginRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
@@ -47,24 +47,22 @@ public class AuthEventListener {
     @Value("${mail.frontend.password-reset-link}")
     private String resetPasswordLink;
 
-    @EventListener
-    @Transactional
     @Async
-    public void handleMfaLoginAttemptedEvent(MfaLoginRequestedEvent event) {
-        User user = event.user();
-        Token token = tokenService.createOtpToken(user, TokenName.TWO_FACTOR_AUTH, 1);
-        smsService.sendSms("+48" + user.getPhoneNumber(), fromPhoneNumber,
+    @EventListener
+    public void handleMfaLoginAttemptedEvent(MfaTokenCreatedEvent event) {
+        Token token = event.token();
+        smsService.sendSms("+48" + event.user().getPhoneNumber(), fromPhoneNumber,
                 "Kod logowania do Aurorum Clinic : " + token.getRawValue());
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @Async
+    @TransactionalEventListener
     public void handleDoctorRegisteredEvent(DoctorRegisteredEvent event) {
         Doctor doctor = event.doctor();
 
         Context context = new Context();
         context.setVariable("password", event.password());
         String htmlPageAsText = springTemplateEngine.process("employee-registered-email", context);
-
         emailService.sendEmail(
                 noreplyEmailAddres,
                 doctor.getEmail(),
@@ -73,14 +71,15 @@ public class AuthEventListener {
         );
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @Async
+    @TransactionalEventListener
     public void handleEmployeeRegisteredEvent(EmployeeRegisteredEvent event) {
         User employee = event.user();
 
         Context context = new Context();
         context.setVariable("password", event.password());
         String htmlPageAsText = springTemplateEngine.process("employee-registered-email", context);
-
+        System.out.println("creating employee");
         emailService.sendEmail(
                 noreplyEmailAddres,
                 employee.getEmail(),

@@ -81,6 +81,7 @@ public class AppointmentNotificationListener {
         }
     }
 
+    @Async
     @TransactionalEventListener
     public void handleAppointmentRescheduleEvent(AppointmentRescheduledEvent event) {
         Appointment appointment = event.getAppointment();
@@ -102,7 +103,7 @@ public class AppointmentNotificationListener {
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
             emailService.sendEmail(
                     noreplyEmailAddres, patient.getEmail(),
-                    "wizyta umówiona", htmlPageAsText);
+                    "wizyta przełożona", htmlPageAsText);
         } else {
             String message = String.format("""
                     Twoja wizyta została przełożona na dzień: %s
@@ -142,8 +143,10 @@ public class AppointmentNotificationListener {
         }
     }
 
-    @TransactionalEventListener
+    @Async
+    @EventListener
     public void handleSurveyCreatedEvent(SurveyCreatedEvent event) {
+        System.out.println("IM INVOKED");
         Survey survey = event.survey();
         Appointment appointment = survey.getAppointment();
         Doctor doctor = survey.getAppointment().getDoctor();

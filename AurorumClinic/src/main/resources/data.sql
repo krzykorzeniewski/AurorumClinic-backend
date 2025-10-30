@@ -45,23 +45,29 @@ insert into specialization_doctor (pk_doctor, pk_specialization) values
                                                                      (12, 2), (13, 3), (14, 5), (15, 4), (16, 3), (17, 3);
 
 insert into schedule (started_at, finished_at, fk_doctor) values
-                                                              ('2025-10-28T08:00:00', '2025-10-28T17:00:00', 4),
-                                                              ('2025-10-29T08:00:00', '2025-10-29T17:00:00', 4),
-                                                              ('2025-10-30T14:00:00', '2025-10-30T21:00:00', 4),
-                                                              ('2025-10-28T10:00:00', '2025-10-28T20:00:00', 5),
-                                                              ('2025-10-29T08:00:00', '2025-10-29T20:00:00', 5),
-                                                              ('2025-10-30T10:00:00', '2025-10-30T20:00:00', 5),
-                                                              ('2025-10-28T09:00:00', '2025-10-28T21:00:00', 10),
-                                                              ('2025-10-29T09:00:00', '2025-10-29T21:00:00', 10),
-                                                              ('2025-10-30T09:00:00', '2025-10-30T21:00:00', 10),
-                                                              ('2025-10-28T08:00:00', '2025-10-28T16:00:00', 12),
-                                                              ('2025-10-29T08:00:00', '2025-10-29T16:00:00', 13),
-                                                              ('2025-10-30T12:00:00', '2025-10-30T20:00:00', 14),
-                                                              ('2025-10-28T09:00:00', '2025-10-28T15:00:00', 15),
-                                                              ('2025-10-28T08:00:00', '2025-10-28T18:00:00', 16),
-                                                              ('2025-10-29T08:00:00', '2025-10-29T18:00:00', 16),
-                                                              ('2025-10-28T10:00:00', '2025-10-28T19:00:00', 17),
-                                                              ('2025-10-29T10:00:00', '2025-10-29T19:00:00', 17);
+                                                              ('2025-10-30T08:00:00', '2025-10-30T21:00:00', 4),
+                                                              ('2025-11-05T08:00:00', '2025-11-05T17:00:00', 4),
+                                                              ('2025-11-06T14:00:00', '2025-11-06T21:00:00', 4),
+
+                                                              ('2025-11-04T10:00:00', '2025-11-04T20:00:00', 5),
+                                                              ('2025-11-05T08:00:00', '2025-11-05T20:00:00', 5),
+                                                              ('2025-11-06T10:00:00', '2025-11-06T20:00:00', 5),
+
+                                                              ('2025-11-04T09:00:00', '2025-11-04T21:00:00', 10),
+                                                              ('2025-11-05T09:00:00', '2025-11-05T21:00:00', 10),
+                                                              ('2025-11-06T09:00:00', '2025-11-06T21:00:00', 10),
+
+                                                              ('2025-11-04T08:00:00', '2025-11-04T16:00:00', 12),
+                                                              ('2025-11-05T08:00:00', '2025-11-05T16:00:00', 13),
+                                                              ('2025-11-06T12:00:00', '2025-11-06T20:00:00', 14),
+
+                                                              ('2025-11-04T09:00:00', '2025-11-04T15:00:00', 15),
+                                                              ('2025-11-04T08:00:00', '2025-11-04T18:00:00', 16),
+                                                              ('2025-11-05T08:00:00', '2025-11-05T18:00:00', 16),
+
+                                                              ('2025-11-04T10:00:00', '2025-11-04T19:00:00', 17),
+                                                              ('2025-11-05T10:00:00', '2025-11-05T19:00:00', 17);
+
 
 insert into service (name, duration, price, description) values
                                                              ('Konsultacja psychiatryczna dorosłych (pierwsza wizyta)', 45, 350, 'Ocena stanu psychicznego z indywidualnym planem leczenia'),
@@ -91,28 +97,6 @@ insert into appointment (started_at, finished_at, status, description, fk_servic
                                                                                                                                              ('2025-10-28T10:00:00', '2025-10-28T10:40:00', 'FINISHED', 'chciałbym sobię zapalić nieco trawkę', 1, 2, 5, 8, 1),
                                                                                                                                              ('2025-10-28T13:00:00', '2025-10-28T13:30:00', 'FINISHED', 'chłop za dużo gra w robloxa', 4, 3, 10, 9, 1);
 
-insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient, notification_sent) values
-                                                                                                                                             ('2025-10-28T08:00:00', '2025-10-28T09:00:00', 'CREATED', 'terapia poznawczo-behawioralna – 1 sesja', 5, null, 4, 1, 0),
-                                                                                                                                             ('2025-10-28T09:15:00', '2025-10-28T10:15:00', 'CREATED', 'terapia poznawczo-behawioralna – 2 sesja', 6, null, 4, 1, 0),
-                                                                                                                                             ('2025-10-29T08:00:00', '2025-10-29T09:00:00', 'CREATED', 'konsultacja psychologiczna', 5, null, 4, 1, 0),
-                                                                                                                                             ('2025-10-30T14:00:00', '2025-10-30T15:00:00', 'CREATED', 'kontynuacja terapii', 6, null, 4, 1, 0),
-                                                                                                                                             ('2025-10-28T10:00:00', '2025-10-28T10:45:00', 'CREATED', 'pierwsza konsultacja psychiatryczna', 1, null, 5, 1, 0),
-                                                                                                                                             ('2025-10-29T08:00:00', '2025-10-29T08:30:00', 'CREATED', 'kolejna wizyta psychiatryczna', 3, null, 5, 1, 0),
-                                                                                                                                             ('2025-10-30T10:00:00', '2025-10-30T10:45:00', 'CREATED', 'monitoring leczenia', 1, null, 5, 1, 0),
-                                                                                                                                             ('2025-10-28T09:00:00', '2025-10-28T09:45:00', 'CREATED', 'rozmowa o stresie dziecka', 2, null, 10, 1, 0),
-                                                                                                                                             ('2025-10-29T10:00:00', '2025-10-29T10:30:00', 'CREATED', 'kolejna konsultacja dziecięca', 4, null, 10, 1, 0),
-                                                                                                                                             ('2025-10-30T11:00:00', '2025-10-30T11:45:00', 'CREATED', 'ocena rozwoju emocjonalnego', 2, null, 10, 1, 0),
-                                                                                                                                             ('2025-10-28T08:00:00', '2025-10-28T09:00:00', 'CREATED', 'terapia dziecięca', 5, null, 12, 1, 0),
-                                                                                                                                             ('2025-10-29T08:00:00', '2025-10-29T08:30:00', 'CREATED', 'ocena farmakoterapii', 3, null, 13, 1, 0),
-                                                                                                                                             ('2025-10-30T12:00:00', '2025-10-30T13:00:00', 'CREATED', 'sesja psychoterapeutyczna', 6, null, 14, 1, 0),
-                                                                                                                                             ('2025-10-28T09:00:00', '2025-10-28T09:45:00', 'CREATED', 'pierwsza konsultacja dziecięca', 2, null, 15, 1, 0),
-                                                                                                                                             ('2025-10-28T08:00:00', '2025-10-28T08:30:00', 'CREATED', 'kontrola psychiatryczna', 3, null, 16, 1, 0),
-                                                                                                                                             ('2025-10-29T17:00:00', '2025-10-29T17:30:00', 'CREATED', 'kolejna wizyta kontrolna', 3, null, 16, 1, 0),
-                                                                                                                                             ('2025-10-28T10:00:00', '2025-10-28T10:30:00', 'CREATED', 'ocena nastroju', 3, null, 17, 1, 0),
-                                                                                                                                             ('2025-10-29T11:00:00', '2025-10-29T11:45:00', 'CREATED', 'plan dalszej terapii', 1, null, 17, 1, 0),
-                                                                                                                                             ('2025-10-28T15:00:00', '2025-10-28T16:00:00', 'CREATED', 'sesja podsumowująca', 6, null, 4, 1, 0),
-                                                                                                                                             ('2025-10-29T09:30:00', '2025-10-29T10:30:00', 'CREATED', 'terapia poznawczo-behawioralna', 5, null, 4, 1, 0);
-
 
 insert into payment (amount, created_at, completed_at, method, status, fk_appointment) values
                                                                                            (250, '2025-10-14T07:51:52', '2025-10-14T07:52:31', 'OFFLINE', 'COMPLETED', 1),
@@ -120,24 +104,3 @@ insert into payment (amount, created_at, completed_at, method, status, fk_appoin
                                                                                            (300, '2025-10-15T07:51:52', '2025-10-15T07:52:31', 'OFFLINE', 'COMPLETED', 3);
 
 
-insert into payment (amount, created_at, completed_at, method, status, fk_appointment) values
-                                                                                           (250, '2025-10-27T08:00:00', '2025-10-27T08:05:00', 'OFFLINE', 'COMPLETED', 4),
-                                                                                           (200, '2025-10-27T09:00:00', '2025-10-27T09:05:00', 'OFFLINE', 'COMPLETED', 5),
-                                                                                           (250, '2025-10-27T10:00:00', '2025-10-27T10:05:00', 'OFFLINE', 'COMPLETED', 6),
-                                                                                           (200, '2025-10-27T11:00:00', '2025-10-27T11:05:00', 'OFFLINE', 'COMPLETED', 7),
-                                                                                           (350, '2025-10-27T12:00:00', '2025-10-27T12:05:00', 'OFFLINE', 'COMPLETED', 8),
-                                                                                           (300, '2025-10-27T13:00:00', '2025-10-27T13:05:00', 'OFFLINE', 'COMPLETED', 9),
-                                                                                           (350, '2025-10-27T14:00:00', '2025-10-27T14:05:00', 'OFFLINE', 'COMPLETED', 10),
-                                                                                           (350, '2025-10-27T15:00:00', '2025-10-27T15:05:00', 'OFFLINE', 'COMPLETED', 11),
-                                                                                           (300, '2025-10-27T16:00:00', '2025-10-27T16:05:00', 'OFFLINE', 'COMPLETED', 12),
-                                                                                           (350, '2025-10-27T17:00:00', '2025-10-27T17:05:00', 'OFFLINE', 'COMPLETED', 13),
-                                                                                           (250, '2025-10-27T18:00:00', '2025-10-27T18:05:00', 'OFFLINE', 'COMPLETED', 14),
-                                                                                           (300, '2025-10-27T19:00:00', '2025-10-27T19:05:00', 'OFFLINE', 'COMPLETED', 15),
-                                                                                           (200, '2025-10-27T20:00:00', '2025-10-27T20:05:00', 'OFFLINE', 'COMPLETED', 16),
-                                                                                           (350, '2025-10-27T21:00:00', '2025-10-27T21:05:00', 'OFFLINE', 'COMPLETED', 17),
-                                                                                           (300, '2025-10-27T22:00:00', '2025-10-27T22:05:00', 'OFFLINE', 'COMPLETED', 18),
-                                                                                           (300, '2025-10-27T23:00:00', '2025-10-27T23:05:00', 'OFFLINE', 'COMPLETED', 19),
-                                                                                           (300, '2025-10-27T23:30:00', '2025-10-27T23:35:00', 'OFFLINE', 'COMPLETED', 20),
-                                                                                           (350, '2025-10-28T00:00:00', '2025-10-28T00:05:00', 'OFFLINE', 'COMPLETED', 21),
-                                                                                           (250, '2025-10-28T01:00:00', '2025-10-28T01:05:00', 'OFFLINE', 'COMPLETED', 22),
-                                                                                           (200, '2025-10-28T02:00:00', '2025-10-28T02:05:00', 'OFFLINE', 'COMPLETED', 23);
