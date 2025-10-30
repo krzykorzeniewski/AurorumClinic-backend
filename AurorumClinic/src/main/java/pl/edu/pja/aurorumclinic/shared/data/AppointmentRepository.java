@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.shared.data;
 
+import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,4 +61,46 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     boolean existsBetweenUsers(Long participantId, Long secParticipantId);
 
     Page<Appointment> findByService_Schedules_Id(Pageable pageable, Long scheduleId);
+
+    @Query("""
+            select count(a1.id) as scheduled,
+            sum(case when a1.status = 'FINISHED' then 1 else 0 end) as finished,
+            avg (case when a1.status = 'FINISHED' then a1.service.duration else null end) as avgDuration,
+            avg (case when a1.status = 'FINISHED' then a1.opinion.rating else null end) as avgRating
+            from Appointment a1
+                    left join a1.opinion
+                    left join a1.service
+            where a1.doctor.id = :doctorId and (a1.startedAt < :finishedAt and a1.finishedAt > :startedAt)
+            """)
+    List<Tuple> getDoctorAppointmentStatsBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
+
+    @Query("""
+            select count(a1.id) as scheduled,
+            sum(case when a1.status = 'FINISHED' then 1 else 0 end) as finished,
+            avg (case when a1.status = 'FINISHED' then a1.service.duration else null end) as avgDuration,
+            avg (case when a1.status = 'FINISHED' then a1.opinion.rating else null end) as avgRating,
+            a1.service.name as servName,
+            a1.service.id as servId
+                from Appointment a1
+                    left join a1.opinion
+                    left join a1.service
+            where a1.doctor.id = :doctorId and (a1.startedAt < :finishedAt and a1.finishedAt > :startedAt)
+            group by servName, servId
+            order by scheduled desc
+            """)
+    List<Tuple> getDoctorAppointmentStatsPerServiceBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
+
+    @Query("""
+            select
+                count(a.id) as scheduled,
+                sum(case when a.status = 'FINISHED' then 1 else 0 end) as finished,
+                avg(case when a.status = 'FINISHED' then a.service.duration else null end) as avgDuration,
+                avg(case when a.status = 'FINISHED' then a.opinion.rating else null end) as avgRating
+            from Appointment a
+            left join a.opinion
+            left join a.service
+            where (a.startedAt < :finishedAt and a.finishedAt > :startedAt)
+    """)
+    List<Tuple> getAllAppointmentStatsBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
+
 }
