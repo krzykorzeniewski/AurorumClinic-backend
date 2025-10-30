@@ -47,6 +47,7 @@ public class AppointmentNotificationListener {
     @Value("${twilio.trial_number}")
     private String clinicPhoneNumber;
 
+    @Async
     @TransactionalEventListener
     public void handleAppointmentCreatedEvent(AppointmentCreatedEvent event) {
         Appointment appointment = event.getAppointment();
@@ -112,6 +113,7 @@ public class AppointmentNotificationListener {
         }
     }
 
+    @Async
     @TransactionalEventListener
     public void handleAppointmentDeletedEvent(AppointmentDeletedEvent event) {
         Patient patient = event.getPatient();
