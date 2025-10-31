@@ -52,7 +52,7 @@ public class Doctor extends User {
     @ToString.Exclude
     private Set<Schedule> schedules;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @ToString.Exclude
     @JoinTable(name = "Specialization_Doctor",
             joinColumns = @JoinColumn(name = "PK_Doctor"),

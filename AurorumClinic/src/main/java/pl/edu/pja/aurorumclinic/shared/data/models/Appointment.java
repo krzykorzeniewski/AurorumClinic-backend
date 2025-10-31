@@ -48,7 +48,7 @@ public class Appointment {
     @ToString.Exclude
     private Payment payment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "FK_Service")
     @ToString.Exclude
     private Service service;
@@ -62,12 +62,12 @@ public class Appointment {
     @ToString.Exclude
     private Opinion opinion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "FK_Doctor")
     @ToString.Exclude
     private Doctor doctor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "FK_Patient")
     @ToString.Exclude
     private Patient patient;

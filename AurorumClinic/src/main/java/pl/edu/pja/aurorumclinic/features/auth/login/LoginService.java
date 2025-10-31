@@ -7,6 +7,6 @@ public interface LoginService {
     LoginUserResponse login(LoginUserRequest loginUserRequest);
     LoginUserResponse refresh(RefreshAccessTokenRequest refreshAccessTokenRequest);
     LoginUserResponse login2fa(TwoFactorAuthLoginRequest twoFactorAuthLoginRequest);
-    void send2fa(TwoFactorAuthTokenRequest twoFactorAuthTokenRequest);
+    void createMfaToken(TwoFactorAuthTokenRequest twoFactorAuthTokenRequest);
 
 }

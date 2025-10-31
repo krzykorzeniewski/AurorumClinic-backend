@@ -45,7 +45,7 @@ public class RegisterController {
 
     @PostMapping("/verify-email-token")
     public ResponseEntity<ApiResponse<?>> getVerifyEmailToken(@Valid @RequestBody VerifyEmailTokenRequest requestDto) {
-        registerService.sendVerifyEmail(requestDto);
+        registerService.createVerifyEmailToken(requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

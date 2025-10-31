@@ -22,7 +22,7 @@ public class ResetPasswordController {
 
     @PostMapping("/reset-password-token")
     public ResponseEntity<ApiResponse<?>> getResetPasswordToken(@Valid @RequestBody ResetPasswordTokenRequest requestDto) {
-        resetPasswordService.sendResetPasswordEmail(requestDto);
+        resetPasswordService.createResetPasswordToken(requestDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

@@ -41,6 +41,7 @@ public class AppointmentNotificationListener {
     @Value("${twilio.trial_number}")
     private String clinicPhoneNumber;
 
+    @Async
     @TransactionalEventListener
     public void handleAppointmentCreatedEvent(AppointmentCreatedEvent event) {
         Appointment appointment = event.getAppointment();
@@ -69,6 +70,7 @@ public class AppointmentNotificationListener {
         }
     }
 
+    @Async
     @TransactionalEventListener
     public void handleAppointmentRescheduleEvent(AppointmentRescheduledEvent event) {
         Appointment appointment = event.getAppointment();
@@ -86,7 +88,7 @@ public class AppointmentNotificationListener {
         if (Objects.equals(patient.getCommunicationPreferences(), CommunicationPreference.EMAIL)) {
             emailService.sendEmail(
                     noreplyEmailAddres, patient.getEmail(),
-                    "wizyta umówiona", htmlPageAsText);
+                    "wizyta przełożona", htmlPageAsText);
         } else {
             String message = String.format("""
                     Twoja wizyta została przełożona na dzień: %s
@@ -96,6 +98,7 @@ public class AppointmentNotificationListener {
         }
     }
 
+    @Async
     @TransactionalEventListener
     public void handleAppointmentDeletedEvent(AppointmentDeletedEvent event) {
         Patient patient = event.getPatient();
@@ -124,7 +127,8 @@ public class AppointmentNotificationListener {
         }
     }
 
-    @TransactionalEventListener
+    @Async
+    @EventListener
     public void handleSurveyCreatedEvent(SurveyCreatedEvent event) {
         Survey survey = event.survey();
         Appointment appointment = survey.getAppointment();

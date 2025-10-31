@@ -5,9 +5,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.auth.reset_password.events.ResetPasswordRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.reset_password.events.ResetPasswordTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
@@ -21,7 +23,7 @@ public class ResetPasswordServiceImpl implements ResetPasswordService{
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    public void sendResetPasswordEmail(ResetPasswordTokenRequest resetPasswordTokenRequest) {
+    public void createResetPasswordToken(ResetPasswordTokenRequest resetPasswordTokenRequest) {
         User userFromDb = userRepository.findByEmail(resetPasswordTokenRequest.email());
         if (userFromDb == null) {
             return;
@@ -29,7 +31,8 @@ public class ResetPasswordServiceImpl implements ResetPasswordService{
         if (!userFromDb.isEmailVerified()) {
             return;
         }
-        applicationEventPublisher.publishEvent(new ResetPasswordRequestedEvent(userFromDb));
+        Token token = tokenService.createToken(userFromDb, TokenName.PASSWORD_RESET, 15);
+        applicationEventPublisher.publishEvent(new ResetPasswordTokenCreatedEvent(userFromDb, token));
     }
 
     @Transactional

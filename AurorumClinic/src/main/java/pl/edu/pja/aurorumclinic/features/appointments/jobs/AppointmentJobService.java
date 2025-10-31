@@ -55,11 +55,11 @@ public class AppointmentJobService {
                         .toInstant());
     }
 
-//    @EventListener
-//    public void onApplicationStart(ContextRefreshedEvent event) {
-//        scheduleAllUnfinished();
-//        scheduleAllWithoutNotification();
-//    }
+    @EventListener
+    public void onApplicationStart(ContextRefreshedEvent event) {
+        scheduleAllUnfinished();
+        scheduleAllWithoutNotification();
+    }
 
     private void scheduleAllUnfinished() {
         List<Appointment> notFinishedAppointments =

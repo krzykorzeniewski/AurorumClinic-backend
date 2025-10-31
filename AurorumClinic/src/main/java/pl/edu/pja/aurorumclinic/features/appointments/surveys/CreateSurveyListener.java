@@ -2,6 +2,8 @@ package pl.edu.pja.aurorumclinic.features.appointments.surveys;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -20,7 +22,8 @@ public class CreateSurveyListener {
     private final SurveyRepository surveyRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @Async
+    @TransactionalEventListener
     public void handleAppointmentFinishedEvent(AppointmentFinishedEvent event) {
         Appointment appointment = event.appointment();
         Survey survey = Survey.builder()

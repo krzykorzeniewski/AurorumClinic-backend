@@ -9,15 +9,13 @@ import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
 import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.EmailVerificationTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.PasswordValidator;
 import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
-import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
-import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
-import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
-import pl.edu.pja.aurorumclinic.shared.data.models.User;
+import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -82,7 +80,8 @@ public class RegisterServiceImpl implements RegisterService{
                 .phoneNumber(registerPatientRequest.phoneNumber())
                 .build();
         userRepository.save(patient);
-        applicationEventPublisher.publishEvent(new PatientRegisteredEvent(patient));
+        Token emailVerificationtoken = tokenService.createToken(patient, TokenName.EMAIL_VERIFICATION, 15);
+        applicationEventPublisher.publishEvent(new PatientRegisteredEvent(patient, emailVerificationtoken));
     }
 
     @Override
@@ -105,7 +104,7 @@ public class RegisterServiceImpl implements RegisterService{
     }
 
     @Override
-    public void sendVerifyEmail(VerifyEmailTokenRequest verifyEmailTokenRequest) {
+    public void createVerifyEmailToken(VerifyEmailTokenRequest verifyEmailTokenRequest) {
         User userFromDb = userRepository.findByEmail(verifyEmailTokenRequest.email());
         if (userFromDb == null) {
             throw new ApiNotFoundException("Email not found", "email");
@@ -113,7 +112,8 @@ public class RegisterServiceImpl implements RegisterService{
         if (userFromDb.isEmailVerified()) {
             throw new ApiException("Email is already verified", "email");
         }
-        applicationEventPublisher.publishEvent(new AccountVerificationRequestedEvent(userFromDb));
+        Token emailVerificationtoken = tokenService.createToken(userFromDb, TokenName.EMAIL_VERIFICATION, 15);
+        applicationEventPublisher.publishEvent(new EmailVerificationTokenCreatedEvent(userFromDb, emailVerificationtoken));
     }
 
     @Override

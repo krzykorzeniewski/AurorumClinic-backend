@@ -74,7 +74,7 @@ public class LoginController {
 
     @PostMapping("/login-2fa-token")
     public ResponseEntity<ApiResponse<?>> get2faToken(@Valid @RequestBody TwoFactorAuthTokenRequest twoFactorAuthTokenRequest) {
-        loginService.send2fa(twoFactorAuthTokenRequest);
+        loginService.createMfaToken(twoFactorAuthTokenRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

@@ -27,7 +27,7 @@ public class NewsletterEmailListener {
     private String unsubscribeLink;
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void handleNewsletterEmailMessageCreatedEvent(NewsletterEmailMessageCreated event) {
+    public void onNewsletterEmailMessageCreatedEvent(NewsletterEmailMessageCreated event) {
         String subject = event.newsletterEmailMessage().subject();
         String content = event.newsletterEmailMessage().content();
         List<String> emails = event.newsletterEmailMessage().subscribedPatients().stream().map(Patient::getEmail)

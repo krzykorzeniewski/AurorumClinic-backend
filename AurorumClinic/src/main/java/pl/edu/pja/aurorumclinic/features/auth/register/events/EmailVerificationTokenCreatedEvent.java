@@ -3,6 +3,6 @@ package pl.edu.pja.aurorumclinic.features.auth.register.events;
 import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 
-public record PatientRegisteredEvent(User user,
-                                     Token token) {
+public record EmailVerificationTokenCreatedEvent(User user,
+                                                 Token token) {
 }
