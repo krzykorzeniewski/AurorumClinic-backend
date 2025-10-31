@@ -32,12 +32,6 @@ public class AppointmentNotificationListener {
     private final DateTimeFormatter dateFormatter;
     private final SpringTemplateEngine springTemplateEngine;
 
-    @Value("${mail.frontend.appointment.delete-link}")
-    private String deleteAppointmentLink;
-
-    @Value("${mail.frontend.appointment.reschedule-link}")
-    private String rescheduleAppointmentLink;
-
     @Value("${mail.frontend.appointment.survey-link}")
     private String appointmentSurveyLink;
 
@@ -51,15 +45,11 @@ public class AppointmentNotificationListener {
     @TransactionalEventListener
     public void handleAppointmentCreatedEvent(AppointmentCreatedEvent event) {
         Appointment appointment = event.getAppointment();
-        String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
-        String deleteLink = deleteAppointmentLink + appointment.getId();
         Patient patient = event.getPatient();
         Doctor doctor = appointment.getDoctor();
 
         Context context = new Context();
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
-        context.setVariable("rescheduleLink", rescheduleLink);
-        context.setVariable("deleteLink", deleteLink);
         context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
         context.setVariable("doctorSpecialization", doctor.getSpecializations());
@@ -74,8 +64,7 @@ public class AppointmentNotificationListener {
         } else {
             String message = String.format("""
                     Twoja wizyta została umówiona w dniu: %s
-                    przełóż wizytę: %s
-                    odwołaj wizytę: %s""", appointment.getStartedAt().format(dateFormatter), rescheduleLink, deleteLink);
+                    """, appointment.getStartedAt().format(dateFormatter));
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
                     message);
         }
@@ -85,15 +74,11 @@ public class AppointmentNotificationListener {
     @TransactionalEventListener
     public void handleAppointmentRescheduleEvent(AppointmentRescheduledEvent event) {
         Appointment appointment = event.getAppointment();
-        String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
-        String deleteLink = deleteAppointmentLink + appointment.getId();
         Patient patient = event.getPatient();
         Doctor doctor = appointment.getDoctor();
 
         Context context = new Context();
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
-        context.setVariable("rescheduleLink", rescheduleLink);
-        context.setVariable("deleteLink", deleteLink);
         context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
         context.setVariable("doctorSpecialization", doctor.getSpecializations());
@@ -107,8 +92,7 @@ public class AppointmentNotificationListener {
         } else {
             String message = String.format("""
                     Twoja wizyta została przełożona na dzień: %s
-                    przełóż wizytę: %s
-                    odwołaj wizytę: %s""", appointment.getStartedAt().format(dateFormatter), rescheduleLink, deleteLink);
+                    """, appointment.getStartedAt().format(dateFormatter));
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
                     message);
         }
@@ -170,13 +154,9 @@ public class AppointmentNotificationListener {
         Appointment appointment = event.appointment();
         Doctor doctor = appointment.getDoctor();
         Patient patient = appointment.getPatient();
-        String rescheduleLink = rescheduleAppointmentLink + appointment.getId();
-        String deleteLink = deleteAppointmentLink + appointment.getId();
 
         Context context = new Context();
         context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
-        context.setVariable("rescheduleLink", rescheduleLink);
-        context.setVariable("deleteLink", deleteLink);
         context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
         context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
         context.setVariable("doctorSpecialization", doctor.getSpecializations());
@@ -191,8 +171,7 @@ public class AppointmentNotificationListener {
         } else {
             String message = String.format("""
                     Przypominamy o nadchodzącej wizycie w dniu: %s
-                    przełóż wizytę: %s
-                    odwołaj wizytę: %s""", appointment.getStartedAt().format(dateFormatter), rescheduleLink, deleteLink);
+                    """, appointment.getStartedAt().format(dateFormatter));
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
                     message);
         }

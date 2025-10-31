@@ -45,7 +45,7 @@ insert into specialization_doctor (pk_doctor, pk_specialization) values
                                                                      (12, 2), (13, 3), (14, 5), (15, 4), (16, 3), (17, 3);
 
 insert into schedule (started_at, finished_at, fk_doctor) values
-                                                              ('2025-10-30T08:00:00', '2025-10-30T21:00:00', 4),
+                                                              ('2025-11-04T08:00:00', '2025-11-04T17:00:00', 4),
                                                               ('2025-11-05T08:00:00', '2025-11-05T17:00:00', 4),
                                                               ('2025-11-06T14:00:00', '2025-11-06T21:00:00', 4),
 

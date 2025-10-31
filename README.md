@@ -1,1 +1,3 @@
 # Aurorum-backend
+
+Engineering thesis
