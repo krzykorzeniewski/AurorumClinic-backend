@@ -9,10 +9,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaTokenCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.EmailVerificationTokenCreatedEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.*;
 import pl.edu.pja.aurorumclinic.features.auth.reset_password.events.ResetPasswordTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.verify_phone_number.events.PhoneNumberVerificationTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
@@ -80,6 +77,23 @@ public class AuthEventListener {
                 noreplyEmailAddres,
                 employee.getEmail(),
                 "Twoje konto zostało utworzone",
+                htmlPageAsText
+        );
+    }
+
+    @Async
+    @TransactionalEventListener
+    public void onStaffMemberPasswordCreatedEvent(StaffMemberPasswordCreatedEvent event) {
+        User employee = event.user();
+
+        Context context = new Context();
+        context.setVariable("password", event.password());
+        String htmlPageAsText = springTemplateEngine.process("employee-registered-email", context);
+
+        emailService.sendEmail(
+                noreplyEmailAddres,
+                employee.getEmail(),
+                "Twoje hasło zostało wygenerowane",
                 htmlPageAsText
         );
     }

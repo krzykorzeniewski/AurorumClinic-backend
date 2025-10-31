@@ -9,4 +9,5 @@ public interface RegisterService {
     void registerEmployee(RegisterEmployeeRequest registerEmployeeRequest);
     void createVerifyEmailToken(VerifyEmailTokenRequest verifyEmailTokenRequest);
     void verifyEmail(VerifyEmailRequest verifyEmailRequest);
+    void createNewPassword(Long staffMemberId);
 }

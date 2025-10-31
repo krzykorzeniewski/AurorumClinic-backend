@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 
@@ -41,6 +38,13 @@ public class RegisterController {
     public ResponseEntity<ApiResponse<?>> registerDoctor(@Valid @RequestBody RegisterDoctorRequest requestDto) {
         registerService.registerDoctor(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
+    }
+
+    @PostMapping("/{id}/new-password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<?>> createNewPassword(@PathVariable("id") Long staffMemberId) {
+        registerService.createNewPassword(staffMemberId);
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/verify-email-token")

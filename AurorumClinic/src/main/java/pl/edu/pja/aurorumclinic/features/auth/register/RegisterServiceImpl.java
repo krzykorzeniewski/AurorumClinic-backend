@@ -6,10 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.EmailVerificationTokenCreatedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.*;
 import pl.edu.pja.aurorumclinic.shared.PasswordValidator;
 import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
@@ -23,6 +20,7 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -128,6 +126,20 @@ public class RegisterServiceImpl implements RegisterService{
         }
         tokenService.validateAndDeleteToken(userFromDb, verifyEmailRequest.token());
         userFromDb.setEmailVerified(true);
+    }
+
+    @Override
+    @Transactional
+    public void createNewPassword(Long staffMemberId) {
+        User userFromDb = userRepository.findById(staffMemberId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        if (Objects.equals(userFromDb.getRole(), UserRole.PATIENT)) {
+            throw new ApiException("User is not a staff member", "id");
+        }
+        String randomPassword = tokenService.createRandomToken().substring(0, 10);
+        userFromDb.setPassword(passwordEncoder.encode(randomPassword));
+        applicationEventPublisher.publishEvent(new StaffMemberPasswordCreatedEvent(userFromDb, randomPassword));
     }
 
 }
