@@ -3,7 +3,6 @@ package pl.edu.pja.aurorumclinic.features.schedules;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import pl.edu.pja.aurorumclinic.features.schedules.commands.EmployeeCreateSchedule;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
@@ -25,7 +24,8 @@ public class ScheduleValidator {
     @Value("${workday.end.hour}")
     private Integer endOfDay;
 
-    public void validateSchedule(LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor, List<Service> services) {
+    public void validateTimeslotAndServices(
+            LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor, List<Service> services) {
         validateTimeSlot(startedAt, finishedAt, doctor.getId());
         validateSpecializations(doctor, services);
     }

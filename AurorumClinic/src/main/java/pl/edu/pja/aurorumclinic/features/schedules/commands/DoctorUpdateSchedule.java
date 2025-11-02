@@ -54,7 +54,7 @@ public class DoctorUpdateSchedule {
         if (servicesFromDb.size() > request.serviceIds.size()) {
             throw new ApiException("Some service ids are not found", "serviceIds");
         }
-        scheduleValidator.validateSchedule(request.startedAt, request.finishedAt, scheduleFromDb.getDoctor(),
+        scheduleValidator.validateTimeslotAndServices(request.startedAt, request.finishedAt, scheduleFromDb.getDoctor(),
                 servicesFromDb);
 
         scheduleFromDb.setStartedAt(request.startedAt);
