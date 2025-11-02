@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pl.edu.pja.aurorumclinic.features.schedules.ScheduleValidator;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
@@ -24,6 +25,7 @@ import java.util.Objects;
 public class DoctorDeleteSchedule {
 
     private final ScheduleRepository scheduleRepository;
+    private final ScheduleValidator scheduleValidator;
 
     @DeleteMapping("/me/{id}")
     @Transactional
@@ -40,6 +42,7 @@ public class DoctorDeleteSchedule {
         if (!Objects.equals(scheduleFromDb.getDoctor().getId(), doctorId)) {
             throw new ApiAuthorizationException("doctor id is not assigned to this schedule");
         }
+        scheduleValidator.checkIfScheduleHasAppointments(scheduleFromDb);
         scheduleRepository.delete(scheduleFromDb);
     }
 

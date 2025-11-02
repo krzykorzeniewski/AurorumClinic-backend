@@ -103,4 +103,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     """)
     List<Tuple> getAllAppointmentStatsBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
 
+    boolean existsByService_Schedules_Id(Long scheduleId);
 }

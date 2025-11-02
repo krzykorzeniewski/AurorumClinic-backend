@@ -3,8 +3,10 @@ package pl.edu.pja.aurorumclinic.features.schedules;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
+import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
@@ -17,6 +19,7 @@ import java.util.List;
 public class ScheduleValidator {
 
     private final ScheduleRepository scheduleRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Value("${workday.start.hour}")
     private Integer startOfDay;
@@ -28,6 +31,12 @@ public class ScheduleValidator {
             LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor, List<Service> services) {
         validateTimeSlot(startedAt, finishedAt, doctor.getId());
         validateSpecializations(doctor, services);
+    }
+
+    public void checkIfScheduleHasAppointments(Schedule schedule) {
+        if (appointmentRepository.existsByService_Schedules_Id(schedule.getId())) {
+            throw new ApiException("Schedule has appointments assigned", "appointments");
+        }
     }
 
     private void validateSpecializations(Doctor doctor, List<Service> services) {

@@ -31,7 +31,7 @@ public class EmployeeUpdateSchedule {
     private final ScheduleValidator scheduleValidator;
     private final ServiceRepository serviceRepository;
 
-    @PutMapping("/{id}") //todo reschedule all appointments within this schedule, same for delete
+    @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<ApiResponse<?>> updateSchedule(@PathVariable("id") Long scheduleId,
                                                          @RequestBody @Valid EmpUpdateScheduleRequest request) {
@@ -47,6 +47,7 @@ public class EmployeeUpdateSchedule {
         if (servicesFromDb.size() > request.serviceIds.size()) {
             throw new ApiException("Some service ids are not found", "serviceIds");
         }
+        scheduleValidator.checkIfScheduleHasAppointments(scheduleFromDb);
         scheduleValidator.validateTimeslotAndServices(request.startedAt, request.finishedAt, scheduleFromDb.getDoctor(),
                 servicesFromDb);
 
