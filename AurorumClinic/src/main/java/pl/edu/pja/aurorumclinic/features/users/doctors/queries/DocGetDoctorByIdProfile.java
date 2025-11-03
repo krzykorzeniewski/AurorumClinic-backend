@@ -1,14 +1,13 @@
-package pl.edu.pja.aurorumclinic.features.users.doctors;
+package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.users.doctors.commands.MeUpdateProfile;
-import pl.edu.pja.aurorumclinic.features.users.doctors.commands.MeUpdateProfileRequest;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import pl.edu.pja.aurorumclinic.features.users.doctors.DoctorProfileMapper;
 import pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.DoctorProfileResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
@@ -19,28 +18,22 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 @RequestMapping("/api/users/doctors/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('DOCTOR')")
-public class MeProfileController {
+public class DocGetDoctorByIdProfile {
 
     private final DoctorRepository doctorRepository;
-    private final MeUpdateProfile meUpdateProfile;
-    private final DoctorProfileMapper mapper = new DoctorProfileMapper();
+    private final DoctorProfileMapper mapper;
 
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<DoctorProfileResponse>> getMyProfile(
             @AuthenticationPrincipal Long userID
     ) {
+        return ResponseEntity.ok(ApiResponse.success(handle(userID)));
+    }
 
+    private DoctorProfileResponse handle(Long userID) {
         Doctor doctor = doctorRepository.findById(userID)
                 .orElseThrow(() -> new ApiNotFoundException("Doktor nie zostal znaleziony", "email"));
-        return ResponseEntity.ok(ApiResponse.success(mapper.toResponse(doctor)));
+        return mapper.toResponse(doctor);
     }
 
-    @PatchMapping("/profile")
-    public ResponseEntity<ApiResponse<DoctorProfileResponse>> updateMyProfile(
-            @AuthenticationPrincipal Long userID,
-            @RequestBody @Valid MeUpdateProfileRequest request
-    ) {
-        Doctor updated = meUpdateProfile.handle(userID, request);
-        return ResponseEntity.ok(ApiResponse.success(mapper.toResponse(updated)));
-    }
 }

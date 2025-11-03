@@ -11,7 +11,7 @@ public interface SpecializationRepository extends JpaRepository<Specialization, 
 
 
     @Query("""
-           select new pl.edu.pja.aurorumclinic.features.appointments.specializations.queries.shared.
+           select new pl.edu.pja.aurorumclinic.features.specializations.queries.shared.
                       GetSpecializationResponse(s.id, s.name) from Specialization s
            """)
     Page<GetSpecializationResponse> findAllSpecializationDtos(Pageable pageable);
