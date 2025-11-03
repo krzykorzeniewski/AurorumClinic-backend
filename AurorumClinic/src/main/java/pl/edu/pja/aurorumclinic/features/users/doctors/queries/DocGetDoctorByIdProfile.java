@@ -32,7 +32,7 @@ public class DocGetDoctorByIdProfile {
 
     private DoctorProfileResponse handle(Long userID) {
         Doctor doctor = doctorRepository.findById(userID)
-                .orElseThrow(() -> new ApiNotFoundException("Doktor nie zostal znaleziony", "email"));
+                .orElseThrow(() -> new ApiNotFoundException("ID not found", "Id"));
         return mapper.toResponse(doctor);
     }
 
