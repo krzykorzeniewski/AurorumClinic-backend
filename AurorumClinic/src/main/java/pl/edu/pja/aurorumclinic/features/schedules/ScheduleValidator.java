@@ -13,6 +13,8 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -39,6 +41,21 @@ public class ScheduleValidator {
         }
     }
 
+    public void checkIfScheduleHasAppointmentsInOldTimeslot(Schedule schedule,
+                                                            LocalDateTime newStartedAt, LocalDateTime newFinishedAt) {
+        LocalDateTime oldStartedAt = schedule.getStartedAt();
+        LocalDateTime oldFinishedAt = schedule.getFinishedAt();
+        if (newStartedAt.isBefore(oldStartedAt) && newFinishedAt.isAfter(oldFinishedAt)) {
+            return;
+        }
+        Set<Long> appointmentIdsInTimeslot = appointmentRepository.getAppointmentsInScheduleTimeslot
+                (schedule.getId(), oldStartedAt, oldFinishedAt, newStartedAt, newFinishedAt);
+
+        if (!appointmentIdsInTimeslot.isEmpty()) {
+            throw new ApiException(appointmentIdsInTimeslot.toString(), "appointments");
+        }
+    }
+
     private void validateSpecializations(Doctor doctor, List<Service> services) {
         for (Service service: services) {
             for (Specialization specialization: doctor.getSpecializations()) {
@@ -51,6 +68,9 @@ public class ScheduleValidator {
     }
 
     private void validateTimeSlot(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId) {
+        if (!Objects.equals(startedAt.getDayOfMonth(), finishedAt.getDayOfMonth())) {
+            throw new ApiException("Schedule can be one day long", "startedAt, finishedAt");
+        }
         if (startedAt.getHour() < startOfDay) {
             throw new ApiException("Start date cannot be before work hours", "startedAt");
         }

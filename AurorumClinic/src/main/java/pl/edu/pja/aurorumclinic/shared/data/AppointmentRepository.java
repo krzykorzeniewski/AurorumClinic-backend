@@ -1,7 +1,6 @@
 package pl.edu.pja.aurorumclinic.shared.data;
 
 import jakarta.persistence.Tuple;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +10,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     @Query("""
@@ -105,4 +105,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Tuple> getAllAppointmentStatsBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
 
     boolean existsByService_Schedules_Id(Long scheduleId);
+
+    @Query("""
+           select a.id from Appointment a
+           join a.service s
+           join s.schedules s2
+           where s2.id = :scheduleId
+           and (a.startedAt < :newFinishedAt and a.finishedAt > :oldFinishedAt)
+           or (a.startedAt < :newStartedAt and a.finishedAt > :oldStartedAt)
+           """)
+    Set<Long> getAppointmentsInScheduleTimeslot(Long scheduleId, LocalDateTime oldStartedAt, LocalDateTime oldFinishedAt,
+                                                LocalDateTime newStartedAt, LocalDateTime newFinishedAt);
 }
