@@ -29,7 +29,7 @@ public class DoctorDeleteSchedule {
 
     @DeleteMapping("/me/{id}")
     @Transactional
-    public ResponseEntity<ApiResponse<?>> updateSchedule(@PathVariable("id") Long scheduleId,
+    public ResponseEntity<ApiResponse<?>> deleteSchedule(@PathVariable("id") Long scheduleId,
                                                          @AuthenticationPrincipal Long doctorId) {
         handle(scheduleId, doctorId);
         return ResponseEntity.ok(ApiResponse.success(null));

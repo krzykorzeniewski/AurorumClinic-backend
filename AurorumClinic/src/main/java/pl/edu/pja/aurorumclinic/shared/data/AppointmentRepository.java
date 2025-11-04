@@ -1,6 +1,7 @@
 package pl.edu.pja.aurorumclinic.shared.data;
 
 import jakarta.persistence.Tuple;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

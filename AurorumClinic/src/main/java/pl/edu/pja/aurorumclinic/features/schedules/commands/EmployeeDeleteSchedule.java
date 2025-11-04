@@ -22,7 +22,7 @@ public class EmployeeDeleteSchedule {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<ApiResponse<?>> updateSchedule(@PathVariable("id") Long scheduleId) {
+    public ResponseEntity<ApiResponse<?>> deleteSchedule(@PathVariable("id") Long scheduleId) {
         handle(scheduleId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }

@@ -44,7 +44,8 @@ public class Appointment {
     @Column(name = "Notification_Sent", columnDefinition = "bit")
     private boolean notificationSent = false;
 
-    @OneToOne(mappedBy = "appointment", cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "FK_Payment")
     @ToString.Exclude
     private Payment payment;
 
