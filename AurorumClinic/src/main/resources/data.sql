@@ -92,15 +92,16 @@ insert into opinion (rating, comment, answer, created_at) values
                                                               (2, 'Lekarz przepisał lekarstwa, następnie poszedłem wykupić lekarstwa, gdzie Pani w aptece poinformowała mnie, że łączenie dwóch leków może wywołać interakcje. Nie kupiłem tych lekarstw. Napisałem do lekarza odpisał mi: dlaczego?', null, '2025-10-14T17:29:10'),
                                                               (4, 'OK.', null, '2025-10-15T07:17:06');
 
-insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient, notification_sent) values
-                                                                                                                                             ('2025-10-28T08:00:00', '2025-10-28T09:00:00', 'FINISHED', 'odczuwam chroniczny stres i mam napady lękowe', 5, 1, 4, 1, 1),
-                                                                                                                                             ('2025-10-28T10:00:00', '2025-10-28T10:40:00', 'FINISHED', 'chciałbym sobię zapalić nieco trawkę', 1, 2, 5, 8, 1),
-                                                                                                                                             ('2025-10-28T13:00:00', '2025-10-28T13:30:00', 'FINISHED', 'chłop za dużo gra w robloxa', 4, 3, 10, 9, 1);
+insert into payment (amount, created_at, completed_at, method, status) values
+                                                                           (250, '2025-10-14T07:51:52', '2025-10-14T07:52:31', 'OFFLINE', 'COMPLETED'),
+                                                                           (350, '2025-10-14T07:51:52', '2025-10-14T07:52:31', 'OFFLINE', 'COMPLETED'),
+                                                                           (300, '2025-10-15T07:51:52', '2025-10-15T07:52:31', 'OFFLINE', 'COMPLETED');
+
+insert into appointment (started_at, finished_at, status, description, fk_service, fk_opinion, fk_doctor, fk_patient, notification_sent, fk_payment) values
+                                                                                                                                             ('2025-10-28T08:00:00', '2025-10-28T09:00:00', 'FINISHED', 'odczuwam chroniczny stres i mam napady lękowe', 5, 1, 4, 1, 1, 1),
+                                                                                                                                             ('2025-10-28T10:00:00', '2025-10-28T10:40:00', 'FINISHED', 'chciałbym sobię zapalić nieco trawkę', 1, 2, 5, 8, 1, 2),
+                                                                                                                                             ('2025-10-28T13:00:00', '2025-10-28T13:30:00', 'FINISHED', 'chłop za dużo gra w robloxa', 4, 3, 10, 9, 1,3);
 
 
-insert into payment (amount, created_at, completed_at, method, status, fk_appointment) values
-                                                                                           (250, '2025-10-14T07:51:52', '2025-10-14T07:52:31', 'OFFLINE', 'COMPLETED', 1),
-                                                                                           (350, '2025-10-14T07:51:52', '2025-10-14T07:52:31', 'OFFLINE', 'COMPLETED', 2),
-                                                                                           (300, '2025-10-15T07:51:52', '2025-10-15T07:52:31', 'OFFLINE', 'COMPLETED', 3);
 
 

@@ -55,7 +55,7 @@ public class DoctorCreateSchedule {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
 
-        scheduleValidator.validateSchedule(request.startedAt, request.finishedAt, doctorFromDb, servicesFromDb);
+        scheduleValidator.validateTimeslotAndServices(request.startedAt, request.finishedAt, doctorFromDb, servicesFromDb);
 
         Schedule schedule = Schedule.builder()
                 .doctor(doctorFromDb)

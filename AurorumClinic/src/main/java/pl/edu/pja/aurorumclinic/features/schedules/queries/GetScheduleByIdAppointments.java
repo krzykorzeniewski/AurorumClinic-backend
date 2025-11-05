@@ -79,6 +79,8 @@ public class GetScheduleByIdAppointments {
                                 .id(appointmentFromDb.getPatient().getId())
                                 .name(appointmentFromDb.getPatient().getName())
                                 .surname(appointmentFromDb.getPatient().getSurname())
+                                .phoneNumber(appointmentFromDb.getPatient().getPhoneNumber())
+                                .email(appointmentFromDb.getPatient().getEmail())
                                 .build())
                         .build());
         return response;
@@ -106,7 +108,9 @@ public class GetScheduleByIdAppointments {
         @Builder
         record PatientDto(Long id,
                                  String name,
-                                 String surname) {
+                                 String surname,
+                                 String phoneNumber,
+                                 String email) {
         }
         @Builder
         record DoctorDto(Long id,
