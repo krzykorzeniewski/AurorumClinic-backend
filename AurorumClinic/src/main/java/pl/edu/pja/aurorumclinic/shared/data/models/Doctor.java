@@ -59,4 +59,8 @@ public class Doctor extends User {
             inverseJoinColumns = @JoinColumn(name = "PK_Specialization"))
     private Set<Specialization> specializations;
 
+    @OneToMany(mappedBy = "doctor")
+    @ToString.Exclude
+    private Set<Absence> absences;
+
 }
