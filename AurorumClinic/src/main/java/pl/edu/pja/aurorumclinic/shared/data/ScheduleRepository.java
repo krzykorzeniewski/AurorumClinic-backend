@@ -37,4 +37,15 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
                   and s.finishedAt <= :finishedAt
             """)
     Page<Schedule> findAllSchedulesBetweenDates(LocalDateTime startedAt, LocalDateTime finishedAt, Pageable pageable);
+
+    @Query("""
+            select case when count(s) > 0 then true else false end
+                from Schedule s
+                where s.doctor.id = :doctorId
+                  and s.startedAt < :finishedAt
+                  and s.finishedAt > :startedAt
+                  and s.id != :scheduleId
+            """)
+    boolean scheduleExistsInIntervalForDoctorExcludingId(LocalDateTime startedAt, LocalDateTime finishedAt,
+                                                         Long doctorId, Long scheduleId);
 }

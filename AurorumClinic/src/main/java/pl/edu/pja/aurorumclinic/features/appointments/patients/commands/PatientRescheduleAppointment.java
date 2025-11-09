@@ -49,8 +49,8 @@ public class PatientRescheduleAppointment {
         }
         LocalDateTime newStartedAt = request.startedAt();
         LocalDateTime newFinishedAt = newStartedAt.plusMinutes(appointmentFromDb.getService().getDuration());
-        appointmentValidator.validateAppointment(newStartedAt, newFinishedAt, appointmentFromDb.getDoctor(),
-                appointmentFromDb.getService());
+        appointmentValidator.validateRescheduledAppointment(newStartedAt, newFinishedAt, appointmentFromDb.getDoctor(),
+                appointmentFromDb.getService(), appointmentFromDb);
 
         appointmentFromDb.setStartedAt(newStartedAt);
         appointmentFromDb.setFinishedAt(newFinishedAt);

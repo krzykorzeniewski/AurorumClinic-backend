@@ -3,12 +3,10 @@ package pl.edu.pja.aurorumclinic.features.schedules;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
-import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
-import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
-import pl.edu.pja.aurorumclinic.shared.data.models.Service;
-import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
+import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.time.LocalDateTime;
@@ -22,6 +20,7 @@ public class ScheduleValidator {
 
     private final ScheduleRepository scheduleRepository;
     private final AppointmentRepository appointmentRepository;
+    private final AbsenceRepository absenceRepository;
 
     @Value("${workday.start.hour}")
     private Integer startOfDay;
@@ -32,6 +31,12 @@ public class ScheduleValidator {
     public void validateTimeslotAndServices(
             LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor, List<Service> services) {
         validateTimeSlot(startedAt, finishedAt, doctor.getId());
+        validateSpecializations(doctor, services);
+    }
+
+    public void validateNewTimeslotAndServices(
+            LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor, List<Service> services, Schedule schedule) {
+        validateNewTimeSlot(startedAt, finishedAt, doctor.getId(), schedule);
         validateSpecializations(doctor, services);
     }
 
@@ -86,6 +91,34 @@ public class ScheduleValidator {
         if (scheduleRepository.scheduleExistsInIntervalForDoctor(startedAt,
                 finishedAt, doctorId)) {
             throw new ApiException("Schedule overlaps with already existing one", "schedule");
+        }
+        if (absenceRepository.absenceExistsInIntervalForDoctor(startedAt, finishedAt, doctorId)) {
+            throw new ApiException("Schedule overlaps with already existing absence", "schedule");
+        }
+    }
+
+    private void validateNewTimeSlot(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId, Schedule schedule) {
+        if (!Objects.equals(startedAt.getDayOfMonth(), finishedAt.getDayOfMonth())) {
+            throw new ApiException("Schedule can be one day long", "startedAt, finishedAt");
+        }
+        if (startedAt.getHour() < startOfDay) {
+            throw new ApiException("Start date cannot be before work hours", "startedAt");
+        }
+        if (finishedAt.getHour() > endOfDay) {
+            throw new ApiException("End date cannot be after work hours", "finishedAt");
+        }
+        if (startedAt.isAfter(finishedAt)) {
+            throw new ApiException("Start date cannot be after end date", "startedAt");
+        }
+        if (finishedAt.isBefore(startedAt)) {
+            throw new ApiException("End date cannot be before start date", "finishedAt");
+        }
+        if (scheduleRepository.scheduleExistsInIntervalForDoctorExcludingId(startedAt,
+                finishedAt, doctorId, schedule.getId())) {
+            throw new ApiException("Schedule overlaps with already existing one", "schedule");
+        }
+        if (absenceRepository.absenceExistsInIntervalForDoctor(startedAt, finishedAt, doctorId)) {
+            throw new ApiException("Schedule overlaps with already existing absence", "schedule");
         }
     }
     

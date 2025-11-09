@@ -47,8 +47,8 @@ public class EmployeeUpdateSchedule {
         if (servicesFromDb.size() > request.serviceIds.size()) {
             throw new ApiException("Some service ids are not found", "serviceIds");
         }
-        scheduleValidator.validateTimeslotAndServices(request.startedAt, request.finishedAt, scheduleFromDb.getDoctor(),
-                servicesFromDb);
+        scheduleValidator.validateNewTimeslotAndServices(request.startedAt, request.finishedAt, scheduleFromDb.getDoctor(),
+                servicesFromDb, scheduleFromDb);
         scheduleValidator.checkIfScheduleHasAppointmentsInOldTimeslot(scheduleFromDb, request.startedAt, request.finishedAt);
 
         scheduleFromDb.setStartedAt(request.startedAt);
