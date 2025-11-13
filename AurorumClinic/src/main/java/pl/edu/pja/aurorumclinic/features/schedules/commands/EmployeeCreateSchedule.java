@@ -1,6 +1,7 @@
 package pl.edu.pja.aurorumclinic.features.schedules.commands;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

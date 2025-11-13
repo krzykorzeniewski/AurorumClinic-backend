@@ -28,73 +28,72 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('EMPLOYEE', 'DOCTOR')")
-public class GetScheduleByIdAppointments {
+@PreAuthorize("hasRole('EMPLOYEE')")
+public class EmployeeGetScheduleByIdAppointments {
 
     private final ScheduleRepository scheduleRepository;
     private final AppointmentRepository appointmentRepository;
     private final ObjectStorageService objectStorageService;
 
     @GetMapping("/{id}/appointments")
-    public ResponseEntity<ApiResponse<Page<GetAppointmentResponse>>> getScheduleByIdAppointments(
-            @PageableDefault Pageable pageable, @PathVariable("id") Long scheduleId) {
-        return ResponseEntity.ok(ApiResponse.success(handle(pageable, scheduleId)));
+    public ResponseEntity<ApiResponse<List<EmployeeGetScheduleAppointmentResponse>>> empGetScheduleByIdAppointments(
+            @PathVariable("id") Long scheduleId) {
+        return ResponseEntity.ok(ApiResponse.success(handle(scheduleId)));
     }
 
-    private Page<GetAppointmentResponse> handle(Pageable pageable, Long scheduleId) {
+    private List<EmployeeGetScheduleAppointmentResponse> handle(Long scheduleId) {
         scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        Page<Appointment> appointmentsFromSchedule = appointmentRepository.findByService_Schedules_Id(pageable, scheduleId);
-        Page<GetAppointmentResponse> response = appointmentsFromSchedule.map(appointmentFromDb ->
-                GetAppointmentResponse.builder()
+        List<Appointment> appointmentsFromSchedule = appointmentRepository.findByService_Schedules_Id(scheduleId);
+        return appointmentsFromSchedule.stream().map(appointmentFromDb ->
+                EmployeeGetScheduleAppointmentResponse.builder()
                         .id(appointmentFromDb.getId())
                         .status(appointmentFromDb.getStatus())
                         .startedAt(appointmentFromDb.getStartedAt())
                         .description(appointmentFromDb.getDescription())
-                        .doctor(GetAppointmentResponse.DoctorDto.builder()
+                        .doctor(EmployeeGetScheduleAppointmentResponse.DoctorDto.builder()
                                 .id(appointmentFromDb.getDoctor().getId())
                                 .name(appointmentFromDb.getDoctor().getName())
                                 .surname(appointmentFromDb.getDoctor().getSurname())
                                 .profilePicture(objectStorageService.generateUrl(appointmentFromDb.getDoctor()
                                         .getProfilePicture()))
                                 .specializations(appointmentFromDb.getDoctor().getSpecializations()
-                                        .stream().map(spec -> GetAppointmentResponse.
+                                        .stream().map(spec -> EmployeeGetScheduleAppointmentResponse.
                                                 DoctorDto.SpecializationDto.builder()
                                                 .id(spec.getId())
                                                 .name(spec.getName())
                                                 .build()).toList())
                                 .build())
-                        .service(GetAppointmentResponse.ServiceDto.builder()
+                        .service(EmployeeGetScheduleAppointmentResponse.ServiceDto.builder()
                                 .id(appointmentFromDb.getService().getId())
                                 .name(appointmentFromDb.getService().getName())
                                 .price(appointmentFromDb.getService().getPrice())
                                 .build())
-                        .payment(GetAppointmentResponse.PaymentDto.builder()
+                        .payment(EmployeeGetScheduleAppointmentResponse.PaymentDto.builder()
                                 .id(appointmentFromDb.getPayment().getId())
                                 .amount(appointmentFromDb.getPayment().getAmount())
                                 .status(appointmentFromDb.getPayment().getStatus())
                                 .build())
-                        .patient(GetAppointmentResponse.PatientDto.builder()
+                        .patient(EmployeeGetScheduleAppointmentResponse.PatientDto.builder()
                                 .id(appointmentFromDb.getPatient().getId())
                                 .name(appointmentFromDb.getPatient().getName())
                                 .surname(appointmentFromDb.getPatient().getSurname())
                                 .phoneNumber(appointmentFromDb.getPatient().getPhoneNumber())
                                 .email(appointmentFromDb.getPatient().getEmail())
                                 .build())
-                        .build());
-        return response;
+                        .build()).toList();
     }
 
     @Builder
-     record GetAppointmentResponse(Long id,
-                                         @JsonFormat(shape = JsonFormat.Shape.STRING) AppointmentStatus status,
-                                         LocalDateTime startedAt,
-                                         String description,
-                                         DoctorDto doctor,
-                                         ServiceDto service,
-                                         PaymentDto payment,
-                                         PatientDto patient) {
+     record EmployeeGetScheduleAppointmentResponse(Long id,
+                                                   @JsonFormat(shape = JsonFormat.Shape.STRING) AppointmentStatus status,
+                                                   LocalDateTime startedAt,
+                                                   String description,
+                                                   DoctorDto doctor,
+                                                   ServiceDto service,
+                                                   PaymentDto payment,
+                                                   PatientDto patient) {
         @Builder
         record ServiceDto(Long id,
                                  String name,

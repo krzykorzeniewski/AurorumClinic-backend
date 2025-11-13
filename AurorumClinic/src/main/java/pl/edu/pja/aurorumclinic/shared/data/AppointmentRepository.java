@@ -61,7 +61,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            """)
     boolean existsBetweenUsers(Long participantId, Long secParticipantId);
 
-    Page<Appointment> findByService_Schedules_Id(Pageable pageable, Long scheduleId);
+    List<Appointment> findByService_Schedules_Id(Long scheduleId);
 
     @Query("""
             select count(a1.id) as scheduled,
@@ -116,4 +116,30 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            """)
     Set<Long> getAppointmentsInScheduleTimeslot(Long scheduleId, LocalDateTime oldStartedAt, LocalDateTime oldFinishedAt,
                                                 LocalDateTime newStartedAt, LocalDateTime newFinishedAt);
+
+    @Query("""
+    select case
+             when exists (
+                 select 1
+                 from Schedule s
+                 join s.services s2
+                 where s.doctor.id = :doctorId
+                   and s.startedAt <= :startedAt
+                   and s.finishedAt >= :finishedAt
+                   and s2.id = :serviceId
+             )
+             and not exists (
+                 select 1
+                 from Appointment a
+                 where a.doctor.id = :doctorId
+                   and a.startedAt < :finishedAt
+                   and a.finishedAt > :startedAt
+                   and a.id != :appointmentId
+             )
+             then true
+             else false
+           end
+    """)
+    boolean isTimeSlotAvailableExcludingId(LocalDateTime startedAt, LocalDateTime finishedAt,
+                                           Long doctorId, Long serviceId, Long appointmentId);
 }

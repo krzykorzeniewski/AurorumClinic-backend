@@ -68,6 +68,10 @@ insert into schedule (started_at, finished_at, fk_doctor) values
                                                               ('2025-11-04T10:00:00', '2025-11-04T19:00:00', 17),
                                                               ('2025-11-05T10:00:00', '2025-11-05T19:00:00', 17);
 
+insert into absence (name, started_at, finished_at, fk_doctor) values ('Święta Bożego Narodzenia', '2025-12-24T12:00:00', '2025-12-26T21:00:00', 4),
+                                                                      ('Święta Bożego Narodzenia', '2025-12-24T12:00:00', '2025-12-26T21:00:00', 5),
+                                                                      ('Święta Bożego Narodzenia', '2025-12-24T12:00:00', '2025-12-26T21:00:00', 10)
+
 
 insert into service (name, duration, price, description) values
                                                              ('Konsultacja psychiatryczna dorosłych (pierwsza wizyta)', 45, 350, 'Ocena stanu psychicznego z indywidualnym planem leczenia'),
