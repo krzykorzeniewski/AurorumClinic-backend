@@ -61,7 +61,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            """)
     boolean existsBetweenUsers(Long participantId, Long secParticipantId);
 
-    Page<Appointment> findByService_Schedules_Id(Pageable pageable, Long scheduleId);
+    List<Appointment> findByService_Schedules_Id(Long scheduleId);
 
     @Query("""
             select count(a1.id) as scheduled,
