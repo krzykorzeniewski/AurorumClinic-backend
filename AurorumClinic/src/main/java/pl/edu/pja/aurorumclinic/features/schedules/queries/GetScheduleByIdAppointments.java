@@ -29,7 +29,7 @@ import java.util.List;
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('EMPLOYEE', 'DOCTOR')")
-public class GetScheduleByIdAppointments {
+public class GetScheduleByIdAppointments { //TODO rozdzielić
 
     private final ScheduleRepository scheduleRepository;
     private final AppointmentRepository appointmentRepository;
