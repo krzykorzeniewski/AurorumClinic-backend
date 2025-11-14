@@ -93,7 +93,7 @@ public class ScheduleValidator {
             throw new ApiException("Schedule overlaps with already existing one", "schedule");
         }
         if (absenceRepository.absenceExistsInIntervalForDoctor(startedAt, finishedAt, doctorId)) {
-            throw new ApiException("Schedule overlaps with already existing absence", "schedule");
+            throw new ApiException("Schedule overlaps with already existing absence", "absence");
         }
     }
 
@@ -118,7 +118,7 @@ public class ScheduleValidator {
             throw new ApiException("Schedule overlaps with already existing one", "schedule");
         }
         if (absenceRepository.absenceExistsInIntervalForDoctor(startedAt, finishedAt, doctorId)) {
-            throw new ApiException("Schedule overlaps with already existing absence", "schedule");
+            throw new ApiException("Schedule overlaps with already existing absence", "absence");
         }
     }
     
