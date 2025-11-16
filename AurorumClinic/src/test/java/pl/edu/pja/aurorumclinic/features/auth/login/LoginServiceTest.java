@@ -30,6 +30,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -385,9 +386,6 @@ public class LoginServiceTest {
                 .expiryDate(LocalDateTime.now())
                 .build();
 
-        MfaTokenCreatedEvent event = new MfaTokenCreatedEvent(mfaToken, testUser);
-
-
         when(userRepository.findByEmail(request.email())).thenReturn(testUser);
         when(tokenService.createOtpToken(testUser, TokenName.TWO_FACTOR_AUTH, mfaTokenExpirationInMinutes))
                 .thenReturn(mfaToken);
@@ -395,6 +393,10 @@ public class LoginServiceTest {
         loginService.createMfaToken(request);
 
         verify(tokenService).createOtpToken(testUser, TokenName.TWO_FACTOR_AUTH, mfaTokenExpirationInMinutes);
-        //verify(applicationEventPublisher).publishEvent(event);
+        assertThat(applicationEvents.stream(MfaTokenCreatedEvent.class))
+                .filteredOn(
+                        event ->
+                                Objects.equals(event.user(), testUser) && Objects.equals(event.token(), mfaToken))
+                .hasSize(1);
     }
 }
