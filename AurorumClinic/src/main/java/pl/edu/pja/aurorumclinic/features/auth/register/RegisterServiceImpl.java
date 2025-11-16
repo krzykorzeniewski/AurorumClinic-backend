@@ -1,6 +1,7 @@
 package pl.edu.pja.aurorumclinic.features.auth.register;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,9 @@ public class RegisterServiceImpl implements RegisterService{
     private final ApplicationEventPublisher applicationEventPublisher;
     private final SpecializationRepository specializationRepository;
     private final PasswordValidator passwordValidator;
+
+    @Value("${email-verification-token.expiration.minutes}")
+    private Integer emailVerificationTokenExpirationInMinutes;
 
     @Override
     @Transactional
@@ -78,7 +82,8 @@ public class RegisterServiceImpl implements RegisterService{
                 .phoneNumber(registerPatientRequest.phoneNumber())
                 .build();
         userRepository.save(patient);
-        Token emailVerificationtoken = tokenService.createToken(patient, TokenName.EMAIL_VERIFICATION, 15);
+        Token emailVerificationtoken = tokenService.createToken(patient, TokenName.EMAIL_VERIFICATION,
+                emailVerificationTokenExpirationInMinutes);
         applicationEventPublisher.publishEvent(new PatientRegisteredEvent(patient, emailVerificationtoken));
     }
 
@@ -110,7 +115,8 @@ public class RegisterServiceImpl implements RegisterService{
         if (userFromDb.isEmailVerified()) {
             throw new ApiException("Email is already verified", "email");
         }
-        Token emailVerificationtoken = tokenService.createToken(userFromDb, TokenName.EMAIL_VERIFICATION, 15);
+        Token emailVerificationtoken = tokenService.createToken(userFromDb, TokenName.EMAIL_VERIFICATION,
+                emailVerificationTokenExpirationInMinutes);
         applicationEventPublisher.publishEvent(new EmailVerificationTokenCreatedEvent(userFromDb, emailVerificationtoken));
     }
 

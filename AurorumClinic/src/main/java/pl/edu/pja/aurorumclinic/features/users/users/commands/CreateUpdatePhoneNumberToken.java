@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,6 +36,9 @@ public class CreateUpdatePhoneNumberToken {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final TokenService tokenService;
 
+    @Value("${phone-number-verification-token.expiration.minutes}")
+    private Integer phoneNumberUpdateTokenExpirationInMinutes;
+
     @PostMapping("/me/phone-number-update-token")
     @Transactional
     public ResponseEntity<ApiResponse<?>> createUpdatePhoneNumberToken(@AuthenticationPrincipal Long id,
@@ -52,7 +56,8 @@ public class CreateUpdatePhoneNumberToken {
             throw new ApiConflictException("Phone number is already taken", "phoneNumber");
         }
         userFromDb.setPendingPhoneNumber(newNumber);
-        Token token = tokenService.createOtpToken(userFromDb, TokenName.PHONE_NUMBER_UPDATE, 15);
+        Token token = tokenService.createOtpToken(userFromDb, TokenName.PHONE_NUMBER_UPDATE,
+                phoneNumberUpdateTokenExpirationInMinutes);
         applicationEventPublisher.publishEvent(new UpdatePhoneNumberTokenCreatedEvent(userFromDb, token));
     }
 

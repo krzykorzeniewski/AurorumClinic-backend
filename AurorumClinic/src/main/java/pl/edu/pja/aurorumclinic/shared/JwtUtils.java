@@ -24,6 +24,9 @@ public class JwtUtils {
     @Value("${jwt.issuer}")
     private String issuer;
 
+    @Value("${jwt.expiration.minutes}")
+    private Integer expirationInMinutes;
+
     public String createJwt(User user) {
         return Jwts.builder()
                 .header()
@@ -33,7 +36,7 @@ public class JwtUtils {
                     .issuer(issuer)
                     .subject(String.valueOf(user.getId()))
                     .add("role", user.getRole().name())
-                    .expiration(Date.from(Instant.now().plus(15, ChronoUnit.MINUTES)))
+                    .expiration(Date.from(Instant.now().plus(expirationInMinutes, ChronoUnit.MINUTES)))
                 .and()
                 .signWith(getSecretKey())
                 .compact();
@@ -67,7 +70,7 @@ public class JwtUtils {
         try {
             Jws<Claims> claims = Jwts.parser()
                     .requireIssuer(issuer)
-                .clockSkewSeconds(120)
+                    .clockSkewSeconds(120)
                     .verifyWith(getSecretKey())
                     .build()
                     .parseSignedClaims(jwt);

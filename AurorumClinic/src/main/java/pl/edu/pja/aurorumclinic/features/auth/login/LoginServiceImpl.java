@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.auth.login;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,12 @@ public class LoginServiceImpl implements LoginService{
     private final TokenService tokenService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    @Value("${refresh-token-expiration-minutes}")
+    private Integer refreshTokenExpirationInMinutes;
+
+    @Value("${2fa-login-token.expiration.minutes}")
+    private Integer mfaTokenExpirationInMinutes;
+
     @Override
     @Transactional
     public LoginUserResponse login(LoginUserRequest loginUserRequest) {
@@ -49,7 +56,7 @@ public class LoginServiceImpl implements LoginService{
         }
 
         String jwt = jwtUtils.createJwt(userFromDb);
-        Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);
+        Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, refreshTokenExpirationInMinutes);
 
         return LoginUserResponse.builder()
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
@@ -79,7 +86,7 @@ public class LoginServiceImpl implements LoginService{
         tokenService.validateAndDeleteToken(userFromDb, refreshAccessTokenRequest.refreshToken());
 
         String newJwt = jwtUtils.createJwt(userFromDb);
-        Token newRefreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);;
+        Token newRefreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, refreshTokenExpirationInMinutes);
 
         return LoginUserResponse.builder()
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
@@ -99,7 +106,7 @@ public class LoginServiceImpl implements LoginService{
         tokenService.validateAndDeleteToken(userFromDb, twoFactorAuthLoginRequest.token());
 
         String jwt = jwtUtils.createJwt(userFromDb);
-        Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, 60 * 24);
+        Token refreshToken = tokenService.createToken(userFromDb, TokenName.REFRESH, refreshTokenExpirationInMinutes);
 
         return LoginUserResponse.builder()
                 .twoFactorAuth(userFromDb.isTwoFactorAuth())
@@ -121,7 +128,7 @@ public class LoginServiceImpl implements LoginService{
         if (!userFromDb.isTwoFactorAuth()) {
             throw new ApiAuthenticationException("Given email has 2fa disabled", "email");
         }
-        Token token = tokenService.createOtpToken(userFromDb, TokenName.TWO_FACTOR_AUTH, 1);
+        Token token = tokenService.createOtpToken(userFromDb, TokenName.TWO_FACTOR_AUTH, mfaTokenExpirationInMinutes);
         applicationEventPublisher.publishEvent(new MfaTokenCreatedEvent(token, userFromDb));
     }
 

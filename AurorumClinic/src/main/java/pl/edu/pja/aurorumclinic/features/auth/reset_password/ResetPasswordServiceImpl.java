@@ -1,6 +1,7 @@
 package pl.edu.pja.aurorumclinic.features.auth.reset_password;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class ResetPasswordServiceImpl implements ResetPasswordService{
     private final ApplicationEventPublisher applicationEventPublisher;
     private final PasswordValidator passwordValidator;
 
+    @Value("${reset-password-token.expiration.minutes}")
+    private Integer resetPasswordTokenExpirationInMinutes;
+
     @Override
     public void createResetPasswordToken(ResetPasswordTokenRequest resetPasswordTokenRequest) {
         User userFromDb = userRepository.findByEmail(resetPasswordTokenRequest.email());
@@ -33,7 +37,8 @@ public class ResetPasswordServiceImpl implements ResetPasswordService{
         if (!userFromDb.isEmailVerified()) {
             return;
         }
-        Token token = tokenService.createToken(userFromDb, TokenName.PASSWORD_RESET, 15);
+        Token token = tokenService.createToken(userFromDb, TokenName.PASSWORD_RESET,
+                resetPasswordTokenExpirationInMinutes);
         applicationEventPublisher.publishEvent(new ResetPasswordTokenCreatedEvent(userFromDb, token));
     }
 

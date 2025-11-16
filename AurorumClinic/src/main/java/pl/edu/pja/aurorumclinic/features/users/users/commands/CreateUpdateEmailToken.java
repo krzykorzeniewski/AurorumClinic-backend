@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,6 +37,9 @@ public class CreateUpdateEmailToken {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final TokenService tokenService;
 
+    @Value("${email-verification-token.expiration.minutes}")
+    private Integer emailUpdateTokenExpirationInMinutes;
+
     @PostMapping("/me/email-update-token")
     @Transactional
     public ResponseEntity<ApiResponse<?>> createUpdateEmailToken(@AuthenticationPrincipal Long id,
@@ -53,7 +57,7 @@ public class CreateUpdateEmailToken {
             throw new ApiConflictException("Email is already taken", "email");
         }
         userFromDb.setPendingEmail(newEmail);
-        Token token = tokenService.createOtpToken(userFromDb, TokenName.EMAIL_UPDATE, 10);
+        Token token = tokenService.createOtpToken(userFromDb, TokenName.EMAIL_UPDATE, emailUpdateTokenExpirationInMinutes);
         applicationEventPublisher.publishEvent(new UpdateEmailTokenCreatedEvent(userFromDb, token));
     }
 

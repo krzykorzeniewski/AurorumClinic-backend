@@ -2,6 +2,7 @@ package pl.edu.pja.aurorumclinic.features.users.users.commands;
 
 import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +31,9 @@ public class CreateUpdateMfaToken {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final TokenService tokenService;
 
+    @Value("${2fa-update-token.expiration.minutes}")
+    private Integer mfaUpdateTokenExpirationInMinutes;
+
     @PostMapping("/me/2fa-token")
     public ResponseEntity<ApiResponse<?>> createMfaUpdateToken(@AuthenticationPrincipal Long id) {
         handle(id);
@@ -46,7 +50,8 @@ public class CreateUpdateMfaToken {
         if (userFromDb.isTwoFactorAuth()) {
             throw new ApiException("Phone number already has 2fa enabled", "phoneNumber");
         }
-        Token token = tokenService.createOtpToken(userFromDb, TokenName.TWO_FACTOR_AUTH_UPDATE, 10);
+        Token token = tokenService.createOtpToken(userFromDb, TokenName.TWO_FACTOR_AUTH_UPDATE,
+                mfaUpdateTokenExpirationInMinutes);
         applicationEventPublisher.publishEvent(new MfaTokenCreatedEvent(userFromDb, token));
     }
 
