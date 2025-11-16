@@ -32,7 +32,7 @@ public class MockUpdatePayment {
                                                        @RequestBody @Valid UpdatePaymentRequest paymentRequest) {
         handle(paymentId, paymentRequest);
         return ResponseEntity.ok(ApiResponse.success(null));
-    }
+    } //TODO if patient check if it's his payment
 
     private void handle(Long paymentId, UpdatePaymentRequest paymentRequest) {
         Payment paymentFromDb = paymentRepository.findById(paymentId).orElseThrow(

@@ -68,7 +68,7 @@ public class LoginServiceImpl implements LoginService{
 
     @Override
     @Transactional
-    public LoginUserResponse refresh (RefreshAccessTokenRequest refreshAccessTokenRequest){
+    public LoginUserResponse refresh(RefreshAccessTokenRequest refreshAccessTokenRequest){
         String jwt = refreshAccessTokenRequest.accessToken();
         Long userId;
         try {
