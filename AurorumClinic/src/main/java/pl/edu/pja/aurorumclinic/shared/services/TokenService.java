@@ -34,7 +34,7 @@ public class TokenService {
     }
 
     @Transactional
-    public Token createToken(User user, TokenName tokenName, long minutesValid) {
+    public Token createToken(User user, TokenName tokenName, int minutesValid) {
         String tokenValue = createRandomToken();
         deletePreviousTokens(user.getTokens(), tokenName);
         return tokenRepository.save(Token.builder()
@@ -47,7 +47,7 @@ public class TokenService {
     }
 
     @Transactional
-    public Token createOtpToken(User user, TokenName tokenName, long minutesValid) {
+    public Token createOtpToken(User user, TokenName tokenName, int minutesValid) {
         String otp = createOtp();
         deletePreviousTokens(user.getTokens(), tokenName);
         return tokenRepository.save(Token.builder()

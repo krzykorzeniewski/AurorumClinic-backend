@@ -2,22 +2,15 @@ package pl.edu.pja.aurorumclinic.features.auth.login;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
-import pl.edu.pja.aurorumclinic.features.auth.login.LoginService;
-import pl.edu.pja.aurorumclinic.features.auth.login.LoginServiceImpl;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.*;
 import pl.edu.pja.aurorumclinic.features.auth.login.events.MfaTokenCreatedEvent;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
@@ -360,7 +353,7 @@ public class LoginServiceTest {
     }
 
     @Test
-    void createMfaTokenShouldCreateTokenAndPublishTokenCreatedEvent(
+    void createMfaTokenShouldCreateTokenAndPublishEventWhenDataIsCorrect(
             @Autowired ApplicationEvents applicationEvents) {
         TwoFactorAuthTokenRequest request = new TwoFactorAuthTokenRequest(
                 "mariusz@example.com"
@@ -384,7 +377,7 @@ public class LoginServiceTest {
                 .build();
 
         when(userRepository.findByEmail(request.email())).thenReturn(testUser);
-        when(tokenService.createOtpToken(testUser, TokenName.TWO_FACTOR_AUTH, mfaTokenExpirationInMinutes))
+        when(tokenService.createOtpToken(any(User.class), any(TokenName.class), anyInt()))
                 .thenReturn(mfaToken);
 
         loginService.createMfaToken(request);

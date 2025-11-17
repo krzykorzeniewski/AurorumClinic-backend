@@ -12,6 +12,5 @@ public record RegisterEmployeeRequest(@NotBlank @Size(max = 50) String name,
                                       @Size(min = 11, max = 11) String pesel,
                                       @NotNull LocalDate birthDate,
                                       @NotBlank @Email @Size(max = 100) String email,
-                                      @NotBlank @Size(max = 200) String password,
                                       @NotBlank @Size(max = 9) String phoneNumber) {
 }
