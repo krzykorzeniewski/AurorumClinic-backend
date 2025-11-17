@@ -61,9 +61,6 @@ public class LoginServiceTest {
     @MockitoBean
     TokenService tokenService;
 
-    @MockitoBean
-    ApplicationEventPublisher applicationEventPublisher;
-
     @Autowired
     LoginServiceImpl loginService;
 
