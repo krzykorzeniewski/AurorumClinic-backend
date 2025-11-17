@@ -71,7 +71,7 @@ public class EmployeeUpdatePatient {
 
     public record PutPatientRequest(@NotBlank @Size(max = 50) String name,
                                     @NotBlank @Size(max = 50) String surname,
-                                    @NotBlank @Size(min = 11, max = 11) String pesel,
+                                    @Size(min = 11, max = 11) String pesel,
                                     @NotNull LocalDate birthdate,
                                     @Size(min = 9, max = 9) @NotBlank String phoneNumber,
                                     @Email @NotBlank @Size(max = 100) String email,
