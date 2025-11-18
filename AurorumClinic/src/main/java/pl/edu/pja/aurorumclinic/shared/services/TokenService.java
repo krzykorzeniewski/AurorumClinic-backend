@@ -29,7 +29,7 @@ public class TokenService {
         return Encoders.BASE64URL.encode(bytes);
     }
 
-    private String createOtp() {
+    protected String createOtp() {
         return String.format("%06d", new SecureRandom().nextInt(999999));
     }
 
