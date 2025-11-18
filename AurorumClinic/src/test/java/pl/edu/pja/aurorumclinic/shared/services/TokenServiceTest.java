@@ -67,14 +67,14 @@ public class TokenServiceTest {
         int minutesValid = 10;
 
         when(spyTokenService.createRandomToken()).thenReturn(tokenValue);
-        spyTokenService.deletePreviousTokens(anyList(), any(TokenName.class));
         when(passwordEncoder.encode(anyString())).thenReturn(tokenValue);
 
         tokenService.createToken(testUser, name, minutesValid);
 
         ArgumentCaptor<Token> tokenArgumentCaptor = ArgumentCaptor.forClass(Token.class);
         verify(tokenRepository).save(tokenArgumentCaptor.capture());
-
+        verify(spyTokenService).deletePreviousTokens(testUser.getTokens(), name);
+        verify(passwordEncoder).encode(tokenValue);
         Token savedToken = tokenArgumentCaptor.getValue();
 
         assertThat(savedToken).isNotNull();
@@ -96,14 +96,14 @@ public class TokenServiceTest {
         int minutesValid = 5;
 
         when(spyTokenService.createOtp()).thenReturn(tokenValue);
-        spyTokenService.deletePreviousTokens(anyList(), any(TokenName.class));
         when(passwordEncoder.encode(anyString())).thenReturn(tokenValue);
 
         tokenService.createOtpToken(testUser, name, minutesValid);
 
         ArgumentCaptor<Token> tokenArgumentCaptor = ArgumentCaptor.forClass(Token.class);
         verify(tokenRepository).save(tokenArgumentCaptor.capture());
-
+        verify(spyTokenService).deletePreviousTokens(testUser.getTokens(), name);
+        verify(passwordEncoder).encode(tokenValue);
         Token savedToken = tokenArgumentCaptor.getValue();
 
         assertThat(savedToken).isNotNull();
@@ -133,6 +133,7 @@ public class TokenServiceTest {
         assertThatThrownBy(() -> tokenService.validateAndDeleteToken(testUser, inputValue))
                 .isExactlyInstanceOf(ApiException.class)
                 .hasMessageContaining("Invalid");
+        verify(passwordEncoder).matches(inputValue, testToken.getValue());
     }
 
     @Test
@@ -147,11 +148,14 @@ public class TokenServiceTest {
                 .tokens(List.of(testToken))
                 .build();
 
+        String inputValue = "some hashed value not equal";
+
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-        assertThatThrownBy(() -> tokenService.validateAndDeleteToken(testUser, testToken.getValue()))
+        assertThatThrownBy(() -> tokenService.validateAndDeleteToken(testUser, inputValue))
                 .isExactlyInstanceOf(ApiException.class)
                 .hasMessageContaining("expired");
+        verify(passwordEncoder).matches(inputValue, testToken.getValue());
     }
 
     @Test
@@ -168,9 +172,11 @@ public class TokenServiceTest {
                 .build();
         testToken.setUser(testUser);
 
+        String inputValue = "some hashed value not equal";
+
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
-        tokenService.validateAndDeleteToken(testUser, testToken.getValue());
+        tokenService.validateAndDeleteToken(testUser, inputValue);
 
         ArgumentCaptor<Token> tokenArgumentCaptor = ArgumentCaptor.forClass(Token.class);
         verify(tokenRepository).delete(tokenArgumentCaptor.capture());
@@ -179,6 +185,7 @@ public class TokenServiceTest {
         assertThat(deletedToken.getId()).isEqualTo(testToken.getId());
         assertThat(deletedToken.getUser()).isEqualTo(testToken.getUser());
         assertThat(deletedToken.getValue()).isEqualTo(testToken.getValue());
+        verify(passwordEncoder).matches(inputValue, testToken.getValue());
     }
 
     @Test

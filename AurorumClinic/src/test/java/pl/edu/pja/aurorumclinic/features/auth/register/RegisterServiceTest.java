@@ -5,6 +5,8 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -75,10 +77,11 @@ public class RegisterServiceTest {
                 Set.of(1L, 2L, 3L)
         );
 
-        when(specializationRepository.findAllById(request.specializationIds()))
+        when(specializationRepository.findAllById(any()))
                 .thenReturn(List.of(new Specialization()));
 
         assertThatThrownBy(() -> registerService.registerDoctor(request)).isExactlyInstanceOf(ApiException.class);
+        verify(specializationRepository).findAllById(request.specializationIds());
     }
 
     @Test
@@ -102,8 +105,7 @@ public class RegisterServiceTest {
         );
         String randomPassword = "Haslo123456789";
 
-        when(specializationRepository.findAllById(request.specializationIds()))
-                .thenReturn(List.of(testSpecialization));
+        when(specializationRepository.findAllById(any())).thenReturn(List.of(testSpecialization));
         when(tokenService.createRandomToken()).thenReturn(randomPassword);
         when(passwordEncoder.encode(anyString())).then(invocation -> invocation.getArgument(0));
 
@@ -128,6 +130,8 @@ public class RegisterServiceTest {
         assertThat(savedDoctor.getPwzNumber()).isEqualTo(request.pwzNumber());
         assertThat(savedDoctor.isEmailVerified()).isEqualTo(true);
         assertThat(savedDoctor.getSpecializations()).containsExactly(testSpecialization);
+        verify(specializationRepository).findAllById(request.specializationIds());
+        verify(passwordEncoder).encode(randomPassword.substring(0, 10));
 
         assertThat(applicationEvents.stream(DoctorRegisteredEvent.class))
                 .filteredOn(
@@ -155,7 +159,6 @@ public class RegisterServiceTest {
                 .rawValue("some raw value")
                 .build();
 
-        passwordValidator.validatePassword(anyString());
         when(passwordEncoder.encode(anyString())).thenReturn(request.password());
         when(tokenService.createToken(any(User.class), any(TokenName.class), anyInt()))
                 .thenReturn(emailVerificationToken);
@@ -187,6 +190,8 @@ public class RegisterServiceTest {
                                 Objects.equals(event.user(), savedPatient) &&
                                         Objects.equals(event.token(), emailVerificationToken))
                 .hasSize(1);
+        verify(passwordValidator).validatePassword(request.password());
+        verify(passwordEncoder).encode(request.password());
     }
 
     @Test
@@ -235,22 +240,24 @@ public class RegisterServiceTest {
     void createVerifyEmailTokenShouldThrowApiNotFoundExceptionWhenEmailIsNotFound() {
         VerifyEmailTokenRequest request = new VerifyEmailTokenRequest("mariusz@example.com");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(null);
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
 
         assertThatThrownBy(() -> registerService.createVerifyEmailToken(request))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
     void createVerifyEmailTokenShouldThrowApiExceptionWhenEmailIsVerified() {
         VerifyEmailTokenRequest request = new VerifyEmailTokenRequest("mariusz@example.com");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(User.builder()
+        when(userRepository.findByEmail(anyString())).thenReturn(User.builder()
                         .emailVerified(true)
                 .build());
 
         assertThatThrownBy(() -> registerService.createVerifyEmailToken(request))
                 .isExactlyInstanceOf(ApiException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
@@ -269,7 +276,7 @@ public class RegisterServiceTest {
                 .rawValue("some raw value")
                 .build();
 
-        when(userRepository.findByEmail(request.email())).thenReturn(testUser);
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
         when(tokenService.createToken(any(User.class), any(TokenName.class), anyInt()))
                 .thenReturn(testEmailVerificationToken);
 
@@ -277,6 +284,7 @@ public class RegisterServiceTest {
 
         verify(tokenService).createToken(testUser, TokenName.EMAIL_VERIFICATION,
                 emailVerificationTokenExpirationInMinutes);
+        verify(userRepository).findByEmail(request.email());
 
         assertThat(applicationEvents.stream(EmailVerificationTokenCreatedEvent.class))
                 .filteredOn(event -> Objects.equals(event.user(), testUser) &&
@@ -289,20 +297,22 @@ public class RegisterServiceTest {
     void verifyEmailShouldThrowApiNotFoundExceptionWhenEmailIsNotFound() {
         VerifyEmailRequest request = new VerifyEmailRequest("random token", "mariusz@example.com");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(null);
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
 
         assertThatThrownBy(() -> registerService.verifyEmail(request)).isExactlyInstanceOf(ApiNotFoundException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
     void verifyEmailShouldThrowApiExceptionWhenEmailIsVerified() {
         VerifyEmailRequest request = new VerifyEmailRequest("random token", "mariusz@example.com");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(User.builder()
+        when(userRepository.findByEmail(anyString())).thenReturn(User.builder()
                 .emailVerified(true)
                 .build());
 
         assertThatThrownBy(() -> registerService.verifyEmail(request)).isExactlyInstanceOf(ApiException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
@@ -314,31 +324,39 @@ public class RegisterServiceTest {
                 .emailVerified(false)
                 .build();
 
-        when(userRepository.findByEmail(request.email())).thenReturn(testUser);
-        tokenService.validateAndDeleteToken(any(User.class), anyString());
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
 
         registerService.verifyEmail(request);
 
         verify(tokenService).validateAndDeleteToken(testUser, request.token());
         assertThat(testUser.isEmailVerified()).isEqualTo(true);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
     void createNewPasswordShouldThrowApiNotFoundExceptionWhenIdIsNotFound() {
+        Long userId = 1L;
+
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> registerService.createNewPassword(1L))
+
+        assertThatThrownBy(() -> registerService.createNewPassword(userId))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
+        verify(userRepository).findById(userId);
     }
 
     @Test
     void createNewPasswordShouldThrowApiExceptionWhenUserHasPatientRole() {
+        Long userId = 1L;
+
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(
                 User.builder()
                         .role(UserRole.PATIENT)
                         .build()
         ));
-        assertThatThrownBy(() -> registerService.createNewPassword(1L))
+
+        assertThatThrownBy(() -> registerService.createNewPassword(userId))
                 .isExactlyInstanceOf(ApiException.class);
+        verify(userRepository).findById(userId);
     }
 
     @Test
@@ -365,6 +383,8 @@ public class RegisterServiceTest {
                 .filteredOn(event -> Objects.equals(event.user(), testUser)
                         && Objects.equals(event.password(), correctPassword))
                 .hasSize(1);
+        verify(userRepository).findById(testUser.getId());
+        verify(passwordEncoder).encode(correctPassword);
     }
 
 }

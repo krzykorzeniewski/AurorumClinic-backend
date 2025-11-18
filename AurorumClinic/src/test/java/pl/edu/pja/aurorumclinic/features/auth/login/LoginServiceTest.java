@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.event.ApplicationEvents;
@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -46,7 +45,7 @@ public class LoginServiceTest {
     UserRepository userRepository;
 
     @MockitoBean
-    PasswordEncoder passwordEncoder;
+    BCryptPasswordEncoder passwordEncoder;
 
     @MockitoBean
     JwtUtils jwtUtils;
@@ -61,26 +60,27 @@ public class LoginServiceTest {
     void loginShouldThrowApiAuthExceptionWhenEmailIsNotFound() {
         LoginUserRequest loginUserRequest = new LoginUserRequest("mariusz@example.com", "1234");
 
-        when(userRepository.findByEmail(loginUserRequest.email())).thenReturn(null);
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
 
         assertThatThrownBy(() -> loginService.login(loginUserRequest))
                 .isExactlyInstanceOf(ApiAuthenticationException.class);
+        verify(userRepository).findByEmail(loginUserRequest.email());
     }
 
     @Test
     void loginShouldThrowApiAuthExceptionWhenPasswordIsInvalid() {
         User testUser = User.builder()
                 .email("mariusz@example.com")
-                .password("123")
+                .password("hashed_pass")
                 .build();
-        LoginUserRequest loginUserRequest = new LoginUserRequest(testUser.getEmail(), "1234");
+        LoginUserRequest loginUserRequest = new LoginUserRequest(testUser.getEmail(), "wrong_pass");
 
-        when(userRepository.findByEmail(loginUserRequest.email())).thenReturn(testUser);
-
-        when(passwordEncoder.matches(loginUserRequest.password(), testUser.getPassword())).thenReturn(false);
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
         assertThatThrownBy(() -> loginService.login(loginUserRequest))
                 .isExactlyInstanceOf(ApiAuthenticationException.class);
+        verify(passwordEncoder).matches(loginUserRequest.password(), testUser.getPassword());
     }
 
     @Test
@@ -92,12 +92,12 @@ public class LoginServiceTest {
                 .build();
         LoginUserRequest loginUserRequest = new LoginUserRequest("mariusz@example.com", "1234");
 
-        when(userRepository.findByEmail(loginUserRequest.email())).thenReturn(testUser);
-
-        when(passwordEncoder.matches(loginUserRequest.password(), testUser.getPassword())).thenReturn(true);
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
         assertThatThrownBy(() -> loginService.login(loginUserRequest))
                 .isExactlyInstanceOf(ApiAuthenticationException.class);
+        verify(userRepository).findByEmail(loginUserRequest.email());
     }
 
     @Test
@@ -111,9 +111,8 @@ public class LoginServiceTest {
                 .build();
         LoginUserRequest loginUserRequest = new LoginUserRequest("mariusz@example.com", "1234");
 
-        when(userRepository.findByEmail(loginUserRequest.email())).thenReturn(testUser);
-
-        when(passwordEncoder.matches(loginUserRequest.password(), testUser.getPassword())).thenReturn(true);
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
         LoginUserResponse response = loginService.login(loginUserRequest);
 
@@ -122,6 +121,8 @@ public class LoginServiceTest {
         assertThat(response.role()).isEqualTo(UserRole.PATIENT);
         assertThat(response.accessToken()).isNull();
         assertThat(response.refreshToken()).isNull();
+        verify(userRepository).findByEmail(loginUserRequest.email());
+        verify(passwordEncoder).matches(loginUserRequest.password(), testUser.getPassword());
     }
 
     @Test
@@ -137,13 +138,11 @@ public class LoginServiceTest {
         String jwt = "jwt";
         String refreshToken = "rt";
 
-        when(userRepository.findByEmail(loginUserRequest.email())).thenReturn(testUser);
-
-        when(passwordEncoder.matches(loginUserRequest.password(), testUser.getPassword())).thenReturn(true);
-
-        when(jwtUtils.createJwt(testUser)).thenReturn(jwt);
-        when(tokenService.createToken(testUser, TokenName.REFRESH, refreshTokenExpirationInMinutes)).thenReturn(Token.builder()
-                        .rawValue(refreshToken)
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(jwtUtils.createJwt(any(User.class))).thenReturn(jwt);
+        when(tokenService.createToken(any(User.class), any(TokenName.class), anyInt())).thenReturn(Token.builder()
+                .rawValue(refreshToken)
                 .build());
 
         LoginUserResponse response = loginService.login(loginUserRequest);
@@ -153,6 +152,8 @@ public class LoginServiceTest {
         assertThat(response.role()).isEqualTo(UserRole.PATIENT);
         assertThat(response.accessToken()).isEqualTo(jwt);
         assertThat(response.refreshToken()).isEqualTo(refreshToken);
+        verify(jwtUtils).createJwt(testUser);
+        verify(tokenService).createToken(testUser, TokenName.REFRESH, refreshTokenExpirationInMinutes);
     }
 
     @Test
@@ -161,10 +162,11 @@ public class LoginServiceTest {
                 "definitely not valid access token",
                 "refresh token");
 
-        when(jwtUtils.validateJwt(request.accessToken())).thenThrow(new JwtException("jwt exception"));
+        when(jwtUtils.validateJwt(anyString())).thenThrow(new JwtException("jwt exception"));
 
         assertThatThrownBy(() -> loginService.refresh(request))
                 .isExactlyInstanceOf(ApiAuthenticationException.class);
+        verify(jwtUtils).validateJwt(request.accessToken());
     }
 
     @Test
@@ -180,23 +182,24 @@ public class LoginServiceTest {
         RefreshAccessTokenRequest request = new RefreshAccessTokenRequest(
                 "access token",
                 "refresh token");
-
+        String newJwt = "new access token";
         Token testToken = Token.builder()
                 .id(1L)
-                .value("some value")
-                .rawValue("some value")
+                .value("new refresh token hashed value")
+                .rawValue("new refresh token value")
                 .build();
 
         when(jwtUtils.validateJwt(anyString())).thenThrow(new ExpiredJwtException(null, null, null));
         when(jwtUtils.getUserIdFromExpiredJwt(anyString())).thenReturn(testUser.getId());
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
-        tokenService.validateAndDeleteToken(testUser, "");
-        when(jwtUtils.createJwt(testUser)).thenReturn("");
-        when(tokenService.createToken(testUser, TokenName.REFRESH, refreshTokenExpirationInMinutes)).thenReturn(
-                testToken
-        );
+        when(jwtUtils.createJwt(any(User.class))).thenReturn(newJwt);
+        when(tokenService.createToken(any(User.class), any(TokenName.class), anyInt())).thenReturn(testToken);
 
         assertThatNoException().isThrownBy(() -> loginService.refresh(request));
+        verify(jwtUtils).validateJwt(request.accessToken());
+        verify(jwtUtils).getUserIdFromExpiredJwt(request.accessToken());
+        verify(tokenService).validateAndDeleteToken(testUser, request.refreshToken());
+        verify(jwtUtils).createJwt(testUser);
     }
 
     @Test
@@ -204,12 +207,17 @@ public class LoginServiceTest {
         RefreshAccessTokenRequest request = new RefreshAccessTokenRequest(
                 "access token",
                 "refresh token");
+        Long userId = 1L;
 
-        jwtUtils.validateJwt(anyString());
-        when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(null);
+        when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(userId);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> loginService.refresh(request))
-                .isExactlyInstanceOf(ApiAuthenticationException.class);
+                .isExactlyInstanceOf(ApiAuthenticationException.class)
+                .hasMessageContaining("Invalid");
+        verify(jwtUtils).validateJwt(request.accessToken());
+        verify(jwtUtils).getUserIdFromJwt(request.accessToken());
+        verify(userRepository).findById(userId);
     }
 
     @Test
@@ -224,7 +232,6 @@ public class LoginServiceTest {
                 .build();
 
         String accessToken = "some access token value";
-
         RefreshAccessTokenRequest request = new RefreshAccessTokenRequest(
                 "access token",
                 "refresh token");
@@ -235,14 +242,10 @@ public class LoginServiceTest {
                 .rawValue("some refresh token value")
                 .build();
 
-        jwtUtils.validateJwt(anyString());
         when(jwtUtils.getUserIdFromJwt(anyString())).thenReturn(testUser.getId());
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
-        tokenService.validateAndDeleteToken(testUser, "");
-        when(jwtUtils.createJwt(testUser)).thenReturn(accessToken);
-        when(tokenService.createToken(testUser, TokenName.REFRESH, refreshTokenExpirationInMinutes)).thenReturn(
-                refreshToken
-        );
+        when(jwtUtils.createJwt(any(User.class))).thenReturn(accessToken);
+        when(tokenService.createToken(any(User.class), any(TokenName.class), anyInt())).thenReturn(refreshToken);
 
         LoginUserResponse response = loginService.refresh(request);
 
@@ -251,6 +254,11 @@ public class LoginServiceTest {
         assertThat(response.role()).isEqualTo(testUser.getRole());
         assertThat(response.accessToken()).isEqualTo(accessToken);
         assertThat(response.refreshToken()).isEqualTo(refreshToken.getRawValue());
+        verify(jwtUtils).validateJwt(request.accessToken());
+        verify(jwtUtils).getUserIdFromJwt(request.accessToken());
+        verify(tokenService).validateAndDeleteToken(testUser, request.refreshToken());
+        verify(jwtUtils).createJwt(testUser);
+        verify(tokenService).createToken(testUser, TokenName.REFRESH, refreshTokenExpirationInMinutes);
     }
 
     @Test
@@ -258,13 +266,14 @@ public class LoginServiceTest {
         TwoFactorAuthLoginRequest request = new TwoFactorAuthLoginRequest("123123",
                 "mariusz@example.com");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(null);
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
 
-        assertThatThrownBy(() -> loginService.login2fa(request)).isExactlyInstanceOf(ApiAuthenticationException.class);
+        assertThatThrownBy(() -> loginService.login2fa(request))
+                .isExactlyInstanceOf(ApiAuthenticationException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
-
     void login2faShouldReturnDtoWithJwtAndRefreshToken() {
         TwoFactorAuthLoginRequest request = new TwoFactorAuthLoginRequest("123123",
                 "mariusz@example.com");
@@ -283,11 +292,9 @@ public class LoginServiceTest {
                 .rawValue("some refresh token value")
                 .build();
 
-        when(userRepository.findByEmail(request.email())).thenReturn(testUser);
-        tokenService.validateAndDeleteToken(testUser, request.token());
-        when(jwtUtils.createJwt(testUser)).thenReturn(accessToken);
-        when(tokenService.createToken(testUser, TokenName.REFRESH, refreshTokenExpirationInMinutes)).
-                thenReturn(refreshToken);
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
+        when(jwtUtils.createJwt(any(User.class))).thenReturn(accessToken);
+        when(tokenService.createToken(any(User.class), any(TokenName.class), anyInt())).thenReturn(refreshToken);
 
         LoginUserResponse response = loginService.login2fa(request);
 
@@ -296,6 +303,10 @@ public class LoginServiceTest {
         assertThat(response.role()).isEqualTo(testUser.getRole());
         assertThat(response.accessToken()).isEqualTo(accessToken);
         assertThat(response.refreshToken()).isEqualTo(refreshToken.getRawValue());
+        verify(userRepository).findByEmail(request.email());
+        verify(tokenService).validateAndDeleteToken(testUser, request.token());
+        verify(jwtUtils).createJwt(testUser);
+        verify(tokenService).createToken(testUser, TokenName.REFRESH, refreshTokenExpirationInMinutes);
     }
 
     @Test
@@ -304,10 +315,11 @@ public class LoginServiceTest {
                 "mariusz@example.com"
         );
 
-        when(userRepository.findByEmail(request.email())).thenReturn(null);
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
 
         assertThatThrownBy(() -> loginService.createMfaToken(request))
                 .isExactlyInstanceOf(ApiAuthenticationException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
@@ -319,16 +331,16 @@ public class LoginServiceTest {
         User testUser = User.builder()
                 .id(1L)
                 .email("mariusz@example.com")
-                .password("1234")
                 .emailVerified(true)
                 .phoneNumberVerified(false)
                 .twoFactorAuth(true)
-                .role(UserRole.PATIENT)
                 .build();
-        when(userRepository.findByEmail(request.email())).thenReturn(testUser);
+
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
 
         assertThatThrownBy(() -> loginService.createMfaToken(request))
                 .isExactlyInstanceOf(ApiAuthenticationException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
@@ -340,16 +352,16 @@ public class LoginServiceTest {
         User testUser = User.builder()
                 .id(1L)
                 .email("mariusz@example.com")
-                .password("1234")
                 .emailVerified(true)
                 .phoneNumberVerified(true)
                 .twoFactorAuth(false)
-                .role(UserRole.PATIENT)
                 .build();
-        when(userRepository.findByEmail(request.email())).thenReturn(testUser);
+
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
 
         assertThatThrownBy(() -> loginService.createMfaToken(request))
                 .isExactlyInstanceOf(ApiAuthenticationException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
@@ -362,7 +374,6 @@ public class LoginServiceTest {
         User testUser = User.builder()
                 .id(1L)
                 .email("mariusz@example.com")
-                .password("1234")
                 .emailVerified(true)
                 .phoneNumberVerified(true)
                 .twoFactorAuth(true)
@@ -376,12 +387,12 @@ public class LoginServiceTest {
                 .expiryDate(LocalDateTime.now())
                 .build();
 
-        when(userRepository.findByEmail(request.email())).thenReturn(testUser);
-        when(tokenService.createOtpToken(any(User.class), any(TokenName.class), anyInt()))
-                .thenReturn(mfaToken);
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
+        when(tokenService.createOtpToken(any(User.class), any(TokenName.class), anyInt())).thenReturn(mfaToken);
 
         loginService.createMfaToken(request);
 
+        verify(userRepository).findByEmail(request.email());
         verify(tokenService).createOtpToken(testUser, TokenName.TWO_FACTOR_AUTH, mfaTokenExpirationInMinutes);
         assertThat(applicationEvents.stream(MfaTokenCreatedEvent.class))
                 .filteredOn(

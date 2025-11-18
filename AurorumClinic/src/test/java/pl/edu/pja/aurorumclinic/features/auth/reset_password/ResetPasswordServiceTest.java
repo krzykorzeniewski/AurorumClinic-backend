@@ -50,22 +50,24 @@ public class ResetPasswordServiceTest {
     void createResetPasswordTokenShouldDoNothingWhenEmailIsNotFound() {
         ResetPasswordTokenRequest request = new ResetPasswordTokenRequest("mariusz@example.com");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(null);
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
 
         assertThatNoException().isThrownBy(() -> resetPasswordService.createResetPasswordToken(request));
         verify(tokenService, times(0)).createToken(any(User.class), any(TokenName.class), anyInt());
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
     void createResetPasswordTokenShouldDoNothingWhenEmailIstNotVerified() {
         ResetPasswordTokenRequest request = new ResetPasswordTokenRequest("mariusz@example.com");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(User.builder()
+        when(userRepository.findByEmail(anyString())).thenReturn(User.builder()
                         .emailVerified(false)
                 .build());
 
         assertThatNoException().isThrownBy(() -> resetPasswordService.createResetPasswordToken(request));
         verify(tokenService, times(0)).createToken(any(User.class), any(TokenName.class), anyInt());
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
@@ -82,15 +84,17 @@ public class ResetPasswordServiceTest {
                 .value("some hashed value")
                 .rawValue("some raw value")
                 .build();
-        when(userRepository.findByEmail(request.email())).thenReturn(testUser);
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
         when(tokenService.createToken(any(User.class), any(TokenName.class), anyInt())).thenReturn(testToken);
 
         resetPasswordService.createResetPasswordToken(request);
+
         verify(tokenService).createToken(testUser, TokenName.PASSWORD_RESET, resetPasswordTokenExpirationInMinutes);
         assertThat(applicationEvents.stream(ResetPasswordTokenCreatedEvent.class))
                 .filteredOn(event ->
                         Objects.equals(event.user(), testUser) && Objects.equals(event.token(), testToken))
                 .hasSize(1);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
@@ -98,10 +102,11 @@ public class ResetPasswordServiceTest {
         ResetPasswordRequest request = new ResetPasswordRequest("SecretPass12345", "SecretToken12345",
                 "mariusz@example.com");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(null);
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
 
         assertThatThrownBy(() -> resetPasswordService.resetPassword(request))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
+        verify(userRepository).findByEmail(request.email());
     }
 
     @Test
@@ -112,14 +117,15 @@ public class ResetPasswordServiceTest {
                 .email(request.email())
                 .password("somepassword")
                 .build();
-        when(userRepository.findByEmail(request.email())).thenReturn(testUser);
-        passwordValidator.validatePassword(request.password());
-        tokenService.validateAndDeleteToken(testUser, request.token());
-        when(passwordEncoder.encode(request.password())).then(invocation -> invocation.getArgument(0));
+        when(userRepository.findByEmail(anyString())).thenReturn(testUser);
+        when(passwordEncoder.encode(anyString())).then(invocation -> invocation.getArgument(0));
 
         resetPasswordService.resetPassword(request);
 
         assertThat(testUser.getPassword()).isEqualTo(request.password());
-
+        verify(userRepository).findByEmail(request.email());
+        verify(passwordValidator).validatePassword(request.password());
+        verify(tokenService).validateAndDeleteToken(testUser, request.token());
+        verify(passwordEncoder).encode(request.password());
     }
 }

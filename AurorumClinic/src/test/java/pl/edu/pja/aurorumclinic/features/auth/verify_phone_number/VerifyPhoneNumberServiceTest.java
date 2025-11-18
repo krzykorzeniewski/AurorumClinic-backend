@@ -42,18 +42,25 @@ public class VerifyPhoneNumberServiceTest {
 
     @Test
     void createPhoneNumberVerificationTokenShouldThrowApiNotFoundExceptionWhenIdIsNotFound() {
+        Long userId = 1L;
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> verifyPhoneNumberService.createPhoneNumberVerificationToken(1L))
+
+        assertThatThrownBy(() -> verifyPhoneNumberService.createPhoneNumberVerificationToken(userId))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
+        verify(userRepository).findById(userId);
     }
 
     @Test
     void createPhoneNumberVerificationTokenShouldThrowApiExceptionWhenPhoneNumberIsVerified() {
+        Long userId = 1L;
+
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(User.builder()
                         .phoneNumberVerified(true)
                 .build()));
-        assertThatThrownBy(() -> verifyPhoneNumberService.createPhoneNumberVerificationToken(1L))
+
+        assertThatThrownBy(() -> verifyPhoneNumberService.createPhoneNumberVerificationToken(userId))
                 .isExactlyInstanceOf(ApiException.class);
+        verify(userRepository).findById(userId);
     }
 
     @Test
@@ -69,7 +76,7 @@ public class VerifyPhoneNumberServiceTest {
                 .value("some hashed value")
                 .rawValue("some raw value")
                 .build();
-        when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(tokenService.createOtpToken(any(User.class), any(TokenName.class), anyInt())).thenReturn(testToken);
 
         verifyPhoneNumberService.createPhoneNumberVerificationToken(testUser.getId());
@@ -81,16 +88,19 @@ public class VerifyPhoneNumberServiceTest {
                 .filteredOn(event ->
                         Objects.equals(event.user(), testUser) && Objects.equals(event.token(), testToken))
                 .hasSize(1);
+        verify(userRepository).findById(testUser.getId());
     }
 
     @Test
     void verifyPhoneNumberShouldThrowApiNotFoundExceptionWhenIdIsNotFound() {
         VerifyPhoneNumberRequest request = new VerifyPhoneNumberRequest("123123");
+        Long userId = 1L;
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> verifyPhoneNumberService.verifyPhoneNumber(request, 1L))
+        assertThatThrownBy(() -> verifyPhoneNumberService.verifyPhoneNumber(request, userId))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
+        verify(userRepository).findById(userId);
     }
 
     @Test
@@ -102,11 +112,11 @@ public class VerifyPhoneNumberServiceTest {
                 .build();
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
-        tokenService.validateAndDeleteToken(any(User.class), anyString());
 
         verifyPhoneNumberService.verifyPhoneNumber(request, testUser.getId());
 
         verify(tokenService).validateAndDeleteToken(testUser, request.token());
+        verify(userRepository).findById(testUser.getId());
         assertThat(testUser.isPhoneNumberVerified()).isEqualTo(true);
     }
 
