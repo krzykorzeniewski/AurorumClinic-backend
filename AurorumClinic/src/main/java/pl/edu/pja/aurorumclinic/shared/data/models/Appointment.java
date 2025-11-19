@@ -55,10 +55,6 @@ public class Appointment {
     private Service service;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @ToString.Exclude
-    private Survey survey;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "FK_Opinion")
     @ToString.Exclude
     private Opinion opinion;

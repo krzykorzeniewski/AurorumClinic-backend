@@ -13,7 +13,6 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
-import pl.edu.pja.aurorumclinic.shared.data.models.Survey;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
@@ -125,28 +124,6 @@ public class AppointmentNotificationListener {
             smsService.sendSms("+48"+patient.getPhoneNumber(), clinicPhoneNumber,
                     message);
         }
-    }
-
-    @Async
-    @EventListener
-    public void handleSurveyCreatedEvent(SurveyCreatedEvent event) {
-        Survey survey = event.survey();
-        Appointment appointment = survey.getAppointment();
-        Doctor doctor = survey.getAppointment().getDoctor();
-        String surveyLink = appointmentSurveyLink + survey.getId();
-
-        Context context = new Context();
-        context.setVariable("appointmentDate", appointment.getStartedAt().format(dateFormatter));
-        context.setVariable("surveyLink", surveyLink);
-        context.setVariable("doctorProfilePicture", objectStorageService.generateUrl(doctor.getProfilePicture()));
-        context.setVariable("doctorName", doctor.getName() +" " + doctor.getSurname());
-        context.setVariable("doctorSpecialization", doctor.getSpecializations());
-        context.setVariable("appointmentService", appointment.getService().getName());
-
-        String htmlPageAsText = springTemplateEngine.process("appointment-survey-email", context);
-        emailService.sendEmail(
-                noreplyEmailAddres, appointment.getPatient().getEmail(),
-                "Oceń wizytę", htmlPageAsText);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
