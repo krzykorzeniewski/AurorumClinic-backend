@@ -162,11 +162,11 @@ public class LoginServiceTest {
                 "definitely not valid access token",
                 "refresh token");
 
-        when(jwtUtils.validateJwt(anyString())).thenThrow(new JwtException("jwt exception"));
+        when(jwtUtils.getUserIdFromJwt(anyString())).thenThrow(new JwtException("jwt exception"));
 
         assertThatThrownBy(() -> loginService.refresh(request))
                 .isExactlyInstanceOf(ApiAuthenticationException.class);
-        verify(jwtUtils).validateJwt(request.accessToken());
+        verify(jwtUtils).getUserIdFromJwt(request.accessToken());
     }
 
     @Test
@@ -189,14 +189,14 @@ public class LoginServiceTest {
                 .rawValue("new refresh token value")
                 .build();
 
-        when(jwtUtils.validateJwt(anyString())).thenThrow(new ExpiredJwtException(null, null, null));
+        when(jwtUtils.getUserIdFromJwt(anyString())).thenThrow(new ExpiredJwtException(null, null, null));
         when(jwtUtils.getUserIdFromExpiredJwt(anyString())).thenReturn(testUser.getId());
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(jwtUtils.createJwt(any(User.class))).thenReturn(newJwt);
         when(tokenService.createToken(any(User.class), any(TokenName.class), anyInt())).thenReturn(testToken);
 
         assertThatNoException().isThrownBy(() -> loginService.refresh(request));
-        verify(jwtUtils).validateJwt(request.accessToken());
+        verify(jwtUtils).getUserIdFromJwt(request.accessToken());
         verify(jwtUtils).getUserIdFromExpiredJwt(request.accessToken());
         verify(tokenService).validateAndDeleteToken(testUser, request.refreshToken());
         verify(jwtUtils).createJwt(testUser);
@@ -215,7 +215,7 @@ public class LoginServiceTest {
         assertThatThrownBy(() -> loginService.refresh(request))
                 .isExactlyInstanceOf(ApiAuthenticationException.class)
                 .hasMessageContaining("Invalid");
-        verify(jwtUtils).validateJwt(request.accessToken());
+        verify(jwtUtils).getUserIdFromJwt(request.accessToken());
         verify(jwtUtils).getUserIdFromJwt(request.accessToken());
         verify(userRepository).findById(userId);
     }
@@ -254,7 +254,6 @@ public class LoginServiceTest {
         assertThat(response.role()).isEqualTo(testUser.getRole());
         assertThat(response.accessToken()).isEqualTo(accessToken);
         assertThat(response.refreshToken()).isEqualTo(refreshToken.getRawValue());
-        verify(jwtUtils).validateJwt(request.accessToken());
         verify(jwtUtils).getUserIdFromJwt(request.accessToken());
         verify(tokenService).validateAndDeleteToken(testUser, request.refreshToken());
         verify(jwtUtils).createJwt(testUser);
