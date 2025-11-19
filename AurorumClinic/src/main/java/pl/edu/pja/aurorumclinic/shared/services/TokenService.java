@@ -72,7 +72,6 @@ public class TokenService {
         tokenRepository.delete(token);
     }
 
-    @Transactional
     protected void deletePreviousTokens(List<Token> userTokens, TokenName tokenName) {
         if (userTokens == null) {
             return;
