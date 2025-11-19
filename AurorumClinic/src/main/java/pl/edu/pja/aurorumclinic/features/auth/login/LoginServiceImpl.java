@@ -68,16 +68,15 @@ public class LoginServiceImpl implements LoginService{
 
     @Override
     @Transactional
-    public LoginUserResponse refresh (RefreshAccessTokenRequest refreshAccessTokenRequest){
+    public LoginUserResponse refresh(RefreshAccessTokenRequest refreshAccessTokenRequest){
         String jwt = refreshAccessTokenRequest.accessToken();
         Long userId;
         try {
-            jwtUtils.validateJwt(jwt);
             userId = jwtUtils.getUserIdFromJwt(jwt);
         } catch (ExpiredJwtException e) {
             userId = jwtUtils.getUserIdFromExpiredJwt(jwt);
         } catch (JwtException jwtException) {
-            throw new ApiAuthenticationException(jwtException.getMessage(), "accessToken");
+            throw new ApiAuthenticationException("Invalid token", "accessToken");
         }
 
         User userFromDb = userRepository.findById(userId).orElseThrow(

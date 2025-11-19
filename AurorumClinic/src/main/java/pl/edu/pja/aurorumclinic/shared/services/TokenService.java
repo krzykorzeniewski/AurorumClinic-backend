@@ -29,12 +29,12 @@ public class TokenService {
         return Encoders.BASE64URL.encode(bytes);
     }
 
-    private String createOtp() {
+    protected String createOtp() {
         return String.format("%06d", new SecureRandom().nextInt(999999));
     }
 
     @Transactional
-    public Token createToken(User user, TokenName tokenName, long minutesValid) {
+    public Token createToken(User user, TokenName tokenName, int minutesValid) {
         String tokenValue = createRandomToken();
         deletePreviousTokens(user.getTokens(), tokenName);
         return tokenRepository.save(Token.builder()
@@ -47,7 +47,7 @@ public class TokenService {
     }
 
     @Transactional
-    public Token createOtpToken(User user, TokenName tokenName, long minutesValid) {
+    public Token createOtpToken(User user, TokenName tokenName, int minutesValid) {
         String otp = createOtp();
         deletePreviousTokens(user.getTokens(), tokenName);
         return tokenRepository.save(Token.builder()
@@ -72,7 +72,6 @@ public class TokenService {
         tokenRepository.delete(token);
     }
 
-    @Transactional
     protected void deletePreviousTokens(List<Token> userTokens, TokenName tokenName) {
         if (userTokens == null) {
             return;

@@ -4,7 +4,7 @@ insert into user_ (name, surname, pesel, birthdate, email, phone_number, two_fac
                                                                                                                                     ('Marcin', 'Nowak', '85051234567', '1985-05-12', 'marcin.nowak@example.com', '601234568', 0, 'EMPLOYEE', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00'),
                                                                                                                                     ('Piotr', 'Zieliński', '92030498765', '1992-03-04', 'piotr.zielinski@example.com', '601234569', 0, 'DOCTOR', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00'),
                                                                                                                                     ('Ewa', 'Wiśniewska', '93040567891', '1993-04-05', 'ewa.wisniewska@example.com', '601234570', 0, 'DOCTOR', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00'),
-                                                                                                                                    ('Tomasz', 'Lewandowski', '95060712345', '1995-06-07', 'tomasz.lewandowski@example.com', '601234571', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00'),
+                                                                                                                                    ('Tomasz', 'Lewandowski', '95060712345', '1995-06-07', 'tomasz.lewandowski@example.com', '601234571', 1, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00'),
                                                                                                                                     ('Anna', 'Wójcik', '87080934567', '1987-08-09', 'anna.wojcik@example.com', '601234572', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00'),
                                                                                                                                     ('Kamil', 'Majewski', '86011056789', '1986-01-10', 'kamil.majewski@example.com', '601234573', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00'),
                                                                                                                                     ('Maria', 'Jankowska', '80021234567', '1980-02-12', 'maria.jankowska@example.com', '601234574', 0, 'PATIENT', '$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa', '2025-10-04T09:00:00'),
@@ -19,6 +19,9 @@ insert into user_ (name, surname, pesel, birthdate, email, phone_number, two_fac
 
 update user_ set email_verified = 1;
 update user_ set phone_number_verified = 0;
+update user_ set phone_number_verified = 1 where two_factor_authentication = 1;
+
+insert into token (value, expiry_date, name, fk_user) values ('$2a$12$xWpNg9vh6b9Vt29b4QvSvuAzD8eZoMV4e/I4XIZgRXJ0xsNwQJqUG', DATEADD(Hour, 2, GETDATE()), 'TWO_FACTOR_AUTH', 6)
 
 insert into patient (pk_patient, communication_preferences, newsletter) values (1, 'EMAIL', 1), (6, 'EMAIL', 0), (7, 'EMAIL', 0), (8, 'EMAIL', 0), (9, 'EMAIL', 0), (11, 'EMAIL', 0);
 
