@@ -12,6 +12,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.LoginUserRequest;
+import pl.edu.pja.aurorumclinic.features.auth.login.dtos.TwoFactorAuthLoginRequest;
+
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
@@ -65,5 +67,31 @@ public class LoginControllerIntegrationTest {
         assertThat(result).cookies().doesNotContainCookies("Access-Token", "Refresh-Token");
     }
 
+    @Test
+    void loginUserWith2faShouldReturn200AndCookies() throws JsonProcessingException {
+        TwoFactorAuthLoginRequest request = new TwoFactorAuthLoginRequest("123123", "tomasz.lewandowski@example.com");
+
+        MvcTestResult result = mvcTester.post().uri("/api/auth/login-2fa")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(result).cookies().containsCookie("Access-Token");
+        assertThat(result).cookies().containsCookie("Refresh-Token");
+    }
+
+    @Test
+    void loginUserWith2faShouldReturn4xxWhenCredentialsAreInvalid() throws JsonProcessingException {
+        TwoFactorAuthLoginRequest invalidEmailRequest = new TwoFactorAuthLoginRequest("123123", "tomasz.ewandowski@example.com");
+
+        MvcTestResult result = mvcTester.post().uri("/api/auth/login-2fa")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidEmailRequest))
+                .exchange();
+
+        assertThat(result).hasStatus4xxClientError();
+        assertThat(result).cookies().doesNotContainCookies("Access-Token", "Refresh-Token");
+    }
 
 }

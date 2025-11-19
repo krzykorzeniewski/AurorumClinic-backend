@@ -19,6 +19,9 @@ insert into user_ (name, surname, pesel, birthdate, email, phone_number, two_fac
 
 update user_ set email_verified = 1;
 update user_ set phone_number_verified = 0;
+update user_ set phone_number_verified = 1 where two_factor_authentication = 1;
+
+insert into token (value, expiry_date, name, fk_user) values ('$2a$12$xWpNg9vh6b9Vt29b4QvSvuAzD8eZoMV4e/I4XIZgRXJ0xsNwQJqUG', DATEADD(Hour, 2, GETDATE()), 'TWO_FACTOR_AUTH', 6)
 
 insert into patient (pk_patient, communication_preferences, newsletter) values (1, 'EMAIL', 1), (6, 'EMAIL', 0), (7, 'EMAIL', 0), (8, 'EMAIL', 0), (9, 'EMAIL', 0), (11, 'EMAIL', 0);
 
