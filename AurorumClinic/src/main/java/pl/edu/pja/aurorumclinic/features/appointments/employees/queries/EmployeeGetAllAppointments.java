@@ -6,32 +6,49 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.employees.queries.shared.GetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.User;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('EMPLOYEE')")
+@PreAuthorize("hasAnyRole('EMPLOYEE', 'DOCTOR')")
 public class EmployeeGetAllAppointments {
 
     private final AppointmentRepository appointmentRepository;
     private final ObjectStorageService objectStorageService;
+    private final UserRepository userRepository;
 
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<GetAppointmentResponse>>> getAllAppointments(
-            @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(handle(pageable)));
+            @PageableDefault Pageable pageable,
+            @AuthenticationPrincipal Long empId) {
+        return ResponseEntity.ok(ApiResponse.success(handle(pageable, empId)));
     }
 
-    private Page<GetAppointmentResponse> handle(Pageable pageable) {
-        Page<Appointment> appointmentsFromDb = appointmentRepository.findAll(pageable);
+    private Page<GetAppointmentResponse> handle(Pageable pageable, Long empId) {
+        Page<Appointment> appointmentsFromDb;
+        User empFromDb = userRepository.findById(empId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        if (Objects.equals(empFromDb.getRole(), UserRole.DOCTOR)) {
+            appointmentsFromDb = appointmentRepository.findAllByDoctorId(pageable, empId);
+        } else {
+            appointmentsFromDb = appointmentRepository.findAll(pageable);
+        }
         return appointmentsFromDb.map(appointment -> GetAppointmentResponse.builder()
                 .id(appointment.getId())
                 .status(appointment.getStatus())

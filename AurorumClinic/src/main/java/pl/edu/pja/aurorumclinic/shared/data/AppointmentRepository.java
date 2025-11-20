@@ -142,4 +142,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     """)
     boolean isTimeSlotAvailableExcludingId(LocalDateTime startedAt, LocalDateTime finishedAt,
                                            Long doctorId, Long serviceId, Long appointmentId);
+
+    Page<Appointment> findAllByDoctorId(Pageable pageable, Long doctorId);
 }
