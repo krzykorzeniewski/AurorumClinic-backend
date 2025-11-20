@@ -1,10 +1,8 @@
 package pl.edu.pja.aurorumclinic.features.appointments.jobs;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentFinishedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
@@ -15,7 +13,6 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 public class FinishAppointmentJob {
 
     private final AppointmentRepository appointmentRepository;
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public void execute(Long appointmentId) {
@@ -23,7 +20,6 @@ public class FinishAppointmentJob {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         appointmentFromDb.setStatus(AppointmentStatus.FINISHED);
-        applicationEventPublisher.publishEvent(new AppointmentFinishedEvent(appointmentFromDb));
     }
 
 }
