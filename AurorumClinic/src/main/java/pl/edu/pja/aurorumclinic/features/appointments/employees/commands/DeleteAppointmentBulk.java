@@ -17,6 +17,7 @@ import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +42,7 @@ public class DeleteAppointmentBulk {
     private void handle(DeleteAppointmentBulkRequest request) {
         List<Appointment> appointmentsFromDb = appointmentRepository.findAllById(request.appointmentIds);
         if (appointmentsFromDb.size() != request.appointmentIds.size()) {
-            throw new ApiException("Some appointment ids are not found", "appointmentIds");
+            throw new ApiNotFoundException("Some appointment ids are not found", "appointmentIds");
         }
         if (appointmentsFromDb.stream().anyMatch(
                 appointment -> Objects.equals(appointment.getStatus(), AppointmentStatus.FINISHED))) {
