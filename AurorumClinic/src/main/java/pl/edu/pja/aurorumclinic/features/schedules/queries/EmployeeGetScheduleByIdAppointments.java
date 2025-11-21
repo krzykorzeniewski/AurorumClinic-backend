@@ -3,9 +3,6 @@ package pl.edu.pja.aurorumclinic.features.schedules.queries;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +42,7 @@ public class EmployeeGetScheduleByIdAppointments {
         scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        List<Appointment> appointmentsFromSchedule = appointmentRepository.findByService_Schedules_Id(scheduleId);
+        List<Appointment> appointmentsFromSchedule = appointmentRepository.findAllByScheduleId(scheduleId);
         return appointmentsFromSchedule.stream().map(appointmentFromDb ->
                 EmployeeGetScheduleAppointmentResponse.builder()
                         .id(appointmentFromDb.getId())

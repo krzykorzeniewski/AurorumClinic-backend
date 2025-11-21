@@ -6,12 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import pl.edu.pja.aurorumclinic.IntegrationTest;
+import pl.edu.pja.aurorumclinic.TestDataConfiguration;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.LoginUserRequest;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.TwoFactorAuthLoginRequest;
 
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@Import(TestDataConfiguration.class)
 public class LoginControllerIntegrationTest extends IntegrationTest {
 
     @Autowired
@@ -30,7 +33,7 @@ public class LoginControllerIntegrationTest extends IntegrationTest {
 
     @Test
     void loginShouldReturn200AndCookies() throws JsonProcessingException {
-        LoginUserRequest request = new LoginUserRequest("piotr.zielinski@example.com", "123");
+        LoginUserRequest request = new LoginUserRequest("mariusz@example.com", "123");
 
         MvcTestResult result = mvcTester.post().uri("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -57,7 +60,7 @@ public class LoginControllerIntegrationTest extends IntegrationTest {
 
     @Test
     void loginShouldReturn200WithoutCookiesWhenUserHasTwoFactorAuthEnabled() throws JsonProcessingException {
-        LoginUserRequest request = new LoginUserRequest("tomasz.lewandowski@example.com", "123");
+        LoginUserRequest request = new LoginUserRequest("andrzej@example.com", "123");
 
         MvcTestResult result = mvcTester.post().uri("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -70,7 +73,7 @@ public class LoginControllerIntegrationTest extends IntegrationTest {
 
     @Test
     void loginUserWith2faShouldReturn200AndCookies() throws JsonProcessingException {
-        TwoFactorAuthLoginRequest request = new TwoFactorAuthLoginRequest("123123", "tomasz.lewandowski@example.com");
+        TwoFactorAuthLoginRequest request = new TwoFactorAuthLoginRequest("123123", "andrzej@example.com");
 
         MvcTestResult result = mvcTester.post().uri("/api/auth/login-2fa")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +87,7 @@ public class LoginControllerIntegrationTest extends IntegrationTest {
 
     @Test
     void loginUserWith2faShouldReturn4xxWhenCredentialsAreInvalid() throws JsonProcessingException {
-        TwoFactorAuthLoginRequest invalidEmailRequest = new TwoFactorAuthLoginRequest("123123", "tomasz.ewandowski@example.com");
+        TwoFactorAuthLoginRequest invalidEmailRequest = new TwoFactorAuthLoginRequest("123120", "andrzej@example.com");
 
         MvcTestResult result = mvcTester.post().uri("/api/auth/login-2fa")
                 .contentType(MediaType.APPLICATION_JSON)
