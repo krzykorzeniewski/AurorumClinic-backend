@@ -113,6 +113,34 @@ public class PatientGetAppointmentByIdTest {
                 .patient(testPatient)
                 .build();
         String imageUrl = "some image url";
+        PatientGetAppointmentResponse testResponse = PatientGetAppointmentResponse.builder()
+                .id(testAppointment.getId())
+                .status(testAppointment.getStatus())
+                .startedAt(testAppointment.getStartedAt())
+                .description(testAppointment.getDescription())
+                .doctor(PatientGetAppointmentResponse.DoctorDto.builder()
+                        .id(testAppointment.getDoctor().getId())
+                        .name(testAppointment.getDoctor().getName())
+                        .surname(testAppointment.getDoctor().getSurname())
+                        .profilePicture(imageUrl)
+                        .specializations(testAppointment.getDoctor().getSpecializations()
+                                .stream().map(spec -> PatientGetAppointmentResponse.
+                                        DoctorDto.SpecializationDto.builder()
+                                        .id(spec.getId())
+                                        .name(spec.getName())
+                                        .build()).toList())
+                        .build())
+                .service(PatientGetAppointmentResponse.ServiceDto.builder()
+                        .id(testAppointment.getService().getId())
+                        .name(testAppointment.getService().getName())
+                        .price(testAppointment.getService().getPrice())
+                        .build())
+                .payment(PatientGetAppointmentResponse.PaymentDto.builder()
+                        .id(testAppointment.getPayment().getId())
+                        .amount(testAppointment.getPayment().getAmount())
+                        .status(testAppointment.getPayment().getStatus())
+                        .build())
+                .build();
 
         when(appointmentRepository.getAppointmentByIdAndPatientId(anyLong(), anyLong())).thenReturn(testAppointment);
         when(objectStorageService.generateUrl(anyString())).thenReturn(imageUrl);
@@ -120,25 +148,12 @@ public class PatientGetAppointmentByIdTest {
         ResponseEntity<ApiResponse<PatientGetAppointmentResponse>> resultResponse =
                 patientGetAppointmentById.getAppointment(testAppointment.getId(), testPatient.getId());
 
-        assertThat(resultResponse.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
         assertThat(resultResponse.getBody()).isNotNull();
 
         PatientGetAppointmentResponse resultDto = resultResponse.getBody().getData();
-        assertThat(resultDto).isNotNull();
-        assertThat(resultDto.id()).isEqualTo(testAppointment.getId());
-        assertThat(resultDto.status()).isEqualTo(testAppointment.getStatus());
-        assertThat(resultDto.startedAt()).isEqualTo(testAppointment.getStartedAt());
-
-        assertThat(resultDto.doctor().id()).isEqualTo(testAppointment.getDoctor().getId());
-        assertThat(resultDto.doctor().name()).isEqualTo(testAppointment.getDoctor().getName());
-        assertThat(resultDto.doctor().specializations()).hasSize(1);
-        assertThat(resultDto.doctor().profilePicture()).isEqualTo(imageUrl);
-
-        assertThat(resultDto.service().id()).isEqualTo(testAppointment.getService().getId());
-        assertThat(resultDto.service().name()).isEqualTo(testAppointment.getService().getName());
-
-        assertThat(resultDto.payment().id()).isEqualTo(testAppointment.getPayment().getId());
-        assertThat(resultDto.payment().status()).isEqualTo(testAppointment.getPayment().getStatus());
+        assertThat(resultDto)
+                .usingRecursiveComparison()
+                .isEqualTo(testResponse);
 
         verify(appointmentRepository).getAppointmentByIdAndPatientId(testAppointment.getId(), testPatient.getId());
         verify(objectStorageService).generateUrl(testAppointment.getDoctor().getProfilePicture());

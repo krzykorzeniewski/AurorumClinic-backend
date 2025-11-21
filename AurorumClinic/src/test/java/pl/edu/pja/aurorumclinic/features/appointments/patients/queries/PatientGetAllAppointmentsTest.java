@@ -80,35 +80,49 @@ public class PatientGetAllAppointmentsTest {
                 .build();
         String imageUrl = "http://some-example.png.url";
         PageImpl<Appointment> appointmentsPage = new PageImpl<>(List.of(testAppointment), pageable, 1);
-
+        PatientGetAppointmentResponse testResponse = PatientGetAppointmentResponse.builder()
+                .id(testAppointment.getId())
+                .status(testAppointment.getStatus())
+                .startedAt(testAppointment.getStartedAt())
+                .description(testAppointment.getDescription())
+                .doctor(PatientGetAppointmentResponse.DoctorDto.builder()
+                        .id(testAppointment.getDoctor().getId())
+                        .name(testAppointment.getDoctor().getName())
+                        .surname(testAppointment.getDoctor().getSurname())
+                        .profilePicture(imageUrl)
+                        .specializations(testAppointment.getDoctor().getSpecializations()
+                                .stream().map(spec -> PatientGetAppointmentResponse.
+                                        DoctorDto.SpecializationDto.builder()
+                                        .id(spec.getId())
+                                        .name(spec.getName())
+                                        .build()).toList())
+                        .build())
+                .service(PatientGetAppointmentResponse.ServiceDto.builder()
+                        .id(testAppointment.getService().getId())
+                        .name(testAppointment.getService().getName())
+                        .price(testAppointment.getService().getPrice())
+                        .build())
+                .payment(PatientGetAppointmentResponse.PaymentDto.builder()
+                        .id(testAppointment.getPayment().getId())
+                        .amount(testAppointment.getPayment().getAmount())
+                        .status(testAppointment.getPayment().getStatus())
+                        .build())
+                .build();
         when(appointmentRepository.findAllByPatientId(anyLong(), any())).thenReturn(appointmentsPage);
         when(objectStorageService.generateUrl(anyString())).thenReturn(imageUrl);
 
         ResponseEntity<ApiResponse<Page<PatientGetAppointmentResponse>>> resultResponse =
                 patientGetAllAppointments.getMyAppointments(testPatient.getId(), pageable);
 
-        assertThat(resultResponse.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
         assertThat(resultResponse.getBody()).isNotNull();
 
         Page<PatientGetAppointmentResponse> resultPage = resultResponse.getBody().getData();
         assertThat(resultPage.getContent()).hasSize(1);
 
         PatientGetAppointmentResponse resultDto = resultPage.getContent().get(0);
-        assertThat(resultDto).isNotNull();
-        assertThat(resultDto.id()).isEqualTo(testAppointment.getId());
-        assertThat(resultDto.status()).isEqualTo(testAppointment.getStatus());
-        assertThat(resultDto.startedAt()).isEqualTo(testAppointment.getStartedAt());
-
-        assertThat(resultDto.doctor().id()).isEqualTo(testAppointment.getDoctor().getId());
-        assertThat(resultDto.doctor().name()).isEqualTo(testAppointment.getDoctor().getName());
-        assertThat(resultDto.doctor().specializations()).hasSize(1);
-        assertThat(resultDto.doctor().profilePicture()).isEqualTo(imageUrl);
-
-        assertThat(resultDto.service().id()).isEqualTo(testAppointment.getService().getId());
-        assertThat(resultDto.service().name()).isEqualTo(testAppointment.getService().getName());
-
-        assertThat(resultDto.payment().id()).isEqualTo(testAppointment.getPayment().getId());
-        assertThat(resultDto.payment().status()).isEqualTo(testAppointment.getPayment().getStatus());
+        assertThat(resultDto)
+                .usingRecursiveComparison()
+                        .isEqualTo(testResponse);
 
         verify(appointmentRepository).findAllByPatientId(testPatient.getId(), pageable);
         verify(objectStorageService).generateUrl(testAppointment.getDoctor().getProfilePicture());
