@@ -50,14 +50,14 @@ public class CreateAppointment {
 
     private void handle(EmployeeCreateAppointmentRequest request) {
         Patient patientFromDb = patientRepository.findById(request.patientId()).orElseThrow(
-                () ->  new ApiNotFoundException("Id not found", "id")
+                () ->  new ApiNotFoundException("Id not found", "patientId")
         );
         Doctor doctorFromDb = doctorRepository.findById(request.doctorId()).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+                () -> new ApiNotFoundException("Id not found", "doctorId")
         );
         Service serviceFromDb = serviceRepository.findById(
                 request.serviceId()).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+                () -> new ApiNotFoundException("Id not found", "serviceId")
         );
         Appointment newAppointment = Appointment.builder()
                 .service(serviceFromDb)
@@ -71,9 +71,9 @@ public class CreateAppointment {
         appointmentValidator.validateAppointment(newAppointment.getStartedAt(), newAppointment.getFinishedAt(),
                 newAppointment.getDoctor(), newAppointment.getService());
 
-        Appointment appointmentFromDb = appointmentRepository.save(newAppointment);
+        appointmentRepository.save(newAppointment);
         applicationEventPublisher.publishEvent(
-                new AppointmentCreatedEvent(patientFromDb, appointmentFromDb));
+                new AppointmentCreatedEvent(patientFromDb, newAppointment));
     }
 
     public record EmployeeCreateAppointmentRequest(@NotNull Long patientId,
