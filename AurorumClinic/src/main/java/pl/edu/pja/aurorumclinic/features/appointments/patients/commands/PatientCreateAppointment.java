@@ -73,9 +73,9 @@ public class PatientCreateAppointment {
         appointmentValidator.validateAppointment(newAppointment.getStartedAt(), newAppointment.getFinishedAt(),
                 newAppointment.getDoctor(), newAppointment.getService());
 
-        Appointment appointmentFromDb = appointmentRepository.save(newAppointment);
+        appointmentRepository.save(newAppointment);
         applicationEventPublisher.publishEvent(
-                new AppointmentCreatedEvent(patientFromDb, appointmentFromDb));
+                new AppointmentCreatedEvent(patientFromDb, newAppointment));
     }
 
     public record PatientCreateAppointmentRequest(@NotNull LocalDateTime startedAt,

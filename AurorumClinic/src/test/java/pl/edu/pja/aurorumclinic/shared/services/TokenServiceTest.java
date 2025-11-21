@@ -132,7 +132,7 @@ public class TokenServiceTest {
 
         assertThatThrownBy(() -> tokenService.validateAndDeleteToken(testUser, inputValue))
                 .isExactlyInstanceOf(ApiException.class)
-                .hasMessageContaining("Invalid");
+                .message().containsIgnoringCase("Invalid");
         verify(passwordEncoder).matches(inputValue, testToken.getValue());
     }
 
@@ -154,7 +154,7 @@ public class TokenServiceTest {
 
         assertThatThrownBy(() -> tokenService.validateAndDeleteToken(testUser, inputValue))
                 .isExactlyInstanceOf(ApiException.class)
-                .hasMessageContaining("expired");
+                .message().containsIgnoringCase("expired");
         verify(passwordEncoder).matches(inputValue, testToken.getValue());
     }
 

@@ -47,7 +47,7 @@ public class DoctorGetScheduleByIdAppointments {
         scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "scheduleId")
         );
-        List<Appointment> appointmentsFromSchedule = appointmentRepository.findByService_Schedules_Id(scheduleId);
+        List<Appointment> appointmentsFromSchedule = appointmentRepository.findAllByScheduleId(scheduleId);
         return appointmentsFromSchedule.stream().map(appointmentFromDb ->
                 DoctorGetScheduleAppointmentResponse.builder()
                         .id(appointmentFromDb.getId())

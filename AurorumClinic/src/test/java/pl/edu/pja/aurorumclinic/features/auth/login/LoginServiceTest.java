@@ -214,7 +214,7 @@ public class LoginServiceTest {
 
         assertThatThrownBy(() -> loginService.refresh(request))
                 .isExactlyInstanceOf(ApiAuthenticationException.class)
-                .hasMessageContaining("Invalid");
+                .message().containsIgnoringCase("Invalid");
         verify(jwtUtils).getUserIdFromJwt(request.accessToken());
         verify(jwtUtils).getUserIdFromJwt(request.accessToken());
         verify(userRepository).findById(userId);

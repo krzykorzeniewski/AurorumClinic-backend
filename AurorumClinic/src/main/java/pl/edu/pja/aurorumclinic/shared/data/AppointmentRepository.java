@@ -61,7 +61,14 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
            """)
     boolean existsBetweenUsers(Long participantId, Long secParticipantId);
 
-    List<Appointment> findByService_Schedules_Id(Long scheduleId);
+    @Query("""
+            select a from Schedule s
+                    join s.services s1
+                    join s1.appointments a
+                where s.id = :scheduleId
+                and a.doctor.id = s.doctor.id
+            """)
+    List<Appointment> findAllByScheduleId(Long scheduleId);
 
     @Query("""
             select count(a1.id) as scheduled,
@@ -104,7 +111,18 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     """)
     List<Tuple> getAllAppointmentStatsBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
 
-    boolean existsByService_Schedules_Id(Long scheduleId);
+    @Query("""
+            select case when
+                exists (select 1 from Appointment a
+                            join a.service s1
+                            join s1.schedules s2
+                        where s2.id = :scheduleId
+                        and a.doctor.id = s2.doctor.id)
+                then true
+                else false
+            end
+            """)
+    boolean existsByScheduleId(Long scheduleId);
 
     @Query("""
            select a.id from Appointment a

@@ -28,7 +28,7 @@ public class PatientGetAppointmentById {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PatientGetAppointmentResponse>> getAppointment(@PathVariable("id") Long appointmentId,
-                                                                                     @AuthenticationPrincipal Long userId) throws IOException {
+                                                                                     @AuthenticationPrincipal Long userId){
         return ResponseEntity.ok(ApiResponse.success(handle(appointmentId, userId)));
     }
 
@@ -60,7 +60,6 @@ public class PatientGetAppointmentById {
                         .name(appointmentFromDb.getService().getName())
                         .price(appointmentFromDb.getService().getPrice())
                         .build())
-
                 .payment(PatientGetAppointmentResponse.PaymentDto.builder()
                         .id(appointmentFromDb.getPayment().getId())
                         .amount(appointmentFromDb.getPayment().getAmount())

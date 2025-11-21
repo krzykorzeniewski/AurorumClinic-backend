@@ -41,7 +41,7 @@ public class ScheduleValidator {
     }
 
     public void checkIfScheduleHasAppointments(Schedule schedule) {
-        if (appointmentRepository.existsByService_Schedules_Id(schedule.getId())) {
+        if (appointmentRepository.existsByScheduleId(schedule.getId())) {
             throw new ApiException("Schedule has appointments assigned", "appointments");
         }
     }
