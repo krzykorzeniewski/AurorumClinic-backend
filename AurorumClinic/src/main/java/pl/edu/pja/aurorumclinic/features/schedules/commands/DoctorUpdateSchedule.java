@@ -27,7 +27,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('Doctor')")
+@PreAuthorize("hasRole('DOCTOR')")
 public class DoctorUpdateSchedule {
 
     private final ScheduleRepository scheduleRepository;

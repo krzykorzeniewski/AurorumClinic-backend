@@ -16,9 +16,11 @@ import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Absence;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/absences")
@@ -47,6 +49,9 @@ public class DoctorUpdateAbsence {
         Doctor doctorFromDb = doctorRepository.findById(doctorId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "doctorId")
         );
+        if (!Objects.equals(absenceFromDb.getDoctor().getId(), doctorFromDb.getId())) {
+            throw new ApiAuthorizationException("Absence doctor id does not match request doctor id");
+        }
         absenceValidator.validateNewTimeslot(request.startedAt, request.finishedAt, doctorFromDb, absenceFromDb);
         absenceFromDb.setName(request.name);
         absenceFromDb.setStartedAt(request.startedAt);

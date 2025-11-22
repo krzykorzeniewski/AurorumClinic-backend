@@ -13,6 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.PaymentStatus;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
@@ -77,6 +78,49 @@ public class PatientGetAppointmentByIdTest {
         assertThatThrownBy(
                 () -> patientGetAppointmentById.getAppointment(testAppointment.getId(), testPatient.getId())
         ).isExactlyInstanceOf(ApiNotFoundException.class);
+        verify(appointmentRepository).getAppointmentByIdAndPatientId(testAppointment.getId(), testPatient.getId());
+    }
+
+    @Test
+    void shouldThrowApiAuthExceptiondWhenAppointmentPatientIdDoesNotMatchRequestId() {
+        Patient testPatient = Patient.builder()
+                .id(1L)
+                .build();
+        Appointment testAppointment = Appointment.builder()
+                .id(1L)
+                .status(AppointmentStatus.FINISHED)
+                .startedAt(LocalDateTime.now().minusMinutes(30))
+                .description("Lęki")
+                .doctor(Doctor.builder()
+                        .id(1L)
+                        .name("Mariusz")
+                        .surname("Mariuszowski")
+                        .profilePicture("example.pmg")
+                        .specializations(Set.of(Specialization.builder()
+                                .id(1L)
+                                .name("Psychiatra dorosłych")
+                                .build()))
+                        .build())
+                .service(Service.builder()
+                        .id(1L)
+                        .name("Konsultacja psychiatryczna (kolejna wizyta)")
+                        .price(BigDecimal.valueOf(10000))
+                        .build())
+                .payment(Payment.builder()
+                        .id(1L)
+                        .amount(BigDecimal.valueOf(10000))
+                        .status(PaymentStatus.CREATED)
+                        .build())
+                .patient(Patient.builder()
+                        .id(2L) //different thant testPatient
+                        .build())
+                .build();
+
+        when(appointmentRepository.getAppointmentByIdAndPatientId(anyLong(), anyLong())).thenReturn(testAppointment);
+
+        assertThatThrownBy(
+                () -> patientGetAppointmentById.getAppointment(testAppointment.getId(), testPatient.getId())
+        ).isExactlyInstanceOf(ApiAuthorizationException.class);
         verify(appointmentRepository).getAppointmentByIdAndPatientId(testAppointment.getId(), testPatient.getId());
     }
 
