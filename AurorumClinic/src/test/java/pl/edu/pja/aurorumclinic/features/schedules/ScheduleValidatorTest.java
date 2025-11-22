@@ -17,6 +17,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,8 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest(classes = {ScheduleValidator.class})
@@ -562,7 +562,109 @@ public class ScheduleValidatorTest {
                 testSchedule.getDoctor().getId());
     }
 
+    @Test
+    void checkIfScheduleHasAppointmentsShouldThrowApiExceptionWhenAppointmentExistWithinSchedule() {
+        Doctor testDoctor = Doctor.builder()
+                .id(1L)
+                .build();
+        Schedule testSchedule = Schedule.builder()
+                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .doctor(testDoctor)
+                .build();
 
+        when(appointmentRepository.existsBySchedule(anyLong(), any(), any())).thenReturn(true);
 
+        assertThatThrownBy(() -> scheduleValidator.checkIfScheduleHasAppointments(testSchedule))
+                .isExactlyInstanceOf(ApiException.class);
+        verify(appointmentRepository).existsBySchedule(testSchedule.getDoctor().getId(),
+                testSchedule.getStartedAt(), testSchedule.getFinishedAt());
+    }
 
+    @Test
+    void checkIfScheduleHasAppointmentsShouldNotThrowApiExceptionWhenNotExistWithinSchedule() {
+        Doctor testDoctor = Doctor.builder()
+                .id(1L)
+                .build();
+        Schedule testSchedule = Schedule.builder()
+                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .doctor(testDoctor)
+                .build();
+
+        when(appointmentRepository.existsBySchedule(anyLong(), any(), any())).thenReturn(false);
+
+        assertThatNoException().isThrownBy(() ->
+                scheduleValidator.checkIfScheduleHasAppointments(testSchedule));
+        verify(appointmentRepository).existsBySchedule(testSchedule.getDoctor().getId(),
+                testSchedule.getStartedAt(), testSchedule.getFinishedAt());
+    }
+
+    @Test
+    void checkIfScheduleHasAppointmentsInOldTimeSlotShouldThrowApiExceptionWhenAppointmentExistsWithin() {
+        Set<Long> appointmentIds = Set.of(1L, 2L);
+        Doctor testDoctor = Doctor.builder()
+                .id(1L)
+                .build();
+        Schedule testSchedule = Schedule.builder()
+                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .doctor(testDoctor)
+                .build();
+        LocalDateTime newStartedAt = testSchedule.getStartedAt().plusHours(3);
+        LocalDateTime newFinishedAt = testSchedule.getFinishedAt().minusHours(1);
+
+        when(appointmentRepository.getAppointmentIdsInPreviousScheduleTimeslot(anyLong(), any(), any(), any(), any()))
+                .thenReturn(appointmentIds);
+
+        assertThatThrownBy(() -> scheduleValidator
+                .checkIfScheduleHasAppointmentsInOldTimeslot(testSchedule, newStartedAt, newFinishedAt))
+                .isExactlyInstanceOf(ApiException.class)
+                .message().contains(appointmentIds.toString());
+        verify(appointmentRepository).getAppointmentIdsInPreviousScheduleTimeslot(testSchedule.getDoctor().getId(),
+                testSchedule.getStartedAt(), testSchedule.getFinishedAt(), newStartedAt, newFinishedAt);
+    }
+
+    @Test
+    void checkIfScheduleHasAppointmentsInOldTimeSlotShouldNotThrowApiExceptionWhenNoAppointmentExistsWithin() {
+        Set<Long> appointmentIds = new HashSet<>();
+        Doctor testDoctor = Doctor.builder()
+                .id(1L)
+                .build();
+        Schedule testSchedule = Schedule.builder()
+                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .doctor(testDoctor)
+                .build();
+        LocalDateTime newStartedAt = testSchedule.getStartedAt().plusHours(3);
+        LocalDateTime newFinishedAt = testSchedule.getFinishedAt().plusHours(3);
+
+        when(appointmentRepository.getAppointmentIdsInPreviousScheduleTimeslot(anyLong(), any(), any(), any(), any()))
+                .thenReturn(appointmentIds);
+
+        assertThatNoException().isThrownBy(() -> scheduleValidator
+                .checkIfScheduleHasAppointmentsInOldTimeslot(testSchedule, newStartedAt, newFinishedAt));
+        verify(appointmentRepository).getAppointmentIdsInPreviousScheduleTimeslot(testSchedule.getDoctor().getId(),
+                testSchedule.getStartedAt(), testSchedule.getFinishedAt(), newStartedAt, newFinishedAt);
+    }
+
+    @Test
+    void checkIfScheduleHasAppointmentsInOldTimeSlotShouldNotThrowApiExceptionWhenNewTimeSlotContainsOld() {
+        Set<Long> appointmentIds = new HashSet<>();
+        Doctor testDoctor = Doctor.builder()
+                .id(1L)
+                .build();
+        Schedule testSchedule = Schedule.builder()
+                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .doctor(testDoctor)
+                .build();
+        LocalDateTime newStartedAt = testSchedule.getStartedAt().minusHours(1);
+        LocalDateTime newFinishedAt = testSchedule.getFinishedAt().plusHours(3);
+
+        assertThatNoException().isThrownBy(() -> scheduleValidator
+                .checkIfScheduleHasAppointmentsInOldTimeslot(testSchedule, newStartedAt, newFinishedAt));
+        verify(appointmentRepository, never()).getAppointmentIdsInPreviousScheduleTimeslot(testSchedule.getDoctor().getId(),
+                testSchedule.getStartedAt(), testSchedule.getFinishedAt(), newStartedAt, newFinishedAt);
+    }
 }

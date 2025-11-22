@@ -11,10 +11,8 @@ import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Component
@@ -47,7 +45,7 @@ public class ScheduleValidator {
     public void checkIfScheduleHasAppointments(Schedule schedule) {
         if (appointmentRepository.existsBySchedule(
                 schedule.getDoctor().getId(), schedule.getStartedAt(), schedule.getFinishedAt())) {
-            throw new ApiException("Schedule has appointments assigned", "appointments");
+            throw new ApiException("Appointments are scheduled inside this schedule", "appointments");
         }
     }
 
