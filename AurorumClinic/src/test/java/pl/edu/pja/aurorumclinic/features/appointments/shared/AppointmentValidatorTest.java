@@ -1,7 +1,5 @@
 package pl.edu.pja.aurorumclinic.features.appointments.shared;
 
-
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
@@ -29,6 +27,54 @@ public class AppointmentValidatorTest {
     void setUp() {
         appointmentRepository = mock(AppointmentRepository.class);
         appointmentValidator = new AppointmentValidator(appointmentRepository);
+    }
+
+    @Test
+    void validateAppointmentShouldThrowApiExceptionWhenStartDateIsAfterEndDate() {
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(30);
+        LocalDateTime finishedAt = LocalDateTime.now();
+        Specialization testSpec = Specialization.builder()
+                .id(1L)
+                .name("Psychiatra dorosłych")
+                .services(Set.of(Service.builder()
+                        .id(1L)
+                        .build()))
+                .build();
+        Service testService = Service.builder()
+                .id(2L)
+                .build();
+        Doctor testDoctor = Doctor.builder()
+                .id(1L)
+                .specializations(Set.of(testSpec))
+                .build();
+
+        assertThatThrownBy(() ->
+                appointmentValidator.validateAppointment(startedAt, finishedAt, testDoctor, testService))
+                .isExactlyInstanceOf(ApiException.class);
+    }
+
+    @Test
+    void validateAppointmentShouldThrowApiExceptionWhenEndDateIsBeforeStartDate() {
+        LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime finishedAt = LocalDateTime.now().minusMinutes(30);
+        Specialization testSpec = Specialization.builder()
+                .id(1L)
+                .name("Psychiatra dorosłych")
+                .services(Set.of(Service.builder()
+                        .id(1L)
+                        .build()))
+                .build();
+        Service testService = Service.builder()
+                .id(2L)
+                .build();
+        Doctor testDoctor = Doctor.builder()
+                .id(1L)
+                .specializations(Set.of(testSpec))
+                .build();
+
+        assertThatThrownBy(() ->
+                appointmentValidator.validateAppointment(startedAt, finishedAt, testDoctor, testService))
+                .isExactlyInstanceOf(ApiException.class);
     }
 
     @Test

@@ -18,6 +18,12 @@ public class AppointmentValidator {
     private final AppointmentRepository appointmentRepository;
 
     public void validateAppointment(LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor, Service service) {
+        if (startedAt.isAfter(finishedAt)) {
+            throw new ApiException("Start date cannot be after end date", "startedAt");
+        }
+        if (finishedAt.isBefore(startedAt)) {
+            throw new ApiException("End date cannot be before start date", "finishedAt");
+        }
         validateSpecialization(doctor, service);
         if (!appointmentRepository.isTimeSlotAvailable(startedAt, finishedAt, doctor.getId(), service.getId())) {
             throw new ApiException("Timeslot is not available", "appointment");
