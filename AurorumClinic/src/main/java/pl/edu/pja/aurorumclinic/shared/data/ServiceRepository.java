@@ -22,4 +22,9 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
            """)
     Page<Service> getAllServicesBySpecializationId(Long specId, Pageable pageable);
 
+    @Query("""
+           select min(s.duration) from Service s
+           """)
+    int getMinServiceDuration();
+
 }

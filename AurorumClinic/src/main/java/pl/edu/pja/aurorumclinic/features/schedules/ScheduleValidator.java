@@ -6,10 +6,13 @@ import org.springframework.stereotype.Component;
 import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
+import pl.edu.pja.aurorumclinic.shared.data.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +24,7 @@ public class ScheduleValidator {
     private final ScheduleRepository scheduleRepository;
     private final AppointmentRepository appointmentRepository;
     private final AbsenceRepository absenceRepository;
+    private final ServiceRepository serviceRepository;
 
     @Value("${workday.start.hour}")
     private Integer startOfDay;
@@ -65,30 +69,15 @@ public class ScheduleValidator {
     private void validateSpecializations(Doctor doctor, List<Service> services) {
         for (Service service: services) {
             for (Specialization specialization: doctor.getSpecializations()) {
-                if(specialization.getServices().contains(service)) {
-                    return;
+                if (!specialization.getServices().contains(service)) {
+                    throw new ApiException("Doctor specialization is not assigned to this service", "specialization");
                 }
             }
         }
-        throw new ApiException("Doctor specialization is not assigned to this service", "specialization");
     }
 
     private void validateTimeSlot(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId) {
-        if (!Objects.equals(startedAt.getDayOfMonth(), finishedAt.getDayOfMonth())) {
-            throw new ApiException("Schedule can be one day long", "startedAt, finishedAt");
-        }
-        if (startedAt.getHour() < startOfDay) {
-            throw new ApiException("Start date cannot be before work hours", "startedAt");
-        }
-        if (finishedAt.getHour() > endOfDay) {
-            throw new ApiException("End date cannot be after work hours", "finishedAt");
-        }
-        if (startedAt.isAfter(finishedAt)) {
-            throw new ApiException("Start date cannot be after end date", "startedAt");
-        }
-        if (finishedAt.isBefore(startedAt)) {
-            throw new ApiException("End date cannot be before start date", "finishedAt");
-        }
+        validateDates(startedAt, finishedAt);
         if (scheduleRepository.scheduleExistsInIntervalForDoctor(startedAt,
                 finishedAt, doctorId)) {
             throw new ApiException("Schedule overlaps with already existing one", "schedule");
@@ -99,21 +88,7 @@ public class ScheduleValidator {
     }
 
     private void validateNewTimeSlot(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId, Schedule schedule) {
-        if (!Objects.equals(startedAt.getDayOfMonth(), finishedAt.getDayOfMonth())) {
-            throw new ApiException("Schedule can be one day long", "startedAt, finishedAt");
-        }
-        if (startedAt.getHour() < startOfDay) {
-            throw new ApiException("Start date cannot be before work hours", "startedAt");
-        }
-        if (finishedAt.getHour() > endOfDay) {
-            throw new ApiException("End date cannot be after work hours", "finishedAt");
-        }
-        if (startedAt.isAfter(finishedAt)) {
-            throw new ApiException("Start date cannot be after end date", "startedAt");
-        }
-        if (finishedAt.isBefore(startedAt)) {
-            throw new ApiException("End date cannot be before start date", "finishedAt");
-        }
+        validateDates(startedAt, finishedAt);
         if (scheduleRepository.scheduleExistsInIntervalForDoctorExcludingId(startedAt,
                 finishedAt, doctorId, schedule.getId())) {
             throw new ApiException("Schedule overlaps with already existing one", "schedule");
@@ -122,6 +97,24 @@ public class ScheduleValidator {
             throw new ApiException("Schedule overlaps with already existing absence", "absence");
         }
     }
-    
+
+    private void validateDates(LocalDateTime startedAt, LocalDateTime finishedAt) {
+        if (startedAt.isAfter(finishedAt) || startedAt.equals(finishedAt)) {
+            throw new ApiException("Start date must be before end date", "startedAt");
+        }
+        if (!startedAt.toLocalDate().equals(finishedAt.toLocalDate())) {
+            throw new ApiException("Schedule can be one day long", "startedAt, finishedAt");
+        }
+        if (startedAt.getHour() < startOfDay) {
+            throw new ApiException("Start date cannot be before work hours", "startedAt");
+        }
+        if (finishedAt.getHour() > endOfDay) {
+            throw new ApiException("End date cannot be after work hours", "finishedAt");
+        }
+        int minDuration = serviceRepository.getMinServiceDuration();
+        if (ChronoUnit.MINUTES.between(startedAt, finishedAt) < minDuration) {
+            throw new ApiException("Schedule has to last for at least the minimum service duration", "startedAt, finishedAt");
+        }
+    }
 
 }
