@@ -41,7 +41,8 @@ public class ScheduleValidator {
     }
 
     public void checkIfScheduleHasAppointments(Schedule schedule) {
-        if (appointmentRepository.existsByScheduleId(schedule.getId())) {
+        if (appointmentRepository.existsBySchedule(
+                schedule.getDoctor().getId(), schedule.getStartedAt(), schedule.getFinishedAt())) {
             throw new ApiException("Schedule has appointments assigned", "appointments");
         }
     }
@@ -53,8 +54,8 @@ public class ScheduleValidator {
         if (newStartedAt.isBefore(oldStartedAt) && newFinishedAt.isAfter(oldFinishedAt)) {
             return;
         }
-        Set<Long> appointmentIdsInTimeslot = appointmentRepository.getAppointmentsInScheduleTimeslot
-                (schedule.getId(), oldStartedAt, oldFinishedAt, newStartedAt, newFinishedAt);
+        Set<Long> appointmentIdsInTimeslot = appointmentRepository.getAppointmentIdsInPreviousScheduleTimeslot
+                (schedule.getDoctor().getId(), oldStartedAt, oldFinishedAt, newStartedAt, newFinishedAt);
 
         if (!appointmentIdsInTimeslot.isEmpty()) {
             throw new ApiException(appointmentIdsInTimeslot.toString(), "appointments");

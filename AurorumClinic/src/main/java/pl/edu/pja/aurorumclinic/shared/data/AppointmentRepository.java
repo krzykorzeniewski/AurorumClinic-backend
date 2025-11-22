@@ -62,13 +62,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     boolean existsBetweenUsers(Long participantId, Long secParticipantId);
 
     @Query("""
-            select a from Schedule s
-                    join s.services s1
-                    join s1.appointments a
-                where s.id = :scheduleId
-                and a.doctor.id = s.doctor.id
+            select a from Appointment a
+            where a.doctor.id = :doctorId
+            and a.startedAt >= :startedAt
+            and a.finishedAt <= :finishedAt
             """)
-    List<Appointment> findAllByScheduleId(Long scheduleId);
+    List<Appointment> findAllBySchedule(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
 
     @Query("""
             select count(a1.id) as scheduled,
@@ -114,26 +113,23 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("""
             select case when
                 exists (select 1 from Appointment a
-                            join a.service s1
-                            join s1.schedules s2
-                        where s2.id = :scheduleId
-                        and a.doctor.id = s2.doctor.id)
+                            where a.doctor.id = :doctorId
+                            and a.startedAt >= :startedAt
+                            and a.finishedAt <= :finishedAt)
                 then true
                 else false
             end
             """)
-    boolean existsByScheduleId(Long scheduleId);
+    boolean existsBySchedule(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
 
-    @Query("""
+    @Query(""" 
            select a.id from Appointment a
-           join a.service s
-           join s.schedules s2
-           where s2.id = :scheduleId
+           where a.doctor.id = :doctorId
            and (a.startedAt < :newFinishedAt and a.finishedAt > :oldFinishedAt)
            or (a.startedAt < :newStartedAt and a.finishedAt > :oldStartedAt)
            """)
-    Set<Long> getAppointmentsInScheduleTimeslot(Long scheduleId, LocalDateTime oldStartedAt, LocalDateTime oldFinishedAt,
-                                                LocalDateTime newStartedAt, LocalDateTime newFinishedAt);
+    Set<Long> getAppointmentIdsInPreviousScheduleTimeslot(Long doctorId, LocalDateTime oldStartedAt, LocalDateTime oldFinishedAt,
+                                                          LocalDateTime newStartedAt, LocalDateTime newFinishedAt);
 
     @Query("""
     select case

@@ -15,13 +15,16 @@ import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.PaymentStatus;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -44,10 +47,14 @@ public class DoctorGetScheduleByIdAppointments {
         doctorRepository.findById(doctorId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "doctorId")
         );
-        scheduleRepository.findById(scheduleId).orElseThrow(
+        Schedule scheduleFromDb = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "scheduleId")
         );
-        List<Appointment> appointmentsFromSchedule = appointmentRepository.findAllByScheduleId(scheduleId);
+        if (!Objects.equals(scheduleFromDb.getDoctor().getId(), doctorId)) {
+            throw new ApiAuthorizationException("Schedule doctor id is different from logged in doctor id");
+        }
+        List<Appointment> appointmentsFromSchedule = appointmentRepository
+            .findAllBySchedule(scheduleFromDb.getDoctor().getId(), scheduleFromDb.getStartedAt(), scheduleFromDb.getFinishedAt());
         return appointmentsFromSchedule.stream().map(appointmentFromDb ->
                 DoctorGetScheduleAppointmentResponse.builder()
                         .id(appointmentFromDb.getId())

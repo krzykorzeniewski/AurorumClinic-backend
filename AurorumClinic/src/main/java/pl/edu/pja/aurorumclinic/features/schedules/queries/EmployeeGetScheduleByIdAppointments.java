@@ -13,6 +13,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.PaymentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -39,10 +40,11 @@ public class EmployeeGetScheduleByIdAppointments {
     }
 
     private List<EmployeeGetScheduleAppointmentResponse> handle(Long scheduleId) {
-        scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+        Schedule scheduleFromDb = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "scheduleId")
         );
-        List<Appointment> appointmentsFromSchedule = appointmentRepository.findAllByScheduleId(scheduleId);
+        List<Appointment> appointmentsFromSchedule = appointmentRepository
+                .findAllBySchedule(scheduleFromDb.getDoctor().getId(), scheduleFromDb.getStartedAt(), scheduleFromDb.getFinishedAt());
         return appointmentsFromSchedule.stream().map(appointmentFromDb ->
                 EmployeeGetScheduleAppointmentResponse.builder()
                         .id(appointmentFromDb.getId())
