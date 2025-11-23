@@ -38,7 +38,6 @@ public class Appointment {
 
     @Column(name = "Description", columnDefinition = "nvarchar(500)")
     @Size(max = 500, message = "Maximum length for this field is 500 characters")
-    @NotBlank(message = "This field is required")
     private String description;
 
     @Column(name = "Notification_Sent", columnDefinition = "bit")
