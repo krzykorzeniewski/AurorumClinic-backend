@@ -188,7 +188,6 @@ public class GetAppointmentByIdTest {
         GetAppointmentResponse resultDto = resultResponse.getBody().getData();
 
         assertThat(resultDto)
-                .usingRecursiveComparison()
                 .isEqualTo(testResponse);
         verify(userRepository).findById(empId);
         verify(appointmentRepository).findById(appointmentId);
@@ -282,7 +281,6 @@ public class GetAppointmentByIdTest {
         GetAppointmentResponse resultDto = resultResponse.getBody().getData();
 
         assertThat(resultDto)
-                .usingRecursiveComparison()
                 .isEqualTo(testResponse);
         verify(userRepository).findById(empId);
         verify(appointmentRepository).findById(appointmentId);

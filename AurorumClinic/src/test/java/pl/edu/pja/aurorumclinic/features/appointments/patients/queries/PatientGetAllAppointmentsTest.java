@@ -121,7 +121,6 @@ public class PatientGetAllAppointmentsTest {
 
         PatientGetAppointmentResponse resultDto = resultPage.getContent().get(0);
         assertThat(resultDto)
-                .usingRecursiveComparison()
                         .isEqualTo(testResponse);
 
         verify(appointmentRepository).findAllByPatientId(testPatient.getId(), pageable);
