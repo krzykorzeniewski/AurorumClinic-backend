@@ -1,22 +1,19 @@
 package pl.edu.pja.aurorumclinic.features.auth.register;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.edu.pja.aurorumclinic.features.auth.register.dtos.*;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.DoctorRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.EmployeeRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.PatientRegisteredEvent;
-import pl.edu.pja.aurorumclinic.features.auth.register.events.AccountVerificationRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.register.events.*;
+import pl.edu.pja.aurorumclinic.shared.PasswordValidator;
 import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
-import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
-import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
-import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
-import pl.edu.pja.aurorumclinic.shared.data.models.User;
+import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -24,6 +21,7 @@ import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +32,10 @@ public class RegisterServiceImpl implements RegisterService{
     private final TokenService tokenService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final SpecializationRepository specializationRepository;
+    private final PasswordValidator passwordValidator;
+
+    @Value("${email-verification-token.expiration.minutes}")
+    private Integer emailVerificationTokenExpirationInMinutes;
 
     @Override
     @Transactional
@@ -67,6 +69,7 @@ public class RegisterServiceImpl implements RegisterService{
     @Override
     @Transactional
     public void registerPatient(RegisterPatientRequest registerPatientRequest) {
+        passwordValidator.validatePassword(registerPatientRequest.password());
         Patient patient = Patient.builder()
                 .name(registerPatientRequest.name())
                 .surname(registerPatientRequest.surname())
@@ -79,7 +82,9 @@ public class RegisterServiceImpl implements RegisterService{
                 .phoneNumber(registerPatientRequest.phoneNumber())
                 .build();
         userRepository.save(patient);
-        applicationEventPublisher.publishEvent(new PatientRegisteredEvent(patient));
+        Token emailVerificationtoken = tokenService.createToken(patient, TokenName.EMAIL_VERIFICATION,
+                emailVerificationTokenExpirationInMinutes);
+        applicationEventPublisher.publishEvent(new PatientRegisteredEvent(patient, emailVerificationtoken));
     }
 
     @Override
@@ -102,7 +107,7 @@ public class RegisterServiceImpl implements RegisterService{
     }
 
     @Override
-    public void sendVerifyEmail(VerifyEmailTokenRequest verifyEmailTokenRequest) {
+    public void createVerifyEmailToken(VerifyEmailTokenRequest verifyEmailTokenRequest) {
         User userFromDb = userRepository.findByEmail(verifyEmailTokenRequest.email());
         if (userFromDb == null) {
             throw new ApiNotFoundException("Email not found", "email");
@@ -110,7 +115,9 @@ public class RegisterServiceImpl implements RegisterService{
         if (userFromDb.isEmailVerified()) {
             throw new ApiException("Email is already verified", "email");
         }
-        applicationEventPublisher.publishEvent(new AccountVerificationRequestedEvent(userFromDb));
+        Token emailVerificationtoken = tokenService.createToken(userFromDb, TokenName.EMAIL_VERIFICATION,
+                emailVerificationTokenExpirationInMinutes);
+        applicationEventPublisher.publishEvent(new EmailVerificationTokenCreatedEvent(userFromDb, emailVerificationtoken));
     }
 
     @Override
@@ -125,6 +132,20 @@ public class RegisterServiceImpl implements RegisterService{
         }
         tokenService.validateAndDeleteToken(userFromDb, verifyEmailRequest.token());
         userFromDb.setEmailVerified(true);
+    }
+
+    @Override
+    @Transactional
+    public void createNewPassword(Long staffMemberId) {
+        User userFromDb = userRepository.findById(staffMemberId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "id")
+        );
+        if (Objects.equals(userFromDb.getRole(), UserRole.PATIENT)) {
+            throw new ApiException("User is not a staff member", "id");
+        }
+        String randomPassword = tokenService.createRandomToken().substring(0, 10);
+        userFromDb.setPassword(passwordEncoder.encode(randomPassword));
+        applicationEventPublisher.publishEvent(new StaffMemberPasswordCreatedEvent(userFromDb, randomPassword));
     }
 
 }

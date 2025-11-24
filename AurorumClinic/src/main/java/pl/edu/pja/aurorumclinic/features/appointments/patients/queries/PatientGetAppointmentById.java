@@ -12,10 +12,12 @@ import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.Pa
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/appointments/me")
@@ -28,7 +30,7 @@ public class PatientGetAppointmentById {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PatientGetAppointmentResponse>> getAppointment(@PathVariable("id") Long appointmentId,
-                                                                                     @AuthenticationPrincipal Long userId) throws IOException {
+                                                                                     @AuthenticationPrincipal Long userId){
         return ResponseEntity.ok(ApiResponse.success(handle(appointmentId, userId)));
     }
 
@@ -36,6 +38,9 @@ public class PatientGetAppointmentById {
         Appointment appointmentFromDb = appointmentRepository.getAppointmentByIdAndPatientId(appointmentId, userId);
         if (appointmentFromDb == null) {
             throw new ApiNotFoundException("id not found", "id");
+        }
+        if (!Objects.equals(appointmentFromDb.getPatient().getId(), userId)) {
+            throw new ApiAuthorizationException("Appointment patient id does not match request patient id");
         }
         PatientGetAppointmentResponse response = PatientGetAppointmentResponse.builder()
                 .id(appointmentFromDb.getId())
@@ -60,7 +65,6 @@ public class PatientGetAppointmentById {
                         .name(appointmentFromDb.getService().getName())
                         .price(appointmentFromDb.getService().getPrice())
                         .build())
-
                 .payment(PatientGetAppointmentResponse.PaymentDto.builder()
                         .id(appointmentFromDb.getPayment().getId())
                         .amount(appointmentFromDb.getPayment().getAmount())

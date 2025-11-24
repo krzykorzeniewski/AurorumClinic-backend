@@ -18,6 +18,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -43,11 +44,14 @@ public class EmployeeUpdatePatient {
         patientFromDb.setSurname(request.surname());
         patientFromDb.setPesel(request.pesel());
         patientFromDb.setBirthdate(request.birthdate());
+
+        if (!Objects.equals(request.phoneNumber, patientFromDb.getPhoneNumber())) {
+            patientFromDb.setPhoneNumber(request.phoneNumber());
+            patientFromDb.setTwoFactorAuth(false);
+        }
         patientFromDb.setPhoneNumber(request.phoneNumber());
         patientFromDb.setEmail(request.email());
-        patientFromDb.setCommunicationPreferences(request.communicationPreferences());
         patientFromDb.setNewsletter(request.newsletter());
-        patientFromDb.setTwoFactorAuth(request.twoFactorAuth());
 
         return PutPatientResponse.builder()
                 .id(patientFromDb.getId())
@@ -67,13 +71,11 @@ public class EmployeeUpdatePatient {
 
     public record PutPatientRequest(@NotBlank @Size(max = 50) String name,
                                     @NotBlank @Size(max = 50) String surname,
-                                    @NotBlank @Size(min = 11, max = 11) String pesel,
+                                    @Size(min = 11, max = 11) String pesel,
                                     @NotNull LocalDate birthdate,
                                     @Size(min = 9, max = 9) @NotBlank String phoneNumber,
                                     @Email @NotBlank @Size(max = 100) String email,
-                                    @NotNull CommunicationPreference communicationPreferences,
-                                    boolean newsletter,
-                                    boolean twoFactorAuth) {
+                                    boolean newsletter) {
     }
 
     @Builder

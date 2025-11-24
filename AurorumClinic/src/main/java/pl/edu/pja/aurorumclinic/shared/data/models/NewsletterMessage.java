@@ -46,6 +46,9 @@ public class NewsletterMessage {
     @Column(name = "Sent_At", columnDefinition = "datetime2(5)")
     private LocalDateTime sentAt;
 
+    @Column(name = "Scheduled_At", columnDefinition = "datetime2(5)")
+    private LocalDateTime scheduledAt;
+
     @Column(name = "Reviewed_At", columnDefinition = "datetime2(5)")
     private LocalDateTime reviewedAt;
 

@@ -1,5 +1,6 @@
 package pl.edu.pja.aurorumclinic.shared.data;
 
+import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,7 @@ import pl.edu.pja.aurorumclinic.features.chats.queries.GetChatsResponse;
 import pl.edu.pja.aurorumclinic.features.users.patients.queries.shared.GetPatientResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
@@ -56,4 +58,13 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             join patient p2 on p2.pk_patient = u2.pk_user where u1.pk_user = :doctorId
             """)
     List<GetChatsResponse> findAllWhoHadConversationWithDoctorId(Long doctorId);
+
+    @Query("""
+            select
+                count(p.id) as totalRegistered,
+                count(case when p.createdAt between :startedAt and :finishedAt then 1 end) as registeredThisPeriod,
+                count(case when p.newsletter = true then 1 end) as subscribedToNewsletter
+            from Patient p
+            """)
+    Tuple getPatientStats(LocalDateTime startedAt, LocalDateTime finishedAt);
 }

@@ -1,13 +1,17 @@
 package pl.edu.pja.aurorumclinic.features.auth.reset_password;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.edu.pja.aurorumclinic.features.auth.reset_password.events.ResetPasswordRequestedEvent;
+import pl.edu.pja.aurorumclinic.features.auth.reset_password.events.ResetPasswordTokenCreatedEvent;
+import pl.edu.pja.aurorumclinic.shared.PasswordValidator;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.TokenName;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
@@ -19,9 +23,13 @@ public class ResetPasswordServiceImpl implements ResetPasswordService{
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final PasswordValidator passwordValidator;
+
+    @Value("${reset-password-token.expiration.minutes}")
+    private Integer resetPasswordTokenExpirationInMinutes;
 
     @Override
-    public void sendResetPasswordEmail(ResetPasswordTokenRequest resetPasswordTokenRequest) {
+    public void createResetPasswordToken(ResetPasswordTokenRequest resetPasswordTokenRequest) {
         User userFromDb = userRepository.findByEmail(resetPasswordTokenRequest.email());
         if (userFromDb == null) {
             return;
@@ -29,7 +37,9 @@ public class ResetPasswordServiceImpl implements ResetPasswordService{
         if (!userFromDb.isEmailVerified()) {
             return;
         }
-        applicationEventPublisher.publishEvent(new ResetPasswordRequestedEvent(userFromDb));
+        Token token = tokenService.createToken(userFromDb, TokenName.PASSWORD_RESET,
+                resetPasswordTokenExpirationInMinutes);
+        applicationEventPublisher.publishEvent(new ResetPasswordTokenCreatedEvent(userFromDb, token));
     }
 
     @Transactional
@@ -39,6 +49,7 @@ public class ResetPasswordServiceImpl implements ResetPasswordService{
         if (userFromDb == null) {
             throw new ApiNotFoundException("Email not found", "email");
         }
+        passwordValidator.validatePassword(resetPasswordRequest.password());
         tokenService.validateAndDeleteToken(userFromDb, resetPasswordRequest.token());
         userFromDb.setPassword(passwordEncoder.encode(resetPasswordRequest.password()));
     }

@@ -14,7 +14,9 @@ import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentDeletedEvent;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.util.Objects;
@@ -41,6 +43,9 @@ public class PatientDeleteAppointment {
                 .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));
         if (!Objects.equals(appointmentFromDb.getPatient().getId(), userId)) {
             throw new ApiAuthorizationException("Patient id does not match user id");
+        }
+        if (Objects.equals(appointmentFromDb.getStatus(), AppointmentStatus.FINISHED)) {
+            throw new ApiException("Appointment has finished, unable to delete", "id");
         }
         appointmentRepository.delete(appointmentFromDb);
         applicationEventPublisher.publishEvent(

@@ -42,8 +42,7 @@ public class Payment {
     @Column(name = "Status", length = 50, columnDefinition = "nvarchar(50)")
     private PaymentStatus status;
 
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "FK_appointment")
+    @OneToOne(mappedBy = "payment")
     @ToString.Exclude
     private Appointment appointment;
 }

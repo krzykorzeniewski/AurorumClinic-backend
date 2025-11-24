@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.employees.commands;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +43,8 @@ public class RescheduleAppointment {
         );
         LocalDateTime newStartedAt = request.startedAt();
         LocalDateTime newFinishedAt = newStartedAt.plusMinutes(appointmentFromDb.getService().getDuration());
-        appointmentValidator.validateAppointment(newStartedAt, newFinishedAt, appointmentFromDb.getDoctor(),
-                appointmentFromDb.getService());
+        appointmentValidator.validateRescheduledAppointment(newStartedAt, newFinishedAt, appointmentFromDb.getDoctor(),
+                appointmentFromDb.getService(), appointmentFromDb);
 
         appointmentFromDb.setStartedAt(newStartedAt);
         appointmentFromDb.setFinishedAt(newFinishedAt);
@@ -54,7 +55,7 @@ public class RescheduleAppointment {
     }
 
     public record EmployeeUpdateAppointmentRequest(@NotNull LocalDateTime startedAt,
-                                                   @NotBlank String description) {
+                                                   @Size(max = 500) String description) {
     }
 
 }

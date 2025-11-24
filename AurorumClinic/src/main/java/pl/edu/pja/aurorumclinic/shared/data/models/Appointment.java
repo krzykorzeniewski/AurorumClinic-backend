@@ -44,30 +44,27 @@ public class Appointment {
     @Column(name = "Notification_Sent", columnDefinition = "bit")
     private boolean notificationSent = false;
 
-    @OneToOne(mappedBy = "appointment")
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "FK_Payment")
     @ToString.Exclude
     private Payment payment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "FK_Service")
     @ToString.Exclude
     private Service service;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private Survey survey;
-
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "FK_Opinion")
     @ToString.Exclude
     private Opinion opinion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "FK_Doctor")
     @ToString.Exclude
     private Doctor doctor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "FK_Patient")
     @ToString.Exclude
     private Patient patient;

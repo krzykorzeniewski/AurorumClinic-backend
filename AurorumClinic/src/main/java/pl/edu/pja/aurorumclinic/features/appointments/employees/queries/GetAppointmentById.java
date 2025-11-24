@@ -3,6 +3,7 @@ package pl.edu.pja.aurorumclinic.features.appointments.employees.queries;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,9 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.employees.queries.shared.GetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.User;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -22,17 +29,26 @@ public class GetAppointmentById {
 
     private final AppointmentRepository appointmentRepository;
     private final ObjectStorageService objectStorageService;
+    private final UserRepository userRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<GetAppointmentResponse>> getAppointmentById(
-            @PathVariable("id") Long appointmentId) {
-        return ResponseEntity.ok(ApiResponse.success(handle(appointmentId)));
+            @PathVariable("id") Long appointmentId,
+            @AuthenticationPrincipal Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(handle(appointmentId, userId)));
     }
 
-    private GetAppointmentResponse handle(Long appointmentId) {
-        Appointment appointmentFromDb = appointmentRepository.findById(appointmentId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+    private GetAppointmentResponse handle(Long appointmentId, Long userId) {
+        User userFromDb = userRepository.findById(userId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "userId")
         );
+        Appointment appointmentFromDb = appointmentRepository.findById(appointmentId).orElseThrow(
+                () -> new ApiNotFoundException("Id not found", "appointmentId")
+        );
+        if (Objects.equals(userFromDb.getRole(), UserRole.DOCTOR)
+                && !Objects.equals(appointmentFromDb.getDoctor().getId(), userFromDb.getId())) {
+            throw new ApiAuthorizationException("Doctor cannot view others appointments");
+        }
         GetAppointmentResponse response = GetAppointmentResponse.builder()
                 .id(appointmentFromDb.getId())
                 .status(appointmentFromDb.getStatus())
