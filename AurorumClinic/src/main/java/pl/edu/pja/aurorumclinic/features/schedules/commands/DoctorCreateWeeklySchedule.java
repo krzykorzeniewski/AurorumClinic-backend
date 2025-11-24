@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -47,7 +48,8 @@ public class DoctorCreateWeeklySchedule {
 
     @PostMapping("/weekly/me")
     @Transactional
-    public ResponseEntity<ApiResponse<?>> createWeeklySchedule(@RequestBody @Valid DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request,
+    public ResponseEntity<ApiResponse<?>> createWeeklySchedule(
+            @RequestBody @Valid DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request,
                                                                @AuthenticationPrincipal Long doctorId) {
         handle(request, doctorId);
         return ResponseEntity.ok(ApiResponse.success(null));
@@ -64,24 +66,24 @@ public class DoctorCreateWeeklySchedule {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         List<Service> mondayServicesFromDb = serviceRepository.findAllById(request.mon.serviceIds);
-        if (mondayServicesFromDb.size() > request.mon.serviceIds.size()) { //TODO dodac check jak w create schedule
-            throw new ApiException("Some service ids are not found", "monServiceIds");
+        if (!mondayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.mon.serviceIds)) {
+            throw new ApiException("Monday service ids are not found", "monServiceIds");
         }
         List<Service> tuesdayServicesFromDb = serviceRepository.findAllById(request.tue.serviceIds);
-        if (tuesdayServicesFromDb.size() > request.tue.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "tueServiceIds");
+        if (!tuesdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.tue.serviceIds)) {
+            throw new ApiException("Tuesday service ids are not found", "tueServiceIds");
         }
         List<Service> wednesdayServicesFromDb = serviceRepository.findAllById(request.wed.serviceIds);
-        if (wednesdayServicesFromDb.size() > request.wed.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "wedServiceIds");
+        if (!wednesdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.wed.serviceIds)) {
+            throw new ApiException("Wednesday service ids are not found", "wedServiceIds");
         }
         List<Service> thursdayServicesFromDb = serviceRepository.findAllById(request.thu.serviceIds);
-        if (thursdayServicesFromDb.size() > request.thu.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "thuServiceIds");
+        if (!thursdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.thu.serviceIds)) {
+            throw new ApiException("Thursday service ids are not found", "thuServiceIds");
         }
         List<Service> fridayServicesFromDb = serviceRepository.findAllById(request.fri.serviceIds);
-        if (fridayServicesFromDb.size() > request.fri.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "friServiceIds");
+        if (!fridayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.fri.serviceIds)) {
+            throw new ApiException("Friday service ids are not found", "friServiceIds");
         }
         LocalDate todayDate = LocalDate.now();
         LocalDate scheduleStartDate = request.startedAt;
