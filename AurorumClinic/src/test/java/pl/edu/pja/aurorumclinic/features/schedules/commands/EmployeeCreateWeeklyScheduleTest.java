@@ -27,14 +27,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {DoctorCreateWeeklySchedule.class})
+@SpringBootTest(classes = {EmployeeCreateWeeklySchedule.class})
 @ActiveProfiles("test")
-public class DoctorCreateWeeklyScheduleTest {
+public class EmployeeCreateWeeklyScheduleTest {
 
     @MockitoBean
     ScheduleRepository scheduleRepository;
@@ -49,140 +50,145 @@ public class DoctorCreateWeeklyScheduleTest {
     ScheduleValidator scheduleValidator;
 
     @Autowired
-    DoctorCreateWeeklySchedule doctorCreateWeeklySchedule;
+    EmployeeCreateWeeklySchedule employeeCreateWeeklySchedule;
 
     @Test
     void createWeeklyScheduleShouldThrowApiExceptionWhenFinishedAtIsBeforeStartedAt() {
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-            DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                    .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
-                            .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
-                            .serviceIds(Set.of(1L, 2L))
-                            .build())
-                    .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
-                            .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
-                            .serviceIds(Set.of(3L))
-                            .build())
-                    .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
-                            .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
-                            .serviceIds(Set.of(1L, 2L))
-                            .build())
-                    .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
-                            .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
-                            .serviceIds(Set.of(3L))
-                            .build())
-                    .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
-                            .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
-                            .serviceIds(Set.of(1L, 2L))
-                            .build())
-                    .startedAt(LocalDate.now())
-                    .finishedAt(LocalDate.now().minusDays(1)) //before startedAt
-                    .build();
         Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
+                                .serviceIds(Set.of(1L, 2L))
+                                .build())
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
+                                .serviceIds(Set.of(3L))
+                                .build())
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
+                                .serviceIds(Set.of(1L, 2L))
+                                .build())
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
+                                .serviceIds(Set.of(3L))
+                                .build())
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
+                                .serviceIds(Set.of(1L, 2L))
+                                .build())
+                        .startedAt(LocalDate.now())
+                        .finishedAt(LocalDate.now().minusDays(1)) //before startedAt
+                        .doctorId(doctorId)
+                        .build();
 
-        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+        assertThatThrownBy(() -> employeeCreateWeeklySchedule.createWeeklySchedule(request))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("is before started");
     }
 
     @Test
     void createWeeklyScheduleShouldThrowApiExceptionWhenStartedAtAndFinishedAtAreInThePast() {
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
                         .startedAt(LocalDate.now().minusDays(10))
                         .finishedAt(LocalDate.now().minusDays(1))
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
 
-        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+        assertThatThrownBy(() -> employeeCreateWeeklySchedule.createWeeklySchedule(request))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("past");
     }
 
     @Test
     void createWeeklyScheduleShouldThrowApiNotFoundExceptionWhenDoctorIdIsNotFound() {
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
                         .startedAt(LocalDate.now())
                         .finishedAt(LocalDate.now().plusMonths(6))
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
 
         when(doctorRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+        assertThatThrownBy(() -> employeeCreateWeeklySchedule.createWeeklySchedule(request))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
         verify(doctorRepository).findById(doctorId);
     }
 
     @Test
     void createWeeklyScheduleShouldThrowApiExceptionWhenMonServiceIdIsNotFound() {
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
                         .startedAt(LocalDate.now())
                         .finishedAt(LocalDate.now().plusMonths(6))
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
+
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
@@ -190,7 +196,7 @@ public class DoctorCreateWeeklyScheduleTest {
         when(doctorRepository.findById(anyLong())).thenReturn(Optional.of(testDoctor));
         when(serviceRepository.findAllById(any())).thenReturn((List.of(Service.builder().id(1L).build()))); //mon has 1L and 2L
 
-        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+        assertThatThrownBy(() -> employeeCreateWeeklySchedule.createWeeklySchedule(request))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("Monday");
         verify(doctorRepository).findById(doctorId);
@@ -199,32 +205,34 @@ public class DoctorCreateWeeklyScheduleTest {
 
     @Test
     void createWeeklyScheduleShouldThrowApiExceptionWhenTueServiceIdIsNotFound() {
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
                         .startedAt(LocalDate.now())
                         .finishedAt(LocalDate.now().plusMonths(6))
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
+
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
@@ -234,7 +242,7 @@ public class DoctorCreateWeeklyScheduleTest {
                 .thenReturn((List.of(Service.builder().id(1L).build(), Service.builder().id(2L).build())))
                 .thenReturn(List.of(Service.builder().id(1L).build(), Service.builder().id(2L).build())); //tue has 3L
 
-        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+        assertThatThrownBy(() -> employeeCreateWeeklySchedule.createWeeklySchedule(request))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("Tuesday");
         verify(doctorRepository).findById(doctorId);
@@ -244,32 +252,34 @@ public class DoctorCreateWeeklyScheduleTest {
 
     @Test
     void createWeeklyScheduleShouldThrowApiExceptionWhenWedServiceIdIsNotFound() {
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 3L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(4L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 4L))
                                 .build())
                         .startedAt(LocalDate.now())
                         .finishedAt(LocalDate.now().plusMonths(6))
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
+
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
@@ -281,7 +291,7 @@ public class DoctorCreateWeeklyScheduleTest {
                 .thenReturn(List.of(Service.builder().id(3L).build()))
                 .thenReturn(List.of(Service.builder().id(1L).build(), Service.builder().id(4L).build())); //wed has 1L, 3L
 
-        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+        assertThatThrownBy(() -> employeeCreateWeeklySchedule.createWeeklySchedule(request))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("Wednesday");
         verify(doctorRepository).findById(doctorId);
@@ -292,32 +302,34 @@ public class DoctorCreateWeeklyScheduleTest {
 
     @Test
     void createWeeklyScheduleShouldThrowApiExceptionWhenThuServiceIdIsNotFound() {
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 3L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(4L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 4L))
                                 .build())
                         .startedAt(LocalDate.now())
                         .finishedAt(LocalDate.now().plusMonths(6))
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
+
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
@@ -330,7 +342,7 @@ public class DoctorCreateWeeklyScheduleTest {
                 .thenReturn(List.of(Service.builder().id(1L).build(), Service.builder().id(3L).build()))
                 .thenReturn(List.of(Service.builder().id(5L).build())); //thu has 4L
 
-        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+        assertThatThrownBy(() -> employeeCreateWeeklySchedule.createWeeklySchedule(request))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("Thursday");
         verify(doctorRepository).findById(doctorId);
@@ -342,32 +354,34 @@ public class DoctorCreateWeeklyScheduleTest {
 
     @Test
     void createWeeklyScheduleShouldThrowApiExceptionWhenFriServiceIdIsNotFound() {
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 3L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(4L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 4L))
                                 .build())
                         .startedAt(LocalDate.now())
                         .finishedAt(LocalDate.now().plusMonths(6))
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
+
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
@@ -381,7 +395,7 @@ public class DoctorCreateWeeklyScheduleTest {
                 .thenReturn(List.of(Service.builder().id(4L).build()))
                 .thenReturn(List.of(Service.builder().id(1L).build(), Service.builder().id(3L).build())); //fri has 1L, 4L
 
-        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+        assertThatThrownBy(() -> employeeCreateWeeklySchedule.createWeeklySchedule(request))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("Friday");
         verify(doctorRepository).findById(doctorId);
@@ -396,32 +410,34 @@ public class DoctorCreateWeeklyScheduleTest {
     void createWeeklyScheduleShouldSaveAllDaysWithinWeeklySchedule() {
         LocalDate scheduleStart = LocalDate.of(2025, 11, 24); //monday
         LocalDate scheduleFinish = LocalDate.of(2025, 12, 7); //sunday
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 3L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(4L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 4L))
                                 .build())
                         .startedAt(scheduleStart)
                         .finishedAt(scheduleFinish)
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
+
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
@@ -438,7 +454,7 @@ public class DoctorCreateWeeklyScheduleTest {
         MockedStatic<LocalDate> mockedLocalDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS);
         mockedLocalDate.when(LocalDate::now).thenReturn(scheduleStart);
 
-        doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId);
+        employeeCreateWeeklySchedule.createWeeklySchedule(request);
 
         ArgumentCaptor<Schedule> schedulesArgumentCaptor = ArgumentCaptor.forClass(Schedule.class);
 
@@ -448,11 +464,11 @@ public class DoctorCreateWeeklyScheduleTest {
 
         assertThat(savedSchedules).filteredOn(
                         schedule -> Objects.equals(schedule.getStartedAt().getDayOfWeek(), DayOfWeek.SUNDAY)
-                || Objects.equals(schedule.getStartedAt().getDayOfWeek(), DayOfWeek.SATURDAY))
+                                || Objects.equals(schedule.getStartedAt().getDayOfWeek(), DayOfWeek.SATURDAY))
                 .hasSize(0);
 
         assertThat(savedSchedules).filteredOn(
-                schedule -> Objects.equals(schedule.getStartedAt().getDayOfWeek(), DayOfWeek.MONDAY))
+                        schedule -> Objects.equals(schedule.getStartedAt().getDayOfWeek(), DayOfWeek.MONDAY))
                 .hasSize(2)
                 .extracting(schedule ->
                         Set.of(schedule.getStartedAt().toLocalTime(), schedule.getFinishedAt().toLocalTime()))
@@ -502,32 +518,34 @@ public class DoctorCreateWeeklyScheduleTest {
     void createWeeklyScheduleShouldSkipDayIfAbsenceExistsWithin() {
         LocalDate scheduleStart = LocalDate.of(2025, 11, 24); //monday
         LocalDate scheduleFinish = LocalDate.of(2025, 12, 7); //sunday
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 3L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(4L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 4L))
                                 .build())
                         .startedAt(scheduleStart)
                         .finishedAt(scheduleFinish)
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
+
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
@@ -548,7 +566,7 @@ public class DoctorCreateWeeklyScheduleTest {
         MockedStatic<LocalDate> mockedLocalDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS);
         mockedLocalDate.when(LocalDate::now).thenReturn(scheduleStart);
 
-        doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId);
+        employeeCreateWeeklySchedule.createWeeklySchedule(request);
 
         ArgumentCaptor<Schedule> schedulesArgumentCaptor = ArgumentCaptor.forClass(Schedule.class);
 
@@ -612,32 +630,34 @@ public class DoctorCreateWeeklyScheduleTest {
     void createWeeklyScheduleShouldNotSavePastScheduleDaysIfStartedAtIsInThePast() {
         LocalDate scheduleStart = LocalDate.of(2025, 11, 24); //monday
         LocalDate scheduleFinish = LocalDate.of(2025, 12, 7); //sunday
-        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
-                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
-                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+        Long doctorId = 1L;
+        EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest request =
+                EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.builder()
+                        .mon(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 2L))
                                 .build())
-                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .tue(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(3L))
                                 .build())
-                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .wed(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 3L))
                                 .build())
-                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .thu(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
                                 .serviceIds(Set.of(4L))
                                 .build())
-                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                        .fri(EmployeeCreateWeeklySchedule.EmpCreateWeeklyScheduleRequest.DayDto.builder()
                                 .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
                                 .serviceIds(Set.of(1L, 4L))
                                 .build())
                         .startedAt(scheduleStart)
                         .finishedAt(scheduleFinish)
+                        .doctorId(doctorId)
                         .build();
-        Long doctorId = 1L;
+
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
@@ -654,7 +674,7 @@ public class DoctorCreateWeeklyScheduleTest {
         MockedStatic<LocalDate> mockedLocalDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS);
         mockedLocalDate.when(LocalDate::now).thenReturn(scheduleStart.plusDays(2)); //skip monday and tuesday
 
-        doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId);
+        employeeCreateWeeklySchedule.createWeeklySchedule(request);
 
         ArgumentCaptor<Schedule> schedulesArgumentCaptor = ArgumentCaptor.forClass(Schedule.class);
 
@@ -713,5 +733,4 @@ public class DoctorCreateWeeklyScheduleTest {
 
         mockedLocalDate.close();
     }
-
 }

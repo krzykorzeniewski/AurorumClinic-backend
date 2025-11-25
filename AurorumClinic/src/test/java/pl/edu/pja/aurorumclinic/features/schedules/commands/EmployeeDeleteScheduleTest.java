@@ -11,19 +11,17 @@ import pl.edu.pja.aurorumclinic.features.schedules.ScheduleValidator;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
-import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = {DoctorDeleteSchedule.class})
+@SpringBootTest(classes = {EmployeeDeleteSchedule.class})
 @ActiveProfiles("test")
-public class DoctorDeleteScheduleTest {
+public class EmployeeDeleteScheduleTest {
 
     @MockitoBean
     ScheduleRepository scheduleRepository;
@@ -32,53 +30,29 @@ public class DoctorDeleteScheduleTest {
     ScheduleValidator scheduleValidator;
 
     @Autowired
-    DoctorDeleteSchedule doctorDeleteSchedule;
+    EmployeeDeleteSchedule employeeDeleteSchedule;
 
     @Test
     void deleteScheduleShouldThrowApiNotFoundExceptionWhenScheduleIdIsNotFound() {
         Long scheduleId = 1L;
-        Long doctorId = 1L;
 
         when(scheduleRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> doctorDeleteSchedule.deleteSchedule(scheduleId, doctorId))
+        assertThatThrownBy(() -> employeeDeleteSchedule.deleteSchedule(scheduleId))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
-        verify(scheduleRepository).findById(scheduleId);
-    }
-
-    @Test
-    void deleteScheduleShouldThrowApiAuthExceptionWhenScheduleDocIdIsNotEqualToRequestDocId() {
-        Long scheduleId = 1L;
-        Long doctorId = 1L;
-        Schedule testSchedule = Schedule.builder()
-                .id(scheduleId)
-                .doctor(Doctor.builder()
-                        .id(2L)
-                        .build())
-                .build();
-
-        when(scheduleRepository.findById(anyLong())).thenReturn(Optional.of(testSchedule));
-
-        assertThatThrownBy(() -> doctorDeleteSchedule.deleteSchedule(scheduleId, doctorId))
-                .isExactlyInstanceOf(ApiAuthorizationException.class);
         verify(scheduleRepository).findById(scheduleId);
     }
 
     @Test
     void deleteScheduleShouldDeleteScheduleWithGivenId() {
         Long scheduleId = 1L;
-        Long doctorId = 1L;
-        Doctor testDoctor = Doctor.builder()
-                .id(doctorId)
-                .build();
         Schedule testSchedule = Schedule.builder()
                 .id(scheduleId)
-                .doctor(testDoctor)
                 .build();
 
         when(scheduleRepository.findById(anyLong())).thenReturn(Optional.of(testSchedule));
 
-        doctorDeleteSchedule.deleteSchedule(scheduleId, doctorId);
+        employeeDeleteSchedule.deleteSchedule(scheduleId);
 
         ArgumentCaptor<Schedule> scheduleArgumentCaptor = ArgumentCaptor.forClass(Schedule.class);
         verify(scheduleRepository).delete(scheduleArgumentCaptor.capture());
@@ -89,5 +63,6 @@ public class DoctorDeleteScheduleTest {
         verify(scheduleRepository).findById(scheduleId);
         verify(scheduleValidator).checkIfScheduleHasAppointments(testSchedule);
     }
+
 
 }
