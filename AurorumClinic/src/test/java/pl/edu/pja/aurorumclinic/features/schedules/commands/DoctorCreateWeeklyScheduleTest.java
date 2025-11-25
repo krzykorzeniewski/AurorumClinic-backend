@@ -714,4 +714,71 @@ public class DoctorCreateWeeklyScheduleTest {
         mockedLocalDate.close();
     }
 
+    @Test
+    void createWeeklyScheduleShouldThrowApiExceptionWhenScheduleValidationFails() {
+        LocalDate scheduleStart = LocalDate.of(2025, 11, 24); //monday
+        LocalDate scheduleFinish = LocalDate.of(2025, 12, 7); //sunday
+        DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest request =
+                DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.builder()
+                        .mon(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
+                                .serviceIds(Set.of(1L, 2L))
+                                .build())
+                        .tue(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
+                                .serviceIds(Set.of(3L))
+                                .build())
+                        .wed(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
+                                .serviceIds(Set.of(1L, 3L))
+                                .build())
+                        .thu(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(10, 0), LocalTime.of(20, 0)))
+                                .serviceIds(Set.of(4L))
+                                .build())
+                        .fri(DoctorCreateWeeklySchedule.DocCreateWeeklyScheduleRequest.DayDto.builder()
+                                .hours(List.of(LocalTime.of(8, 0), LocalTime.of(17, 0)))
+                                .serviceIds(Set.of(1L, 4L))
+                                .build())
+                        .startedAt(scheduleStart)
+                        .finishedAt(scheduleFinish)
+                        .build();
+        Long doctorId = 1L;
+        Doctor testDoctor = Doctor.builder()
+                .id(doctorId)
+                .build();
+
+        when(doctorRepository.findById(anyLong())).thenReturn(Optional.of(testDoctor));
+
+        when(serviceRepository.findAllById(any()))
+                .thenReturn((List.of(Service.builder().id(1L).build(), Service.builder().id(2L).build())))
+                .thenReturn(List.of(Service.builder().id(3L).build()))
+                .thenReturn(List.of(Service.builder().id(1L).build(), Service.builder().id(3L).build()))
+                .thenReturn(List.of(Service.builder().id(4L).build()))
+                .thenReturn(List.of(Service.builder().id(1L).build(), Service.builder().id(4L).build()));
+
+        doThrow(new ApiException("Schedule overlaps with already existing schedule", "schedule"))
+                .when(scheduleValidator).validateTimeslotAndServices(
+                        eq(LocalDateTime.of(scheduleStart, request.mon().hours().get(0))), any(), any(), any()); //first monday validation failed
+
+        MockedStatic<LocalDate> mockedLocalDate = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS);
+        mockedLocalDate.when(LocalDate::now).thenReturn(scheduleStart);
+
+        assertThatThrownBy(() -> doctorCreateWeeklySchedule.createWeeklySchedule(request, doctorId))
+                .isExactlyInstanceOf(ApiException.class)
+                .message().containsIgnoringCase("Schedule overlaps with already existing schedule");
+
+
+        verify(doctorRepository).findById(doctorId);
+        verify(serviceRepository).findAllById(request.mon().serviceIds());
+        verify(serviceRepository).findAllById(request.tue().serviceIds());
+        verify(serviceRepository).findAllById(request.wed().serviceIds());
+        verify(serviceRepository).findAllById(request.thu().serviceIds());
+        verify(serviceRepository).findAllById(request.fri().serviceIds());
+        verify(scheduleValidator, times(1))
+                .validateTimeslotAndServices(any(), any(), any(), any());
+
+        mockedLocalDate.close();
+    }
+
 }

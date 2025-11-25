@@ -155,6 +155,8 @@ public class EmployeeCreateWeeklySchedule {
                 if (Objects.equals(e.getField(), "absence")) {
                     currentDateTime = currentDateTime.plusDays(1);
                     continue;
+                } else {
+                    throw new ApiException(e.getMessage(), e.getField());
                 }
             }
             currentDateTime = currentDateTime.plusDays(1);

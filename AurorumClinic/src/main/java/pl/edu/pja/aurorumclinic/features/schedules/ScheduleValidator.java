@@ -67,11 +67,12 @@ public class ScheduleValidator {
     private void validateSpecializations(Doctor doctor, List<Service> services) {
         for (Service service: services) {
             for (Specialization specialization: doctor.getSpecializations()) {
-                if (!specialization.getServices().contains(service)) {
-                    throw new ApiException("Doctor specialization is not assigned to this service", "specialization");
+                if(specialization.getServices().contains(service)) {
+                    return;
                 }
             }
         }
+        throw new ApiException("Doctor specialization is not assigned to this service", "specialization");
     }
 
     private void validateTimeSlot(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId) {
