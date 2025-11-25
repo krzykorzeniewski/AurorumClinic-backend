@@ -151,7 +151,6 @@ public class EmployeeGetAllAppointmentsTest {
         GetAppointmentResponse resultDto = resultPage.getContent().get(0);
 
         assertThat(resultDto)
-                .usingRecursiveComparison()
                 .isEqualTo(testResponse);
         verify(appointmentRepository).findAllByDoctorId(pageable, empId);
         verify(objectStorageService).generateUrl(testDoctor.getProfilePicture());
@@ -252,7 +251,6 @@ public class EmployeeGetAllAppointmentsTest {
         GetAppointmentResponse resultDto = resultPage.getContent().get(0);
 
         assertThat(resultDto)
-                .usingRecursiveComparison()
                 .isEqualTo(testResponse);
         verify(appointmentRepository).findAll(pageable);
         verify(objectStorageService).generateUrl(testDoctor.getProfilePicture());

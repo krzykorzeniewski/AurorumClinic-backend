@@ -1,6 +1,5 @@
 package pl.edu.pja.aurorumclinic.features.schedules.queries;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +16,6 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/schedules")

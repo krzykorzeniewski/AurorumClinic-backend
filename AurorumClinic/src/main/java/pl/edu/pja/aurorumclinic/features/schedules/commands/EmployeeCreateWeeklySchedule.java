@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -62,24 +64,24 @@ public class EmployeeCreateWeeklySchedule {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         List<Service> mondayServicesFromDb = serviceRepository.findAllById(request.mon.serviceIds);
-        if (mondayServicesFromDb.size() > request.mon.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "serviceIds");
+        if (!mondayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.mon.serviceIds)) {
+            throw new ApiException("Monday service ids are not found", "monServiceIds");
         }
         List<Service> tuesdayServicesFromDb = serviceRepository.findAllById(request.tue.serviceIds);
-        if (tuesdayServicesFromDb.size() > request.tue.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "serviceIds");
+        if (!tuesdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.tue.serviceIds)) {
+            throw new ApiException("Tuesday service ids are not found", "tueServiceIds");
         }
         List<Service> wednesdayServicesFromDb = serviceRepository.findAllById(request.wed.serviceIds);
-        if (wednesdayServicesFromDb.size() > request.wed.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "serviceIds");
+        if (!wednesdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.wed.serviceIds)) {
+            throw new ApiException("Wednesday service ids are not found", "wedServiceIds");
         }
         List<Service> thursdayServicesFromDb = serviceRepository.findAllById(request.thu.serviceIds);
-        if (thursdayServicesFromDb.size() > request.thu.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "serviceIds");
+        if (!thursdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.thu.serviceIds)) {
+            throw new ApiException("Thursday service ids are not found", "thuServiceIds");
         }
         List<Service> fridayServicesFromDb = serviceRepository.findAllById(request.fri.serviceIds);
-        if (fridayServicesFromDb.size() > request.fri.serviceIds.size()) {
-            throw new ApiException("Some service ids are not found", "serviceIds");
+        if (!fridayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.fri.serviceIds)) {
+            throw new ApiException("Friday service ids are not found", "friServiceIds");
         }
         LocalDate todayDateTime = LocalDate.now();
         LocalDate scheduleStartDateTime = request.startedAt;
@@ -159,6 +161,7 @@ public class EmployeeCreateWeeklySchedule {
         }
     }
 
+    @Builder
     record EmpCreateWeeklyScheduleRequest(@NotNull DayDto mon,
                                           @NotNull DayDto tue,
                                           @NotNull DayDto wed,
@@ -167,6 +170,7 @@ public class EmployeeCreateWeeklySchedule {
                                           @NotNull LocalDate startedAt,
                                           @NotNull LocalDate finishedAt,
                                           @NotNull Long doctorId) {
+        @Builder
         record DayDto(@NotEmpty @Size(min = 2, max = 2) List<LocalTime> hours,
                       @NotNull Set<Long> serviceIds) {
         }

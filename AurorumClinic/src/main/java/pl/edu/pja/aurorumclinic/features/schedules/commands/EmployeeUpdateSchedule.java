@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -44,7 +45,7 @@ public class EmployeeUpdateSchedule {
                 () -> new ApiNotFoundException("Id not found", "id")
         );
         List<Service> servicesFromDb = serviceRepository.findAllById(request.serviceIds);
-        if (servicesFromDb.size() > request.serviceIds.size()) {
+        if (!servicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.serviceIds)) {
             throw new ApiException("Some service ids are not found", "serviceIds");
         }
         scheduleValidator.validateNewTimeslotAndServices(request.startedAt, request.finishedAt, scheduleFromDb.getDoctor(),

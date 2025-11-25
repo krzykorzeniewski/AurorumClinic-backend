@@ -196,7 +196,6 @@ public class PatientGetAppointmentByIdTest {
 
         PatientGetAppointmentResponse resultDto = resultResponse.getBody().getData();
         assertThat(resultDto)
-                .usingRecursiveComparison()
                 .isEqualTo(testResponse);
 
         verify(appointmentRepository).getAppointmentByIdAndPatientId(testAppointment.getId(), testPatient.getId());
