@@ -157,6 +157,8 @@ public class DoctorCreateWeeklySchedule {
                 if (Objects.equals(e.getField(), "absence")) {
                     currentDate = currentDate.plusDays(1);
                     continue;
+                } else {
+                    throw new ApiException(e.getMessage(), e.getField());
                 }
             }
             currentDate = currentDate.plusDays(1);

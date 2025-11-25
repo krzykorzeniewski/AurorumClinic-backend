@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.features.services.queries.shared.GetServiceResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 
+import java.util.Optional;
+
 public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     @Query("""
@@ -15,6 +17,13 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
                       ) from Service s
            """)
     Page<GetServiceResponse> findAllGetServiceDtos(Pageable pageable);
+
+    @Query("""
+           select new pl.edu.pja.aurorumclinic.features.services.queries.shared.GetServiceResponse(
+                      s.id, s.name, s.price, s.duration, s.description
+                      ) from Service s where s.id = :serviceId
+           """)
+    Optional<GetServiceResponse> findServiceDtoById(Long serviceId);
 
     @Query("""
            select s from Service s join s.specializations s2

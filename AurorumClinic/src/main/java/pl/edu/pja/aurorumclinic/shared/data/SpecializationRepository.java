@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.features.specializations.queries.shared.GetSpecializationResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 
+import java.util.Optional;
+
 public interface SpecializationRepository extends JpaRepository<Specialization, Long> {
 
 
@@ -15,5 +17,11 @@ public interface SpecializationRepository extends JpaRepository<Specialization, 
                       GetSpecializationResponse(s.id, s.name) from Specialization s
            """)
     Page<GetSpecializationResponse> findAllSpecializationDtos(Pageable pageable);
+
+    @Query("""
+           select new pl.edu.pja.aurorumclinic.features.specializations.queries.shared.
+                      GetSpecializationResponse(s.id, s.name) from Specialization s where s.id = :specId
+           """)
+    Optional<GetSpecializationResponse> findSpecializationDtoById(Long specId);
 
 }
