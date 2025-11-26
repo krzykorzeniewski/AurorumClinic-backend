@@ -12,7 +12,6 @@ import pl.edu.pja.aurorumclinic.features.absences.queries.shared.DoctorGetAbsenc
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
-import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDateTime;

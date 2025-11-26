@@ -31,10 +31,10 @@ public class DoctorGetAbsenceById {
 
     private DoctorGetAbsenceResponse handle(Long absenceId, Long doctorId) {
         doctorRepository.findById(doctorId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "doctorId")
+                () -> new ApiNotFoundException("doctor Id not found", "doctorId")
         );
         return absenceRepository.findDoctorAbsenceDtoById(absenceId, doctorId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "absenceId")
+                () -> new ApiNotFoundException("absence Id not found", "absenceId")
         );
     }
 
