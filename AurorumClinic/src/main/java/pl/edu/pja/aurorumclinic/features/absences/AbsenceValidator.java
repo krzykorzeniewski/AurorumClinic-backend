@@ -19,11 +19,8 @@ public class AbsenceValidator {
     private final AbsenceRepository absenceRepository;
 
     public void validateTimeslot(LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor) {
-        if (startedAt.isAfter(finishedAt)) {
-            throw new ApiException("Start date cannot be after end date", "startedAt");
-        }
-        if (finishedAt.isBefore(startedAt)) {
-            throw new ApiException("End date cannot be before start date", "finishedAt");
+        if (startedAt.isAfter(finishedAt) || finishedAt.isBefore(startedAt)) {
+            throw new ApiException("Start date cannot be after end date", "startedAt, finishedAt");
         }
         if (scheduleRepository.scheduleExistsInIntervalForDoctor(startedAt,
                 finishedAt, doctor.getId())) {
@@ -36,11 +33,8 @@ public class AbsenceValidator {
 
     public void validateNewTimeslot(LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctorFromDb,
                                     Absence absenceFromDb) {
-        if (startedAt.isAfter(finishedAt)) {
-            throw new ApiException("Start date cannot be after end date", "startedAt");
-        }
-        if (finishedAt.isBefore(startedAt)) {
-            throw new ApiException("End date cannot be before start date", "finishedAt");
+        if (startedAt.isAfter(finishedAt) || finishedAt.isBefore(startedAt)) {
+            throw new ApiException("Start date cannot be after end date", "startedAt, finishedAt");
         }
         if (scheduleRepository.scheduleExistsInIntervalForDoctor(startedAt,
                 finishedAt, doctorFromDb.getId())) {
