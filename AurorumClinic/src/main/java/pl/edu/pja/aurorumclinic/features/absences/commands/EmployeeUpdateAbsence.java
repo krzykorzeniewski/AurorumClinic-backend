@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 @PreAuthorize("hasRole('EMPLOYEE')")
 public class EmployeeUpdateAbsence {
 
-    private final DoctorRepository doctorRepository;
     private final AbsenceRepository absenceRepository;
     private final AbsenceValidator absenceValidator;
 
@@ -40,22 +39,17 @@ public class EmployeeUpdateAbsence {
 
     private void handle(Long absenceId, EmpUpdateAbsenceRequest request) {
         Absence absenceFromDb = absenceRepository.findById(absenceId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "absenceId")
+                () -> new ApiNotFoundException("absence Id not found", "absenceId")
         );
-        Doctor doctorFromDb = doctorRepository.findById(request.doctorId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "doctorId")
-        );
-        absenceValidator.validateNewTimeslot(request.startedAt, request.finishedAt, doctorFromDb, absenceFromDb);
+        absenceValidator.validateNewTimeslot(request.startedAt, request.finishedAt, absenceFromDb.getDoctor(), absenceFromDb);
         absenceFromDb.setName(request.name);
         absenceFromDb.setStartedAt(request.startedAt);
         absenceFromDb.setFinishedAt(request.finishedAt);
-        absenceFromDb.setDoctor(doctorFromDb);
     }
 
     record EmpUpdateAbsenceRequest(@NotNull LocalDateTime startedAt,
                                    @NotNull LocalDateTime finishedAt,
-                                   @NotBlank @Size(max = 100) String name,
-                                   @NotNull Long doctorId) {
+                                   @NotBlank @Size(max = 100) String name) {
     }
 
 }

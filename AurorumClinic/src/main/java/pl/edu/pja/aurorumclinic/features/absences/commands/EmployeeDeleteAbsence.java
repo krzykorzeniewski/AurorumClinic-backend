@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.Absence;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 @RestController
@@ -28,10 +29,10 @@ public class EmployeeDeleteAbsence {
     }
 
     private void handle(Long absenceId) {
-        absenceRepository.findById(absenceId).orElseThrow(
+        Absence absenceFromDb = absenceRepository.findById(absenceId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        absenceRepository.deleteById(absenceId);
+        absenceRepository.delete(absenceFromDb);
     }
 
 }
