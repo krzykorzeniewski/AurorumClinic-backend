@@ -77,7 +77,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             from Appointment a1
                     left join a1.opinion
                     left join a1.service
-            where a1.doctor.id = :doctorId and (a1.startedAt < :finishedAt and a1.finishedAt > :startedAt)
+            where a1.doctor.id = :doctorId and (a1.startedAt <= :finishedAt and a1.finishedAt >= :startedAt)
             """)
     List<Tuple> getDoctorAppointmentStatsBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
 
@@ -106,7 +106,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             from Appointment a
             left join a.opinion
             left join a.service
-            where (a.startedAt < :finishedAt and a.finishedAt > :startedAt)
+            where (a.startedAt <= :finishedAt and a.finishedAt >= :startedAt)
     """)
     List<Tuple> getAllAppointmentStatsBetween(LocalDateTime startedAt, LocalDateTime finishedAt);
 

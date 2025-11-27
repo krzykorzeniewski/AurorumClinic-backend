@@ -18,8 +18,8 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
             select case when count(a) > 0 then true else false end
                 from Absence a
                 where a.doctor.id = :doctorId
-                  and a.startedAt < :finishedAt
-                  and a.finishedAt > :startedAt
+                  and a.startedAt <= :finishedAt
+                  and a.finishedAt >= :startedAt
             """)
     boolean absenceExistsInIntervalForDoctor(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId);
 
@@ -27,8 +27,8 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
             select case when count(a) > 0 then true else false end
                 from Absence a
                 where a.doctor.id = :doctorId
-                  and a.startedAt < :finishedAt
-                  and a.finishedAt > :startedAt
+                  and a.startedAt <= :finishedAt
+                  and a.finishedAt >= :startedAt
                   and a.id != :absenceId
             """)
     boolean absenceExistsInIntervalForDoctorExcludingId(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId,
@@ -45,8 +45,8 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
     @Query("""
             select a from Absence a
                   where a.doctor.id = :doctorId
-                  and a.startedAt < :finishedAt
-                  and a.finishedAt > :startedAt
+                  and a.startedAt <= :finishedAt
+                  and a.finishedAt >= :startedAt
             """)
     List<Absence> findAllByDoctorIdAndBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
 
@@ -55,8 +55,8 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
                 a.id, a.name, a.startedAt, a.finishedAt)
            from Absence a
            where a.doctor.id = :doctorId
-                  and a.startedAt < :finishedAt
-                  and a.finishedAt > :startedAt
+                  and a.startedAt <= :finishedAt
+                  and a.finishedAt >= :startedAt
            """)
     List<DoctorGetAbsenceResponse> findAllDoctorAbsenceDtosBetween(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId);
 

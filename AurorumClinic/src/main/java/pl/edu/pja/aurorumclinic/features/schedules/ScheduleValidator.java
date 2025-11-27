@@ -53,7 +53,8 @@ public class ScheduleValidator {
                                                             LocalDateTime newStartedAt, LocalDateTime newFinishedAt) {
         LocalDateTime oldStartedAt = schedule.getStartedAt();
         LocalDateTime oldFinishedAt = schedule.getFinishedAt();
-        if (newStartedAt.isBefore(oldStartedAt) && newFinishedAt.isAfter(oldFinishedAt)) {
+        if ((newStartedAt.isBefore(oldStartedAt) || newStartedAt.isEqual(oldStartedAt))
+                && (newFinishedAt.isAfter(oldFinishedAt) || newFinishedAt.isEqual(oldFinishedAt))) {
             return;
         }
         Set<Long> appointmentIdsInTimeslot = appointmentRepository.getAppointmentIdsInPreviousScheduleTimeslot

@@ -659,7 +659,7 @@ public class ScheduleValidatorTest {
                 .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
                 .doctor(testDoctor)
                 .build();
-        LocalDateTime newStartedAt = testSchedule.getStartedAt().minusHours(1);
+        LocalDateTime newStartedAt = testSchedule.getStartedAt();
         LocalDateTime newFinishedAt = testSchedule.getFinishedAt().plusHours(3);
 
         assertThatNoException().isThrownBy(() -> scheduleValidator
