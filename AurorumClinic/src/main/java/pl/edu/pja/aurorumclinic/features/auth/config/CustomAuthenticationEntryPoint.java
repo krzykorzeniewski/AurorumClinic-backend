@@ -3,6 +3,8 @@ package pl.edu.pja.aurorumclinic.features.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -18,11 +20,14 @@ import java.util.Map;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
+        logger.error("Exception: {} ", authException.getMessage(), authException);
         ApiResponse<?> apiResponse = null;
         if (authException instanceof ApiAuthenticationException) {
             String message = authException.getMessage();

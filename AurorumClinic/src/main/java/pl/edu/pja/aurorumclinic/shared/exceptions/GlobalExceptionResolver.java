@@ -2,6 +2,8 @@ package pl.edu.pja.aurorumclinic.shared.exceptions;
 
 import com.giffing.bucket4j.spring.boot.starter.context.RateLimitException;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,65 +25,75 @@ import java.util.Objects;
 @RestControllerAdvice
 public class GlobalExceptionResolver {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @ExceptionHandler(ApiException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleApiException(ApiException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(Map.of(ex.getField(), ex.getMessage()));
     }
 
     @ExceptionHandler(ApiNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<?> handleApiNotFoundException(ApiNotFoundException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(Map.of(ex.getField(), ex.getMessage()));
     }
 
     @ExceptionHandler(ApiConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiResponse<?> handleApiConflictException(ApiConflictException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(Map.of(ex.getField(), "already in use"));
     }
 
     @ExceptionHandler(ApiAuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleApiAuthException(ApiAuthenticationException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(Map.of(ex.getField(), ex.getMessage()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleBadCredentialsException(BadCredentialsException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(Map.of("credentials", "Invalid email or password"));
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleException(Exception ex) {
-        ex.printStackTrace();
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.error("Internal server error");
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponse<?> handleNoResourceFoundException() {
+    public ApiResponse<?> handleNoResourceFoundException(NoResourceFoundException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(null);
     }
 
     @ExceptionHandler(MissingRequestCookieException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleMissingRequestCookieException(MissingRequestCookieException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(Map.of("cookie", ex.getCookieName() + " is missing"));
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(Map.of("authority", "Access is denied"));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         String fieldAndMessage = ex.getDetailMessageArguments()[1].toString();
         String field = fieldAndMessage.split(":")[0];
         String message = fieldAndMessage.split(":")[1].trim();
@@ -91,6 +103,7 @@ public class GlobalExceptionResolver {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleConstraintViolationException(ConstraintViolationException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         String message = ex.getConstraintViolations().stream().findFirst().orElseThrow().getMessage();
         String field = String.valueOf(ex.getConstraintViolations().stream().findFirst().orElseThrow().getPropertyPath());
         return ApiResponse.fail(Map.of(field, message));
@@ -99,11 +112,12 @@ public class GlobalExceptionResolver {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiResponse<?> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         Throwable cause = ex.getCause();
         if (cause instanceof org.hibernate.exception.ConstraintViolationException) {
             org.hibernate.exception.ConstraintViolationException causeException =
                     (org.hibernate.exception.ConstraintViolationException) ex.getCause();
-            String constraintName = causeException.getConstraintName();
+            String constraintName = causeException.getConstraintName() != null ? causeException.getConstraintName() : "";
             switch (Objects.requireNonNull(constraintName)) {
                 case "uk_user_email" -> {
                     return ApiResponse.fail(Map.of("email", "already in use"));
@@ -121,29 +135,32 @@ public class GlobalExceptionResolver {
                     return ApiResponse.fail(Map.of("name", "already in use"));
                 }
                 default -> {
-                    return ApiResponse.fail(Map.of("duplicate", "already in use"));
+                    return ApiResponse.fail(Map.of("conflict", "data integrity violated"));
                 }
             }
         } else {
-            return ApiResponse.fail(Map.of("duplicate", "already in use"));
+            return ApiResponse.fail(Map.of("conflict", "data integrity violated"));
         }
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex.getCause());
         return ApiResponse.fail(Map.of("payload", "invalid message format"));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(Map.of(ex.getParameterName(), "parameter is required"));
     }
 
     @ExceptionHandler(RateLimitException.class)
     @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
     public ApiResponse<?> handleRateLimitException(RateLimitException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(null);
     }
 

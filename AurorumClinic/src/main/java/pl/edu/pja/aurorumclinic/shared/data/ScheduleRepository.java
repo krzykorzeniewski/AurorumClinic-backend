@@ -25,8 +25,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
                 from Schedule s
                 join fetch s.services
                 where s.doctor.id = :doctorId
-                  and s.startedAt < :finishedAt
-                  and s.finishedAt > :startedAt
+                  and s.startedAt <= :finishedAt
+                  and s.finishedAt >= :startedAt
            """)
     List<Schedule> findAllByDoctorIdAndBetween(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
 
