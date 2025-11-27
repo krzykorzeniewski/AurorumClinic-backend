@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;
+import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Absence;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
@@ -24,6 +25,7 @@ import java.util.Objects;
 public class DoctorDeleteAbsence {
 
     private final AbsenceRepository absenceRepository;
+    private final DoctorRepository doctorRepository;
 
     @DeleteMapping("/me/{id}")
     @Transactional
@@ -35,12 +37,15 @@ public class DoctorDeleteAbsence {
 
     private void handle(Long absenceId, Long doctorId) {
         Absence absenceFromDb = absenceRepository.findById(absenceId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+                () -> new ApiNotFoundException("absence Id not found", "absenceId")
+        );
+        doctorRepository.findById(doctorId).orElseThrow(
+                () -> new ApiNotFoundException("doctor Id not found", "doctorId")
         );
         if (!Objects.equals(absenceFromDb.getDoctor().getId(), doctorId)) {
             throw new ApiAuthorizationException("Absence doctor id does not match logged in user id");
         }
-        absenceRepository.deleteById(absenceId);
+        absenceRepository.delete(absenceFromDb);
     }
 
 }

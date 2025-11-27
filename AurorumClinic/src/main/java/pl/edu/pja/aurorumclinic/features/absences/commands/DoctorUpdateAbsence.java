@@ -44,10 +44,10 @@ public class DoctorUpdateAbsence {
 
     private void handle(Long absenceId, DocUpdateAbsenceRequest request, Long doctorId) {
         Absence absenceFromDb = absenceRepository.findById(absenceId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "absenceId")
+                () -> new ApiNotFoundException("absence Id not found", "absenceId")
         );
         Doctor doctorFromDb = doctorRepository.findById(doctorId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "doctorId")
+                () -> new ApiNotFoundException("doctor Id not found", "doctorId")
         );
         if (!Objects.equals(absenceFromDb.getDoctor().getId(), doctorFromDb.getId())) {
             throw new ApiAuthorizationException("Absence doctor id does not match request doctor id");
