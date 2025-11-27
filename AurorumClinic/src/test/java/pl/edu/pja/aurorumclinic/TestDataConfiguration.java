@@ -3,7 +3,6 @@ package pl.edu.pja.aurorumclinic;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import pl.edu.pja.aurorumclinic.shared.data.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.*;
@@ -33,6 +32,9 @@ public class TestDataConfiguration {
 
     @Autowired
     AppointmentRepository appointmentRepository;
+
+    @Autowired
+    AbsenceRepository absenceRepository;
 
     @Autowired
     TokenRepository tokenRepository;
@@ -149,6 +151,30 @@ public class TestDataConfiguration {
                 .price(new BigDecimal(350))
                 .build();
         serviceRepository.save(service2);
+
+        Absence absence1 = Absence.builder()
+                .name("Święto Niepodległości - Mariusz")
+                .startedAt(LocalDateTime.of(2025, 11, 11, 8, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 11, 21, 0))
+                .doctor(doctor1)
+                .build();
+        absenceRepository.save(absence1);
+
+        Absence absence2 = Absence.builder()
+                .name("Święta Bożego Narodzenia - Mariusz")
+                .startedAt(LocalDateTime.of(2025, 12, 25, 8, 0))
+                .finishedAt(LocalDateTime.of(2025, 12, 26, 21, 0))
+                .doctor(doctor1)
+                .build();
+        absenceRepository.save(absence2);
+
+        Absence absence3 = Absence.builder()
+                .name("Święta Bożego Narodzenia - Błażej")
+                .startedAt(LocalDateTime.of(2025, 12, 25, 8, 0))
+                .finishedAt(LocalDateTime.of(2025, 12, 26, 21, 0))
+                .doctor(doctor2)
+                .build();
+        absenceRepository.save(absence3);
 
         Schedule schedule1 = Schedule.builder()
                 .startedAt(LocalDateTime.now().minusHours(12))
