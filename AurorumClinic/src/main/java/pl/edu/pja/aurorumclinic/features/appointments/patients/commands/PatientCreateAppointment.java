@@ -53,13 +53,13 @@ public class PatientCreateAppointment {
 
     private void handle(PatientCreateAppointmentRequest request, Long userId) {
         Patient patientFromDb = patientRepository.findById(userId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+                () -> new ApiNotFoundException("patientId not found", "id")
         );
         Doctor doctorFromDb = doctorRepository.findById(request.doctorId()).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+                () -> new ApiNotFoundException("doctorId not found", "id")
         );
         Service serviceFromDb = serviceRepository.findById(request.serviceId()).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
+                () -> new ApiNotFoundException("serviceId not found", "id")
         );
         Appointment newAppointment = Appointment.builder()
                 .service(serviceFromDb)

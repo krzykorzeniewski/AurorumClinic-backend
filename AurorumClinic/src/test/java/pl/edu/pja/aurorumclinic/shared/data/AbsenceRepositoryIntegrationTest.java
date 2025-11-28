@@ -4,11 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import pl.edu.pja.aurorumclinic.IntegrationTest;
-import pl.edu.pja.aurorumclinic.TestDataConfiguration;
+import pl.edu.pja.aurorumclinic.test_config.IntegrationTest;
+import pl.edu.pja.aurorumclinic.test_config.TestDataConfiguration;
 import pl.edu.pja.aurorumclinic.features.absences.queries.shared.DoctorGetAbsenceResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.Absence;
 

@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic;
+package pl.edu.pja.aurorumclinic.test_config;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,9 @@ public class TestDataConfiguration {
     @Autowired
     TokenRepository tokenRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
     @PostConstruct
     public void init() {
         createTestData();
@@ -63,6 +66,7 @@ public class TestDataConfiguration {
                 .role(UserRole.DOCTOR)
                 .pesel("12312312311")
                 .phoneNumber("213742000")
+                .profilePicture("example.png")
                 .emailVerified(true)
                 .birthdate(LocalDate.of(1980, 1, 1))
                 .description("Super opis Mariusza")
@@ -83,6 +87,7 @@ public class TestDataConfiguration {
                 .pesel("00000000000")
                 .emailVerified(true)
                 .phoneNumber("123420000")
+                .profilePicture("example.png")
                 .birthdate(LocalDate.of(1989, 10, 5))
                 .description("Super opis Błażeja")
                 .education("Wyedukowany jestem niezbyt bardzo")
@@ -134,22 +139,54 @@ public class TestDataConfiguration {
                 .build();
         patientRepository.save(patient2);
 
+        User admin1 = User.builder()
+                .name("Tibor")
+                .surname("Słupski")
+                .email("tibor@example.com")
+                .password("$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa")
+                .role(UserRole.ADMIN)
+                .twoFactorAuth(true)
+                .emailVerified(true)
+                .phoneNumberVerified(true)
+                .pesel("85620195059")
+                .phoneNumber("684028603")
+                .birthdate(LocalDate.of(1960, 3, 15))
+                .build();
+        userRepository.save(admin1);
+
+        User employee1 = User.builder()
+                .name("Krzysztofa")
+                .surname("Podkarpacka")
+                .email("krzysztofa@example.com")
+                .password("$2a$12$hU0UlMz0B316YWUJ36cs9ObnVw34FDj6rc7ppU6VbZ1A/B.pYKSPa")
+                .role(UserRole.EMPLOYEE)
+                .twoFactorAuth(true)
+                .emailVerified(true)
+                .phoneNumberVerified(true)
+                .pesel("45215566993")
+                .phoneNumber("623827560")
+                .birthdate(LocalDate.of(1945, 9, 27))
+                .build();
+        userRepository.save(employee1);
+
         Service service1 = Service.builder()
                 .name("Konsultacja psychiatryczna dorosłych")
                 .description("Opis konsultacji dorosłych")
                 .duration(30)
-                .specializations(doctor1.getSpecializations())
+                .specializations(new HashSet<>())
                 .price(new BigDecimal(350))
                 .build();
+        service1.getSpecializations().addAll(doctor1.getSpecializations());
         serviceRepository.save(service1);
 
         Service service2 = Service.builder()
                 .name("Opis konsultacji dorosłych dzieci")
                 .description("Test Service Description")
                 .duration(45)
-                .specializations(doctor2.getSpecializations())
+                .specializations(new HashSet<>())
                 .price(new BigDecimal(350))
                 .build();
+        service2.getSpecializations().addAll(doctor2.getSpecializations());
         serviceRepository.save(service2);
 
         Absence absence1 = Absence.builder()
@@ -258,6 +295,20 @@ public class TestDataConfiguration {
                 .payment(null)
                 .build();
         appointmentRepository.save(appointment4);
+
+        Appointment appointment5 = Appointment.builder()
+                .startedAt(LocalDateTime.now().plusDays(1).plusHours(10))
+                .finishedAt(LocalDateTime.now().plusDays(1).plusHours(10).plusMinutes(service1.getDuration()))
+                .status(AppointmentStatus.CREATED)
+                .description(":>")
+                .notificationSent(true)
+                .doctor(doctor2)
+                .patient(patient2)
+                .opinion(null)
+                .service(service2)
+                .payment(null)
+                .build();
+        appointmentRepository.save(appointment5);
     }
 
 }

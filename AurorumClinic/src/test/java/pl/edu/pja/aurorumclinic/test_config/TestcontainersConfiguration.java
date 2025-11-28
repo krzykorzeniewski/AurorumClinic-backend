@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic;
+package pl.edu.pja.aurorumclinic.test_config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;

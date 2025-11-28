@@ -3,13 +3,12 @@ package pl.edu.pja.aurorumclinic.shared.data;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import pl.edu.pja.aurorumclinic.IntegrationTest;
-import pl.edu.pja.aurorumclinic.TestDataConfiguration;
+import pl.edu.pja.aurorumclinic.test_config.IntegrationTest;
+import pl.edu.pja.aurorumclinic.test_config.TestDataConfiguration;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
@@ -45,8 +44,8 @@ public class AppointmentRepositoryIntegrationTest extends IntegrationTest {
 
     @Test
     void isTimeSlotAvailableShouldReturnFalseWhenScheduleExistsAndAppointmentExists() {
-        LocalDateTime appointmentStartedAt = LocalDateTime.now().plusHours(1);
-        LocalDateTime appointmentFinishedAt = appointmentStartedAt.plusHours(1);
+        LocalDateTime appointmentStartedAt = LocalDateTime.now().plusHours(3);
+        LocalDateTime appointmentFinishedAt = appointmentStartedAt.plusHours(3);
         Long serviceId = 2L;
         Long doctorId = 2L;
 

@@ -40,7 +40,7 @@ public class PatientDeleteAppointment {
 
     private void handle(Long appointmentId, Long userId) {
         Appointment appointmentFromDb = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new ApiNotFoundException("Id not found", "id"));
+                .orElseThrow(() -> new ApiNotFoundException("appointmentId not found", "id"));
         if (!Objects.equals(appointmentFromDb.getPatient().getId(), userId)) {
             throw new ApiAuthorizationException("Patient id does not match user id");
         }
