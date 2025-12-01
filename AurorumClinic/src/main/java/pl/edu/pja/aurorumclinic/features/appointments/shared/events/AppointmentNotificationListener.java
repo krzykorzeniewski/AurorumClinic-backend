@@ -31,9 +31,6 @@ public class AppointmentNotificationListener {
     private final DateTimeFormatter dateFormatter;
     private final SpringTemplateEngine springTemplateEngine;
 
-    @Value("${mail.frontend.appointment.survey-link}")
-    private String appointmentSurveyLink;
-
     @Value("${mail.backend.noreply-address}")
     private String noreplyEmailAddres;
 
