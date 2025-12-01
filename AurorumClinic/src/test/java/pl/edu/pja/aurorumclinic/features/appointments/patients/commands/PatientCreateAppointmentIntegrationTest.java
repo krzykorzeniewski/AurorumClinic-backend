@@ -15,6 +15,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
+import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.test_config.IntegrationTest;
 import pl.edu.pja.aurorumclinic.test_config.TestDataConfiguration;
 import pl.edu.pja.aurorumclinic.test_config.WithMockCustomDoctor;
@@ -36,6 +37,9 @@ public class PatientCreateAppointmentIntegrationTest extends IntegrationTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    AppointmentRepository appointmentRepository;
 
     @Test
     @WithMockCustomDoctor //sets role to doctor inside the security context
@@ -154,9 +158,10 @@ public class PatientCreateAppointmentIntegrationTest extends IntegrationTest {
     void createAppointmentShouldPersistAppointmentWithRequestDataAndReturn200When(
             @Autowired ApplicationEvents applicationEvents
             ) throws JsonProcessingException {
+        Long authenticatedPatientId = 3L;
         PatientCreateAppointment.PatientCreateAppointmentRequest request =
                 new PatientCreateAppointment.PatientCreateAppointmentRequest(LocalDateTime.now().plusHours(2),
-                        2L, 2L, "opis");
+                        2L, 2L, "super opis");
 
         MvcTestResult result = mvcTester.post().uri("/api/appointments/me")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -164,9 +169,15 @@ public class PatientCreateAppointmentIntegrationTest extends IntegrationTest {
                 .exchange();
 
         assertThat(result).hasStatus(HttpStatus.OK);
+        assertThat(appointmentRepository.findAll()).anySatisfy(appointment -> {
+            assertThat(appointment.getService().getId()).isEqualTo(request.serviceId());
+            assertThat(appointment.getDoctor().getId()).isEqualTo(request.doctorId());
+            assertThat(appointment.getDescription()).isEqualTo(request.description());
+            assertThat(appointment.getStartedAt()).isEqualToIgnoringNanos(request.startedAt());
+            assertThat(appointment.getPatient().getId()).isEqualTo(authenticatedPatientId);
+        });
         assertThat(applicationEvents.stream(AppointmentCreatedEvent.class))
                 .hasSize(1);
     }
-
 
 }
