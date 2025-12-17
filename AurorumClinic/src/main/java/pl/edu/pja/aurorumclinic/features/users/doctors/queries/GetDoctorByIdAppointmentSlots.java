@@ -13,10 +13,8 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/doctors")
@@ -61,6 +59,13 @@ public class GetDoctorByIdAppointmentSlots {
         int duration = serviceFromDb.getDuration();
 
         for (Schedule schedule : doctorSchedules) {
+            Set<Long> serviceIdsAssignedToSchedule = schedule.getServices()
+                    .stream().map(Service::getId).collect(Collectors.toSet());
+
+            if (!serviceIdsAssignedToSchedule.contains(serviceId)) {
+                continue;
+            }
+
             LocalDateTime appointmentSlotStart = schedule.getStartedAt().isBefore(startedAt)
                     ? startedAt : schedule.getStartedAt();
 
