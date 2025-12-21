@@ -125,6 +125,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query(""" 
            select a.id from Appointment a
            where a.doctor.id = :doctorId
+           and (a.startedAt >= :startedAt and a.finishedAt <= :finishedAt)
+           """)
+    Set<Long> getAppointmentIdsInScheduleTimeslot(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
+
+    @Query(""" 
+           select a.id from Appointment a
+           where a.doctor.id = :doctorId
            and (a.startedAt >= :oldStartedAt and a.finishedAt <= :oldFinishedAt)
            and not (a.startedAt >= :newStartedAt and a.finishedAt <= :newFinishedAt)
            """)

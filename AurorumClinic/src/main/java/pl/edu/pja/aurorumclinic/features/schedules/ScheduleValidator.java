@@ -45,7 +45,9 @@ public class ScheduleValidator {
     public void checkIfScheduleHasAppointments(Schedule schedule) {
         if (appointmentRepository.existsBySchedule(
                 schedule.getDoctor().getId(), schedule.getStartedAt(), schedule.getFinishedAt())) {
-            throw new ApiException("Appointments are scheduled inside this schedule", "appointments");
+            Set<Long> appointmentIdsInTimeslot = appointmentRepository.getAppointmentIdsInScheduleTimeslot(
+                    schedule.getDoctor().getId(), schedule.getStartedAt(), schedule.getFinishedAt());
+            throw new ApiException(appointmentIdsInTimeslot.toString(), "appointments");
         }
     }
 
