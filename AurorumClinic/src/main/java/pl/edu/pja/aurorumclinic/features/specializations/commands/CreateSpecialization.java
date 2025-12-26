@@ -38,7 +38,7 @@ public class CreateSpecialization {
         specializationRepository.save(newSpecialization);
     }
 
-    record CreateSpecializationRequest(@NotBlank @Size(max = 150) String name) {
+    public record CreateSpecializationRequest(@NotBlank @Size(max = 150) String name) {
     }
 
 }

@@ -36,7 +36,7 @@ public class UpdateSpecialization {
         specializationFromDb.setName(request.name);
     }
 
-    record UpdateSpecializationRequest(@NotBlank @Size(max = 150) String name){
+    public record UpdateSpecializationRequest(@NotBlank @Size(max = 150) String name){
 
     }
 

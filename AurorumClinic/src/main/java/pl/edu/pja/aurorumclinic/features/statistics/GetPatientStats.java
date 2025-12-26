@@ -40,9 +40,9 @@ public class GetPatientStats {
     }
 
     @Builder
-    record GetPatientStatsResponse(Long registered,
-                                   Long registeredThisPeriod,
-                                   Long subscribedToNewsletter) {
+    public record GetPatientStatsResponse(Long registered,
+                                          Long registeredThisPeriod,
+                                          Long subscribedToNewsletter) {
 
     }
 
