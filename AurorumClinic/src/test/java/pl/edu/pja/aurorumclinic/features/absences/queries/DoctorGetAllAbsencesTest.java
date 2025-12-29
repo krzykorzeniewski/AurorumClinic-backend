@@ -3,6 +3,9 @@ package pl.edu.pja.aurorumclinic.features.absences.queries;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import pl.edu.pja.aurorumclinic.features.absences.queries.shared.DoctorGetAbsenceResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
@@ -37,25 +40,23 @@ public class DoctorGetAllAbsencesTest {
 
     @Test
     void docGetAllAbsencesShouldThrowApiNotFoundExceptionWhenDoctorIdIsNotFound() {
-        LocalDateTime startedAt = LocalDateTime.now();
-        LocalDateTime finishedAt = startedAt.plusDays(30);
         Long doctorId = 1L;
+        Pageable pageable = Pageable.unpaged();
 
         when(doctorRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> doctorGetAllAbsences.docGetAllAbsences(startedAt, finishedAt, doctorId))
+        assertThatThrownBy(() -> doctorGetAllAbsences.docGetAllAbsences(doctorId, pageable))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
         verify(doctorRepository).findById(doctorId);
     }
 
     @Test
     void docGetAllAbsencesShouldReturnValidDtosForDoctorId() {
-        LocalDateTime startedAt = LocalDateTime.now().minusDays(30);
-        LocalDateTime finishedAt = LocalDateTime.now().plusDays(30);
         Long doctorId = 2L;
         Doctor testDoctor = Doctor.builder()
                 .id(doctorId)
                 .build();
+        Pageable pageable = Pageable.unpaged();
 
         DoctorGetAbsenceResponse response1 = DoctorGetAbsenceResponse.builder()
                 .id(1L)
@@ -70,22 +71,22 @@ public class DoctorGetAllAbsencesTest {
                 .startedAt(LocalDateTime.now().plusDays(15))
                 .finishedAt(LocalDateTime.now().plusDays(22))
                 .build();
-        List<DoctorGetAbsenceResponse> expectedResponse = List.of(response1, response2);
+        Page<DoctorGetAbsenceResponse> expectedResponse = new PageImpl<>(List.of(response1, response2), pageable, 2);
 
         when(doctorRepository.findById(anyLong())).thenReturn(Optional.of(testDoctor));
-        when(absenceRepository.findAllDoctorAbsenceDtosBetween(any(), any(), anyLong())).thenReturn(expectedResponse);
+        when(absenceRepository.findAllDoctorAbsenceDtos(anyLong(), any())).thenReturn(expectedResponse);
 
-        ResponseEntity<ApiResponse<List<DoctorGetAbsenceResponse>>> responseEntity =
-                doctorGetAllAbsences.docGetAllAbsences(startedAt, finishedAt, doctorId);
+        ResponseEntity<ApiResponse<Page<DoctorGetAbsenceResponse>>> responseEntity =
+                doctorGetAllAbsences.docGetAllAbsences(doctorId, pageable);
         assertThat(responseEntity.getBody()).isNotNull();
 
-        List<DoctorGetAbsenceResponse> responseList = responseEntity.getBody().getData();
-        assertThat(responseList).isNotEmpty();
-        assertThat(responseList).hasSize(2);
-        assertThat(responseList).containsExactlyInAnyOrderElementsOf(expectedResponse);
+        Page<DoctorGetAbsenceResponse> responsePage = responseEntity.getBody().getData();
+        assertThat(responsePage).isNotEmpty();
+        assertThat(responsePage).hasSize(2);
+        assertThat(responsePage).containsExactlyInAnyOrderElementsOf(expectedResponse);
 
         verify(doctorRepository).findById(doctorId);
-        verify(absenceRepository).findAllDoctorAbsenceDtosBetween(startedAt, finishedAt, doctorId);
+        verify(absenceRepository).findAllDoctorAbsenceDtos(doctorId, pageable);
     }
 
 }

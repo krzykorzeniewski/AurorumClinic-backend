@@ -1,6 +1,10 @@
 package pl.edu.pja.aurorumclinic.features.absences.queries;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,18 +31,17 @@ public class DoctorGetAllAbsences {
     private final DoctorRepository doctorRepository;
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<List<DoctorGetAbsenceResponse>>> docGetAllAbsences(
-            @RequestParam LocalDateTime startedAt,
-            @RequestParam LocalDateTime finishedAt,
-            @AuthenticationPrincipal Long doctorId
-    ) {
-        return ResponseEntity.ok(ApiResponse.success(handle(startedAt, finishedAt, doctorId)));
+    public ResponseEntity<ApiResponse<Page<DoctorGetAbsenceResponse>>> docGetAllAbsences(
+            @AuthenticationPrincipal Long doctorId,
+            @PageableDefault Pageable pageable
+            ) {
+        return ResponseEntity.ok(ApiResponse.success(handle(doctorId, pageable)));
     }
 
-    private List<DoctorGetAbsenceResponse> handle(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId) {
+    private Page<DoctorGetAbsenceResponse> handle(Long doctorId, Pageable pageable) {
         doctorRepository.findById(doctorId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "doctorId")
         );
-        return absenceRepository.findAllDoctorAbsenceDtosBetween(startedAt, finishedAt, doctorId);
+        return absenceRepository.findAllDoctorAbsenceDtos(doctorId, pageable);
     }
 }

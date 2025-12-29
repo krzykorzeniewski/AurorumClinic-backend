@@ -35,12 +35,9 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
                                                         Long absenceId);
 
     @Query("""
-            select a
-                from Absence a
-                where a.startedAt >= :startedAt
-                  and a.finishedAt <= :finishedAt
+            select a from Absence a
             """)
-    Page<Absence> findAllBetween(LocalDateTime startedAt, LocalDateTime finishedAt, Pageable pageable);
+    Page<Absence> findAllPage(Pageable pageable);
 
     @Query("""
             select a from Absence a
@@ -55,10 +52,8 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
                 a.id, a.name, a.startedAt, a.finishedAt)
            from Absence a
            where a.doctor.id = :doctorId
-                  and a.startedAt <= :finishedAt
-                  and a.finishedAt >= :startedAt
            """)
-    List<DoctorGetAbsenceResponse> findAllDoctorAbsenceDtosBetween(LocalDateTime startedAt, LocalDateTime finishedAt, Long doctorId);
+    Page<DoctorGetAbsenceResponse> findAllDoctorAbsenceDtos(Long doctorId, Pageable pageable);
 
     @Query("""
            select new pl.edu.pja.aurorumclinic.features.absences.queries.shared.DoctorGetAbsenceResponse(

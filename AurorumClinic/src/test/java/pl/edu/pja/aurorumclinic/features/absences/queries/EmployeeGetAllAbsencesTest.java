@@ -42,8 +42,6 @@ public class EmployeeGetAllAbsencesTest {
 
     @Test
     void empGetAllAbsencesShouldReturnPageOfDtos() {
-        LocalDateTime startedAt = LocalDateTime.now().minusDays(30);
-        LocalDateTime finishedAt = LocalDateTime.now().plusDays(30);
         Pageable pageable = Pageable.unpaged();
         Absence testAbsence = Absence.builder()
                 .id(21000037L)
@@ -89,11 +87,11 @@ public class EmployeeGetAllAbsencesTest {
                         .build())
                 .build();
 
-        when(absenceRepository.findAllBetween(any(), any(), any())).thenReturn(returnedPage);
+        when(absenceRepository.findAllPage(any())).thenReturn(returnedPage);
         when(objectStorageService.generateUrl(anyString())).thenReturn(generatedUrl);
 
         ResponseEntity<ApiResponse<Page<EmployeeGetAbsenceResponse>>> responseEntity =
-                employeeGetAllAbsences.empGetAllAbsences(pageable, startedAt, finishedAt);
+                employeeGetAllAbsences.empGetAllAbsences(pageable);
         assertThat(responseEntity.getBody()).isNotNull();
 
         Page<EmployeeGetAbsenceResponse> responsePage = responseEntity.getBody().getData();
@@ -104,10 +102,8 @@ public class EmployeeGetAllAbsencesTest {
         assertThat(response).isNotNull();
         assertThat(response).isEqualTo(expectedResponse);
 
-        verify(absenceRepository).findAllBetween(startedAt, finishedAt, pageable);
+        verify(absenceRepository).findAllPage(pageable);
         verify(objectStorageService).generateUrl(testAbsence.getDoctor().getProfilePicture());
     }
-
-
 
 }
