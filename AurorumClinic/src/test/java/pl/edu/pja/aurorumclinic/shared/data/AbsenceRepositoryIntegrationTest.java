@@ -79,37 +79,22 @@ public class AbsenceRepositoryIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void findAllByDoctorIdAndBetweenShouldReturnEmptyWhenNoExistBetweenDatesForDoctorId() {
-        LocalDateTime startedAt = LocalDateTime.of(2025, 12, 1, 8, 0);
-        LocalDateTime finishedAt = LocalDateTime.of(2025, 12, 24, 21, 0);
-        Long doctorId = 1L; //Mariusz has absence 25-26th December
-
-        assertThat(absenceRepository.findAllByDoctorIdAndBetween(doctorId, startedAt, finishedAt)).isEmpty();
-    }
-
-    @Test
-    void findAllByDoctorIdAndBetweenShouldReturnAbsencesWhenExistBetweenDatesForDoctorId() {
-        LocalDateTime startedAt = LocalDateTime.of(2025, 11, 1, 8, 0);
-        LocalDateTime finishedAt = LocalDateTime.of(2025, 12, 31, 21, 0);
+    void findAllByDoctorIdShouldReturnAbsencesWhenExistForDoctorId() {
         Long doctorId = 1L; //Mariusz has absences 11th of November and 25-26th of December
-
-        assertThat(absenceRepository.findAllByDoctorIdAndBetween(doctorId, startedAt, finishedAt))
+        Pageable pageable = Pageable.unpaged();
+        assertThat(absenceRepository.findAllByDoctorId(doctorId, pageable))
                 .isNotEmpty()
                 .hasSize(2)
                 .extracting(absence ->
-                        Objects.equals(absence.getDoctor().getId(), doctorId) &&
-                        (absence.getStartedAt().isAfter(startedAt) || absence.getStartedAt().isEqual(startedAt)) &&
-                        (absence.getFinishedAt().isBefore(finishedAt) || absence.getFinishedAt().isEqual(finishedAt)))
+                        Objects.equals(absence.getDoctor().getId(), doctorId))
                 .hasSize(2);
     }
 
     @Test
     void findAllDoctorAbsenceDtosBetweenShouldReturnAbsenceDtosWhenExistForDoctorIdBetweenDates() {
-        LocalDateTime startedAt = LocalDateTime.of(2025, 11, 1, 8, 0);
-        LocalDateTime finishedAt = LocalDateTime.of(2025, 12, 31, 21, 0);
         Long doctorId = 1L;
         Pageable pageable = Pageable.unpaged();
-        List<Absence> absencesFromDb = absenceRepository.findAllByDoctorIdAndBetween(doctorId, startedAt, finishedAt);
+        Page<Absence> absencesFromDb = absenceRepository.findAllByDoctorId(doctorId, pageable);
 
         Page<DoctorGetAbsenceResponse> resultPage =
                 absenceRepository.findAllDoctorAbsenceDtos(doctorId, pageable);
@@ -124,12 +109,6 @@ public class AbsenceRepositoryIntegrationTest extends IntegrationTest {
         assertThat(resultPage)
                 .extracting(DoctorGetAbsenceResponse::name)
                 .containsExactlyInAnyOrderElementsOf((absencesFromDb.stream().map(Absence::getName).toList()))
-                .hasSize(2);
-
-        assertThat(resultPage)
-                .extracting(absenceDto ->
-                        (absenceDto.startedAt().isAfter(startedAt) || absenceDto.startedAt().isEqual(startedAt)) &&
-                        (absenceDto.finishedAt().isBefore(finishedAt) || absenceDto.finishedAt().isEqual(finishedAt)))
                 .hasSize(2);
     }
 
