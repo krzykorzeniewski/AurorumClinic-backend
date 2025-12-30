@@ -2,6 +2,9 @@ package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,25 +27,23 @@ public class GetDoctorByIdAbsences {
     private final AbsenceRepository absenceRepository;
 
     @GetMapping("/{id}/absences")
-    public ResponseEntity<ApiResponse<List<GetDoctorAbsenceResponse>>> getDoctorAbsences(
+    public ResponseEntity<ApiResponse<Page<GetDoctorAbsenceResponse>>> getDoctorAbsences(
             @PathVariable("id") Long doctorId,
-            @RequestParam LocalDateTime startedAt,
-            @RequestParam LocalDateTime finishedAt) {
-        return ResponseEntity.ok(ApiResponse.success(handle(doctorId, startedAt, finishedAt)));
+            @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(handle(doctorId, pageable)));
     }
 
-    private List<GetDoctorAbsenceResponse> handle(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt) {
+    private Page<GetDoctorAbsenceResponse> handle(Long doctorId, Pageable pageable) {
         doctorRepository.findById(doctorId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "doctorId")
         );
-        List<Absence> absencesFromDb = absenceRepository.findAllByDoctorIdAndBetween
-                (doctorId, startedAt, finishedAt);
-        return absencesFromDb.stream().map(absence -> GetDoctorAbsenceResponse.builder()
+        Page<Absence> absencesFromDb = absenceRepository.findAllByDoctorId(doctorId, pageable);
+        return absencesFromDb.map(absence -> GetDoctorAbsenceResponse.builder()
                     .id(absence.getId())
                     .name(absence.getName())
                     .startedAt(absence.getStartedAt())
                     .finishedAt(absence.getFinishedAt())
-                .build()).toList();
+                .build());
     }
 
     @Builder

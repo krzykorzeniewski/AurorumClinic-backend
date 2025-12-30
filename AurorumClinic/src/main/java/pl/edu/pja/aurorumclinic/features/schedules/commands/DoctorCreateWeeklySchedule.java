@@ -65,41 +65,57 @@ public class DoctorCreateWeeklySchedule {
         Doctor doctorFromDb = doctorRepository.findById(doctorId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "id")
         );
-        List<Service> mondayServicesFromDb = serviceRepository.findAllById(request.mon.serviceIds);
-        if (!mondayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.mon.serviceIds)) {
-            throw new ApiException("Monday service ids are not found", "monServiceIds");
-        }
-        List<Service> tuesdayServicesFromDb = serviceRepository.findAllById(request.tue.serviceIds);
-        if (!tuesdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.tue.serviceIds)) {
-            throw new ApiException("Tuesday service ids are not found", "tueServiceIds");
-        }
-        List<Service> wednesdayServicesFromDb = serviceRepository.findAllById(request.wed.serviceIds);
-        if (!wednesdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.wed.serviceIds)) {
-            throw new ApiException("Wednesday service ids are not found", "wedServiceIds");
-        }
-        List<Service> thursdayServicesFromDb = serviceRepository.findAllById(request.thu.serviceIds);
-        if (!thursdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.thu.serviceIds)) {
-            throw new ApiException("Thursday service ids are not found", "thuServiceIds");
-        }
-        List<Service> fridayServicesFromDb = serviceRepository.findAllById(request.fri.serviceIds);
-        if (!fridayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.fri.serviceIds)) {
-            throw new ApiException("Friday service ids are not found", "friServiceIds");
-        }
-        LocalDate todayDate = LocalDate.now();
-        LocalDate scheduleStartDate = request.startedAt;
-        LocalDate scheduleFinishDate = request.finishedAt;
-        LocalDate currentDate =
-                todayDate.isAfter(scheduleStartDate) ? todayDate : scheduleStartDate;
 
-        while(!currentDate.isAfter(scheduleFinishDate)) {
-            DayOfWeek currentDay = currentDate.getDayOfWeek();
+        List<Service> mondayServicesFromDb = null;
+        if (!request.mon.serviceIds.isEmpty()) {
+            mondayServicesFromDb = serviceRepository.findAllById(request.mon.serviceIds);
+            if (!mondayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.mon.serviceIds)) {
+                throw new ApiException("Monday service ids are not found", "monServiceIds");
+            }
+        }
+        List<Service> tuesdayServicesFromDb = null;
+        if (!request.tue.serviceIds.isEmpty()) {
+            tuesdayServicesFromDb = serviceRepository.findAllById(request.tue.serviceIds);
+            if (!tuesdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.tue.serviceIds)) {
+                throw new ApiException("Tuesday service ids are not found", "tueServiceIds");
+            }
+        }
+        List<Service> wednesdayServicesFromDb = null;
+        if (!request.wed.serviceIds.isEmpty()) {
+            wednesdayServicesFromDb = serviceRepository.findAllById(request.wed.serviceIds);
+            if (!wednesdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.wed.serviceIds)) {
+                throw new ApiException("Wednesday service ids are not found", "wedServiceIds");
+            }
+        }
+        List<Service> thursdayServicesFromDb = null;
+        if (!request.thu.serviceIds.isEmpty()) {
+            thursdayServicesFromDb = serviceRepository.findAllById(request.thu.serviceIds);
+            if (!thursdayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.thu.serviceIds)) {
+                throw new ApiException("Thursday service ids are not found", "thuServiceIds");
+            }
+        }
+        List<Service> fridayServicesFromDb = null;
+        if (!request.fri.serviceIds.isEmpty()) {
+            fridayServicesFromDb = serviceRepository.findAllById(request.fri.serviceIds);
+            if (!fridayServicesFromDb.stream().map(Service::getId).collect(Collectors.toSet()).containsAll(request.fri.serviceIds)) {
+                throw new ApiException("Friday service ids are not found", "friServiceIds");
+            }
+        }
+        LocalDate todayDateTime = LocalDate.now();
+        LocalDate scheduleStartDateTime = request.startedAt;
+        LocalDate scheduleFinishDateTime = request.finishedAt;
+        LocalDate currentDateTime =
+                todayDateTime.isAfter(scheduleStartDateTime) ? todayDateTime : scheduleStartDateTime;
+
+        while(!currentDateTime.isAfter(scheduleFinishDateTime)) {
+            DayOfWeek currentDay = currentDateTime.getDayOfWeek();
             try {
                 if (Objects.equals(currentDay, DayOfWeek.SATURDAY) || Objects.equals(currentDay, DayOfWeek.SUNDAY)) {
-                    currentDate = currentDate.plusDays(1);
+                    currentDateTime = currentDateTime.plusDays(1);
                     continue;
-                } else if (Objects.equals(currentDay, DayOfWeek.MONDAY)) {
-                    LocalDateTime startedAt = LocalDateTime.of(currentDate, request.mon.hours.get(0));
-                    LocalDateTime finishedAt = LocalDateTime.of(currentDate, request.mon.hours.get(1));
+                } else if (Objects.equals(currentDay, DayOfWeek.MONDAY) && mondayServicesFromDb != null) {
+                    LocalDateTime startedAt = LocalDateTime.of(currentDateTime, request.mon.hours.get(0));
+                    LocalDateTime finishedAt = LocalDateTime.of(currentDateTime, request.mon.hours.get(1));
                     scheduleValidator.validateTimeslotAndServices(startedAt, finishedAt, doctorFromDb, mondayServicesFromDb);
                     Schedule mondaySchedule = Schedule.builder()
                             .doctor(doctorFromDb)
@@ -108,9 +124,9 @@ public class DoctorCreateWeeklySchedule {
                             .services(new HashSet<>(mondayServicesFromDb))
                             .build();
                     scheduleRepository.save(mondaySchedule);
-                } else if (Objects.equals(currentDay, DayOfWeek.TUESDAY)) {
-                    LocalDateTime startedAt = LocalDateTime.of(currentDate, request.tue.hours.get(0));
-                    LocalDateTime finishedAt = LocalDateTime.of(currentDate, request.tue.hours.get(1));
+                } else if (Objects.equals(currentDay, DayOfWeek.TUESDAY) && tuesdayServicesFromDb != null) {
+                    LocalDateTime startedAt = LocalDateTime.of(currentDateTime, request.tue.hours.get(0));
+                    LocalDateTime finishedAt = LocalDateTime.of(currentDateTime, request.tue.hours.get(1));
                     scheduleValidator.validateTimeslotAndServices(startedAt, finishedAt, doctorFromDb, tuesdayServicesFromDb);
                     Schedule tuesdaySchedule = Schedule.builder()
                             .doctor(doctorFromDb)
@@ -119,9 +135,9 @@ public class DoctorCreateWeeklySchedule {
                             .services(new HashSet<>(tuesdayServicesFromDb))
                             .build();
                     scheduleRepository.save(tuesdaySchedule);
-                } else if (Objects.equals(currentDay, DayOfWeek.WEDNESDAY)) {
-                    LocalDateTime startedAt = LocalDateTime.of(currentDate, request.wed.hours.get(0));
-                    LocalDateTime finishedAt = LocalDateTime.of(currentDate, request.wed.hours.get(1));
+                } else if (Objects.equals(currentDay, DayOfWeek.WEDNESDAY) && wednesdayServicesFromDb != null) {
+                    LocalDateTime startedAt = LocalDateTime.of(currentDateTime, request.wed.hours.get(0));
+                    LocalDateTime finishedAt = LocalDateTime.of(currentDateTime, request.wed.hours.get(1));
                     scheduleValidator.validateTimeslotAndServices(startedAt, finishedAt, doctorFromDb, wednesdayServicesFromDb);
                     Schedule wednesdaySchedule = Schedule.builder()
                             .doctor(doctorFromDb)
@@ -130,9 +146,9 @@ public class DoctorCreateWeeklySchedule {
                             .services(new HashSet<>(wednesdayServicesFromDb))
                             .build();
                     scheduleRepository.save(wednesdaySchedule);
-                } else if (Objects.equals(currentDay, DayOfWeek.THURSDAY)) {
-                    LocalDateTime startedAt = LocalDateTime.of(currentDate, request.thu.hours.get(0));
-                    LocalDateTime finishedAt = LocalDateTime.of(currentDate, request.thu.hours.get(1));
+                } else if (Objects.equals(currentDay, DayOfWeek.THURSDAY) && thursdayServicesFromDb != null) {
+                    LocalDateTime startedAt = LocalDateTime.of(currentDateTime, request.thu.hours.get(0));
+                    LocalDateTime finishedAt = LocalDateTime.of(currentDateTime, request.thu.hours.get(1));
                     scheduleValidator.validateTimeslotAndServices(startedAt, finishedAt, doctorFromDb, thursdayServicesFromDb);
                     Schedule thursdaySchedule = Schedule.builder()
                             .doctor(doctorFromDb)
@@ -141,9 +157,9 @@ public class DoctorCreateWeeklySchedule {
                             .services(new HashSet<>(thursdayServicesFromDb))
                             .build();
                     scheduleRepository.save(thursdaySchedule);
-                } else if (Objects.equals(currentDay, DayOfWeek.FRIDAY)) {
-                    LocalDateTime startedAt = LocalDateTime.of(currentDate, request.fri.hours.get(0));
-                    LocalDateTime finishedAt = LocalDateTime.of(currentDate, request.fri.hours.get(1));
+                } else if (Objects.equals(currentDay, DayOfWeek.FRIDAY) && fridayServicesFromDb != null) {
+                    LocalDateTime startedAt = LocalDateTime.of(currentDateTime, request.fri.hours.get(0));
+                    LocalDateTime finishedAt = LocalDateTime.of(currentDateTime, request.fri.hours.get(1));
                     scheduleValidator.validateTimeslotAndServices(startedAt, finishedAt, doctorFromDb, fridayServicesFromDb);
                     Schedule fridaySchedule = Schedule.builder()
                             .doctor(doctorFromDb)
@@ -155,13 +171,13 @@ public class DoctorCreateWeeklySchedule {
                 }
             } catch (ApiException e) {
                 if (Objects.equals(e.getField(), "absence")) {
-                    currentDate = currentDate.plusDays(1);
+                    currentDateTime = currentDateTime.plusDays(1);
                     continue;
                 } else {
                     throw new ApiException(e.getMessage(), e.getField());
                 }
             }
-            currentDate = currentDate.plusDays(1);
+            currentDateTime = currentDateTime.plusDays(1);
         }
     }
 

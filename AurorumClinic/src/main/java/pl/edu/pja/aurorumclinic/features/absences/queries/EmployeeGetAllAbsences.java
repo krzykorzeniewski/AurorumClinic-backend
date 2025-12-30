@@ -29,15 +29,13 @@ public class EmployeeGetAllAbsences {
 
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<EmployeeGetAbsenceResponse>>> empGetAllAbsences(
-            @PageableDefault Pageable pageable,
-            @RequestParam LocalDateTime startedAt,
-            @RequestParam LocalDateTime finishedAt
+            @PageableDefault Pageable pageable
     ) {
-        return ResponseEntity.ok(ApiResponse.success(handle(pageable, startedAt, finishedAt)));
+        return ResponseEntity.ok(ApiResponse.success(handle(pageable)));
     }
 
-    private Page<EmployeeGetAbsenceResponse> handle(Pageable pageable, LocalDateTime startedAt, LocalDateTime finishedAt) {
-        Page<Absence> absencesFromDb = absenceRepository.findAllBetween(startedAt, finishedAt, pageable);
+    private Page<EmployeeGetAbsenceResponse> handle(Pageable pageable) {
+        Page<Absence> absencesFromDb = absenceRepository.findAllPage(pageable);
         return absencesFromDb.map(absence -> EmployeeGetAbsenceResponse.builder()
                 .name(absence.getName())
                 .id(absence.getId())

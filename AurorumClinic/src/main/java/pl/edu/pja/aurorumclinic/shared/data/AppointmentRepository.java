@@ -165,4 +165,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                            Long doctorId, Long serviceId, Long appointmentId);
 
     Page<Appointment> findAllByDoctorId(Pageable pageable, Long doctorId);
+
+    List<Appointment> findByPatient_IdAndFinishedAtAfter(Long patientId, LocalDateTime finishedAtAfter);
 }
