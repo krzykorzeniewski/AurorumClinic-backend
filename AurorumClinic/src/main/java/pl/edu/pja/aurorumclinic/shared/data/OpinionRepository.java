@@ -1,11 +1,18 @@
 package pl.edu.pja.aurorumclinic.shared.data;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
-
-import java.util.List;
 
 public interface OpinionRepository extends JpaRepository<Opinion, Long> {
 
-    List<Opinion> findByAppointment_Doctor_IdOrderByCreatedAtDesc(Long doctorId);
+    Page<Opinion> findByAppointment_Doctor_IdOrderByCreatedAtDesc(Long doctorId, Pageable pageable);
+
+    @Query("select avg(o.rating) from Opinion o where o.appointment.doctor.id = :doctorId")
+    Double getAverageRatingByDoctorId(@Param("doctorId") Long doctorId);
+
+    long countByAppointment_Doctor_Id(Long doctorId);
 }
