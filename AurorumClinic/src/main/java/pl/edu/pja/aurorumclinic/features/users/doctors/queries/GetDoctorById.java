@@ -59,6 +59,7 @@ public class GetDoctorById {
                 .education(doctorFromDb.getEducation())
                 .experience(doctorFromDb.getExperience())
                 .pwzNumber(doctorFromDb.getPwzNumber())
+                .description(doctorFromDb.getDescription())
                 .build();
     }
 
@@ -74,7 +75,8 @@ public class GetDoctorById {
                                  String phoneNumber,
                                  String education,
                                  String experience,
-                                 String pwzNumber) {
+                                 String pwzNumber,
+                                 String description) {
 
         @Builder
         record SpecializationDto(Long id,
