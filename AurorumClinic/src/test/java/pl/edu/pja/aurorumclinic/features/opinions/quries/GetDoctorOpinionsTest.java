@@ -11,6 +11,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
+import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,8 +40,14 @@ class GetDoctorOpinionsTest {
         o1.setComment("super");
         o1.setAnswer("dzięki");
         o1.setCreatedAt(LocalDateTime.now());
+        Patient p1 = Patient.builder()
+                .id(2L)
+                .name("Maurycy")
+                .surname("Nowak")
+                .build();
         Appointment a1 = new Appointment();
         a1.setId(100L);
+        a1.setPatient(p1);
         o1.setAppointment(a1);
 
         Opinion o2 = new Opinion();
@@ -49,7 +56,14 @@ class GetDoctorOpinionsTest {
         o2.setComment("ok");
         o2.setAnswer(null);
         o2.setCreatedAt(LocalDateTime.now().minusDays(1));
+
+        Patient p2 = Patient.builder()
+                .id(1L)
+                .name("Mariusz")
+                .surname("Kowalski")
+                .build();
         Appointment a2 = new Appointment();
+        a2.setPatient(p2);
         a2.setId(101L);
         o2.setAppointment(a2);
 
@@ -75,14 +89,16 @@ class GetDoctorOpinionsTest {
         assertThat(dto1.rating()).isEqualTo(5);
         assertThat(dto1.comment()).isEqualTo("super");
         assertThat(dto1.answer()).isEqualTo("dzięki");
-        assertThat(dto1.appointmentId()).isEqualTo(100L);
 
         GetDoctorOpinions.OpinionDto dto2 = data.getContent().get(1);
         assertThat(dto2.id()).isEqualTo(2L);
         assertThat(dto2.rating()).isEqualTo(3);
         assertThat(dto2.comment()).isEqualTo("ok");
         assertThat(dto2.answer()).isNull();
-        assertThat(dto2.appointmentId()).isEqualTo(101L);
+        assertThat(dto2.patient()).isNotNull();
+        assertThat(dto2.patient().id()).isEqualTo(p2.getId());
+        assertThat(dto2.patient().name()).isEqualTo(p2.getName());
+        assertThat(dto2.patient().surname()).isEqualTo(p2.getSurname());
 
         verify(opinionRepository).findByAppointment_Doctor_IdOrderByCreatedAtDesc(doctorId, pageable);
     }

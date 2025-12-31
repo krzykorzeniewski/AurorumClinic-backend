@@ -29,8 +29,15 @@ public class GetDoctorOpinions {
             String comment,
             String answer,
             LocalDateTime createdAt,
-            Long appointmentId
+            PatientDto patient
     ) {}
+
+    @Builder
+    public record PatientDto(Long id,
+                      String name,
+                      String surname) {
+    }
+
 
     @GetMapping("/{doctorId}/opinions")
     public ResponseEntity<ApiResponse<Page<OpinionDto>>> list(
@@ -50,7 +57,11 @@ public class GetDoctorOpinions {
                 .comment(o.getComment())
                 .answer(o.getAnswer())
                 .createdAt(o.getCreatedAt())
-                .appointmentId(o.getAppointment() != null ? o.getAppointment().getId() : null)
+                .patient(PatientDto.builder()
+                        .id(o.getAppointment().getPatient().getId())
+                        .name(o.getAppointment().getPatient().getName())
+                        .surname(o.getAppointment().getPatient().getSurname())
+                        .build())
                 .build()
         );
     }
