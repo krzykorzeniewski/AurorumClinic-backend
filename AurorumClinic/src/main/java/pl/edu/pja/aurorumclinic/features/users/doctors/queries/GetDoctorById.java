@@ -1,9 +1,9 @@
 package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
 
+import jakarta.annotation.security.PermitAll;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,14 +16,13 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/doctors")
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
+@PermitAll
 public class GetDoctorById {
 
     private final DoctorRepository doctorRepository;
@@ -53,12 +52,9 @@ public class GetDoctorById {
                         .mapToInt(Opinion::getRating)
                         .average()
                         .orElse(0.0))
-                .birthDate(doctorFromDb.getBirthdate())
                 .email(doctorFromDb.getEmail())
-                .phoneNumber(doctorFromDb.getPhoneNumber())
                 .education(doctorFromDb.getEducation())
                 .experience(doctorFromDb.getExperience())
-                .pwzNumber(doctorFromDb.getPwzNumber())
                 .description(doctorFromDb.getDescription())
                 .build();
     }
@@ -70,12 +66,9 @@ public class GetDoctorById {
                                  List<SpecializationDto> specializations,
                                  String profilePicture,
                                  int rating,
-                                 LocalDate birthDate,
                                  String email,
-                                 String phoneNumber,
                                  String education,
                                  String experience,
-                                 String pwzNumber,
                                  String description) {
 
         @Builder
