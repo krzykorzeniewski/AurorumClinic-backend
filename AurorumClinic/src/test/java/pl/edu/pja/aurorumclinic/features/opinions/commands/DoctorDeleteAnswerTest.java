@@ -46,6 +46,7 @@ class DoctorDeleteAnswerTest {
         var resp = controller.deleteAnswer(doctorId, opinionId);
 
         assertThat(op.getAnswer()).isNull();
+        assertThat(op.getAnsweredAt()).isNull();
         assertThat(resp.getBody()).isNotNull();
         ApiResponse<String> body = resp.getBody();
         assertThat(body.getData()).isEqualTo("Answer deleted successfully");

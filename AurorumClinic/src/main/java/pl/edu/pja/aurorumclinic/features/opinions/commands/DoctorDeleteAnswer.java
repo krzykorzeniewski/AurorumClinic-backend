@@ -46,6 +46,7 @@ public class DoctorDeleteAnswer {
         }
 
         op.setAnswer(null);
+        op.setAnsweredAt(null);
         return "Answer deleted successfully";
     }
 }

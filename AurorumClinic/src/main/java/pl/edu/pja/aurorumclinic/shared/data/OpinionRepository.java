@@ -9,10 +9,10 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
 
 public interface OpinionRepository extends JpaRepository<Opinion, Long> {
 
-    Page<Opinion> findByAppointment_Doctor_IdOrderByCreatedAtDesc(Long doctorId, Pageable pageable);
-
     @Query("select avg(o.rating) from Opinion o where o.appointment.doctor.id = :doctorId")
     Double getAverageRatingByDoctorId(@Param("doctorId") Long doctorId);
 
     long countByAppointment_Doctor_Id(Long doctorId);
+
+    Page<Opinion> findByAppointment_Doctor_Id(Long doctorId, Pageable pageable);
 }

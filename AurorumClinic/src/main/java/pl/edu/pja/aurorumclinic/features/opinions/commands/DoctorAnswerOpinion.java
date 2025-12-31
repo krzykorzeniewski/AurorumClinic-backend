@@ -16,6 +16,8 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.moderation.ContentModerationService;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/doctors/me/opinions")
 @RequiredArgsConstructor
@@ -47,6 +49,7 @@ public class DoctorAnswerOpinion {
         }
 
         op.setAnswer(req.answer());
+        op.setAnsweredAt(LocalDateTime.now());
         return "Answer added successfully";
     }
 }

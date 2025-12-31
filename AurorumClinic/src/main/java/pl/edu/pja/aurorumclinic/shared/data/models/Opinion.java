@@ -38,6 +38,9 @@ public class Opinion {
     @NotNull(message = "This field is required")
     private LocalDateTime createdAt;
 
+    @Column(name = "Answered_At", columnDefinition = "datetime2(2)")
+    private LocalDateTime answeredAt;
+
     @OneToOne(mappedBy = "opinion")
     @ToString.Exclude
     private Appointment appointment;

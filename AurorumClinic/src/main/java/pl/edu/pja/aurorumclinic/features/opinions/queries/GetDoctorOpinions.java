@@ -29,6 +29,7 @@ public class GetDoctorOpinions {
             String comment,
             String answer,
             LocalDateTime createdAt,
+            LocalDateTime answeredAt,
             PatientDto patient
     ) {}
 
@@ -49,7 +50,7 @@ public class GetDoctorOpinions {
 
     private Page<OpinionDto> handle(Long doctorId, Pageable pageable) {
         Page<Opinion> page =
-                opinionRepository.findByAppointment_Doctor_IdOrderByCreatedAtDesc(doctorId, pageable);
+                opinionRepository.findByAppointment_Doctor_Id(doctorId, pageable);
 
         return page.map(o -> OpinionDto.builder()
                 .id(o.getId())
@@ -57,6 +58,7 @@ public class GetDoctorOpinions {
                 .comment(o.getComment())
                 .answer(o.getAnswer())
                 .createdAt(o.getCreatedAt())
+                .answeredAt(o.getAnsweredAt())
                 .patient(PatientDto.builder()
                         .id(o.getAppointment().getPatient().getId())
                         .name(o.getAppointment().getPatient().getName())

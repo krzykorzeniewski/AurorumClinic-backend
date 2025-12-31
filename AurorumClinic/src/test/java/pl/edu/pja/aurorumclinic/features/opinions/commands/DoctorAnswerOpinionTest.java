@@ -14,6 +14,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.moderation.ContentModerationService;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -56,6 +57,7 @@ class DoctorAnswerOpinionTest {
         ApiResponse<String> body = resp.getBody();
         assertThat(body.getData()).isEqualTo("Answer added successfully");
         assertThat(op.getAnswer()).isEqualTo("Dziękuję za opinię");
+        assertThat(op.getAnsweredAt()).isEqualToIgnoringNanos(LocalDateTime.now());
     }
 
     @Test

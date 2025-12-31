@@ -69,7 +69,7 @@ class GetDoctorOpinionsTest {
 
         Page<Opinion> page = new PageImpl<>(List.of(o1, o2), pageable, 2);
 
-        when(opinionRepository.findByAppointment_Doctor_IdOrderByCreatedAtDesc(doctorId, pageable))
+        when(opinionRepository.findByAppointment_Doctor_Id(doctorId, pageable))
                 .thenReturn(page);
         var resp = controller.list(doctorId, pageable);
         assertThat(resp).isNotNull();
@@ -100,7 +100,7 @@ class GetDoctorOpinionsTest {
         assertThat(dto2.patient().name()).isEqualTo(p2.getName());
         assertThat(dto2.patient().surname()).isEqualTo(p2.getSurname());
 
-        verify(opinionRepository).findByAppointment_Doctor_IdOrderByCreatedAtDesc(doctorId, pageable);
+        verify(opinionRepository).findByAppointment_Doctor_Id(doctorId, pageable);
     }
 
     @Test
@@ -108,7 +108,7 @@ class GetDoctorOpinionsTest {
         Long doctorId = 1L;
         Pageable pageable = PageRequest.of(0, 5);
 
-        when(opinionRepository.findByAppointment_Doctor_IdOrderByCreatedAtDesc(doctorId, pageable))
+        when(opinionRepository.findByAppointment_Doctor_Id(doctorId, pageable))
                 .thenReturn(Page.empty(pageable));
 
         var resp = controller.list(doctorId, pageable);
@@ -122,6 +122,6 @@ class GetDoctorOpinionsTest {
         assertThat(data.getTotalElements()).isZero();
         assertThat(data.getContent()).isEmpty();
 
-        verify(opinionRepository).findByAppointment_Doctor_IdOrderByCreatedAtDesc(doctorId, pageable);
+        verify(opinionRepository).findByAppointment_Doctor_Id(doctorId, pageable);
     }
 }
