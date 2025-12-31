@@ -21,10 +21,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class GetDoctorOpinions {
     private final OpinionRepository opinionRepository;
-    public record Response(Page<OpinionDto> opinions,
-                           double averageRating,
-                           long total) {
-    }
+
     @Builder
     public record OpinionDto(
             Long id,
@@ -36,26 +33,18 @@ public class GetDoctorOpinions {
     ) {}
 
     @GetMapping("/{doctorId}/opinions")
-    public ResponseEntity<ApiResponse<Response>> list(
+    public ResponseEntity<ApiResponse<Page<OpinionDto>>> list(
             @PathVariable Long doctorId,
             @PageableDefault Pageable pageable
     ) {
         return ResponseEntity.ok(ApiResponse.success(handle(doctorId, pageable)));
     }
 
-    private Response handle(Long doctorId, Pageable pageable) {
+    private Page<OpinionDto> handle(Long doctorId, Pageable pageable) {
         Page<Opinion> page =
                 opinionRepository.findByAppointment_Doctor_IdOrderByCreatedAtDesc(doctorId, pageable);
 
-        double avg = page.isEmpty()
-                ? 0.0
-                : page.stream()
-                .mapToInt(Opinion::getRating)
-                .average()
-                .orElse(0.0);
-
-        double avgRounded = Math.round(avg * 100.0) / 100.0;
-        Page<OpinionDto> mapped = page.map(o -> OpinionDto.builder()
+        return page.map(o -> OpinionDto.builder()
                 .id(o.getId())
                 .rating(o.getRating())
                 .comment(o.getComment())
@@ -64,7 +53,5 @@ public class GetDoctorOpinions {
                 .appointmentId(o.getAppointment() != null ? o.getAppointment().getId() : null)
                 .build()
         );
-
-        return new Response(mapped, avgRounded, page.getTotalElements());
     }
 }
