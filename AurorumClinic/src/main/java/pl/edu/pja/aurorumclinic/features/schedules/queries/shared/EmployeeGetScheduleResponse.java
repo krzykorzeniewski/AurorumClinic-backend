@@ -1,7 +1,6 @@
 package pl.edu.pja.aurorumclinic.features.schedules.queries.shared;
 
 import lombok.Builder;
-import pl.edu.pja.aurorumclinic.features.schedules.queries.EmployeeGetAllSchedules;
 
 import java.time.LocalDateTime;
 import java.util.List;

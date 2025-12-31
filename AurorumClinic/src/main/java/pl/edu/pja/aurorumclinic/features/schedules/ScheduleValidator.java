@@ -7,7 +7,10 @@ import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.ScheduleRepository;
 import pl.edu.pja.aurorumclinic.shared.data.ServiceRepository;
-import pl.edu.pja.aurorumclinic.shared.data.models.*;
+import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
+import pl.edu.pja.aurorumclinic.shared.data.models.Schedule;
+import pl.edu.pja.aurorumclinic.shared.data.models.Service;
+import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.time.LocalDateTime;

@@ -11,8 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import pl.edu.pja.aurorumclinic.features.newsletter.shared.NewsletterMessageRepository;
 import pl.edu.pja.aurorumclinic.features.newsletter.events.NewsletterMessageApprovedEvent;
+import pl.edu.pja.aurorumclinic.features.newsletter.shared.NewsletterMessageRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.NewsletterMessage;
@@ -32,7 +32,6 @@ public class ReviewNewsletterMessage {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public ResponseEntity<ApiResponse<?>> reviewNewsletterMessage(@PathVariable("id") Long newsletterMessId,
                                                                   @RequestBody @Valid UpdateNewsletterMessageRequest request,

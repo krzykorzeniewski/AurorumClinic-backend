@@ -1,14 +1,12 @@
 package pl.edu.pja.aurorumclinic.shared.data.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter

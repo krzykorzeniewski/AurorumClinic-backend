@@ -1,6 +1,5 @@
 package pl.edu.pja.aurorumclinic.features.absences;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;

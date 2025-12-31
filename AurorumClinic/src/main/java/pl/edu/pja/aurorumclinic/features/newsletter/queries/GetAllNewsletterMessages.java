@@ -9,8 +9,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.edu.pja.aurorumclinic.features.newsletter.shared.NewsletterMessageRepository;
 import pl.edu.pja.aurorumclinic.features.newsletter.queries.shared.GetNewsletterMessageResponse;
+import pl.edu.pja.aurorumclinic.features.newsletter.shared.NewsletterMessageRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.NewsletterMessage;
 
