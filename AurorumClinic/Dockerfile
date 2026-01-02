@@ -5,4 +5,4 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:24-jre
 COPY --from=build /target/AurorumClinic-0.0.1-SNAPSHOT.jar AurorumClinic.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "AurorumClinic.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=Europe/Warsaw", "-jar", "AurorumClinic.jar"]
