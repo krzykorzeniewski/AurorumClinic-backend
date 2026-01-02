@@ -39,15 +39,13 @@ class DocUpdateProfileTest {
     DocUpdateProfile controller;
 
     @Test
-    void shouldUpdateProfileAndReturnMappedDto() {
+    void shouldUpdateProfileAndReturnMappedDto() throws IOException {
         Long doctorId = 1L;
 
         MeUpdateProfileRequest req = new MeUpdateProfileRequest(
-                " 10 lat doświadczenia ",
-                " UJ CM ",
-                " dobry lekarz ",
-                " 1234567 "
-        );
+                "10 lat doświadczenia",
+                "UJ CM",
+                "dobry lekarz");
 
         Doctor doctor = new Doctor();
         doctor.setId(doctorId);
@@ -57,7 +55,7 @@ class DocUpdateProfileTest {
         when(doctorRepository.findById(doctorId)).thenReturn(Optional.of(doctor));
         when(mapper.toResponse(doctor)).thenReturn(dto);
 
-        var resp = controller.updateMyProfile(doctorId, req);
+        var resp = controller.updateMyProfile(doctorId, null, req);
 
         verify(doctorRepository).findById(doctorId);
         verify(mapper).toResponse(doctor);
@@ -65,7 +63,6 @@ class DocUpdateProfileTest {
         assertThat(doctor.getExperience()).isEqualTo("10 lat doświadczenia");
         assertThat(doctor.getEducation()).isEqualTo("UJ CM");
         assertThat(doctor.getDescription()).isEqualTo("dobry lekarz");
-        assertThat(doctor.getPwzNumber()).isEqualTo("1234567");
 
         ApiResponse<DoctorProfileResponse> body = resp.getBody();
         assertThat(body).isNotNull();
@@ -77,12 +74,12 @@ class DocUpdateProfileTest {
     void shouldThrowNotFoundWhenUpdatingProfileAndDoctorMissing() {
         Long doctorId = 1L;
         MeUpdateProfileRequest req = new MeUpdateProfileRequest(
-                "exp", "edu", "desc", "pwz"
+                "exp", "edu", "desc"
         );
 
         when(doctorRepository.findById(doctorId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> controller.updateMyProfile(doctorId, req))
+        assertThatThrownBy(() -> controller.updateMyProfile(doctorId, null, req))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
 
         verify(doctorRepository).findById(doctorId);
@@ -93,6 +90,9 @@ class DocUpdateProfileTest {
     void shouldUploadProfilePictureAndSetPath() throws IOException {
         Long doctorId = 2L;
         MultipartFile file = mock(MultipartFile.class);
+        MeUpdateProfileRequest req = new MeUpdateProfileRequest(
+                "exp", "edu", "desc"
+        );
 
         Doctor doctor = new Doctor();
         doctor.setId(doctorId);
@@ -100,7 +100,7 @@ class DocUpdateProfileTest {
         when(doctorRepository.findById(doctorId)).thenReturn(Optional.of(doctor));
         when(objectStorageService.uploadObject(file)).thenReturn("images/profile/abc.jpg");
 
-        var resp = controller.uploadProfilePicture(file, doctorId);
+        var resp = controller.updateMyProfile(doctorId, file, req);
 
         verify(doctorRepository).findById(doctorId);
         verify(objectStorageService).uploadObject(file);
@@ -110,18 +110,5 @@ class DocUpdateProfileTest {
         ApiResponse<?> body = resp.getBody();
         assertThat(body).isNotNull();
         assertThat(body.getStatus()).isEqualTo("success");
-    }
-
-    @Test
-    void shouldThrowNotFoundWhenUploadingProfilePictureAndDoctorMissing() {
-        Long doctorId = 3L;
-        MultipartFile file = mock(MultipartFile.class);
-
-        when(doctorRepository.findById(doctorId)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> controller.uploadProfilePicture(file, doctorId))
-                .isExactlyInstanceOf(ApiNotFoundException.class);
-
-        verify(doctorRepository).findById(doctorId);
-        verifyNoInteractions(objectStorageService);
     }
 }

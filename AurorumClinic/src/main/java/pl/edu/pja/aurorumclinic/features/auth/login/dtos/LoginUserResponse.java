@@ -5,7 +5,8 @@ import lombok.Builder;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
 
 @Builder
-public record LoginUserResponse(boolean twoFactorAuth,
+public record LoginUserResponse(Long id,
+                                boolean twoFactorAuth,
                                 UserRole role,
                                 @JsonIgnore String accessToken,
                                 @JsonIgnore String refreshToken) {

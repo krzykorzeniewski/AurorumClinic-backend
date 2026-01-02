@@ -19,7 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users/doctors/me")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('DOCTOR')")
 public class DocUpdateProfile {
@@ -28,51 +28,30 @@ public class DocUpdateProfile {
     private final DoctorProfileMapper mapper;
     private final ObjectStorageService objectStorageService;
 
-    @Transactional
-    @PatchMapping("/users/doctors/me/profile")
+    @PutMapping("/profile")
+    @Transactional(rollbackFor = IOException.class)
     public ResponseEntity<ApiResponse<DoctorProfileResponse>> updateMyProfile(
             @AuthenticationPrincipal Long userID,
-            @RequestBody @Valid MeUpdateProfileRequest request
-    ) {
-        return ResponseEntity.ok(ApiResponse.success(handleUpdateProfile(userID, request)));
+            @RequestPart(value = "doctorImage", required = false) MultipartFile image,
+            @RequestPart("command") @Valid MeUpdateProfileRequest command
+    ) throws IOException {
+        return ResponseEntity.ok(ApiResponse.success(handle(userID, image, command)));
     }
 
-    private DoctorProfileResponse handleUpdateProfile(Long userID, MeUpdateProfileRequest req) {
-        Doctor d = doctorRepository.findById(userID)
+    private DoctorProfileResponse handle(Long userID, MultipartFile image, MeUpdateProfileRequest command) throws IOException {
+        Doctor doctor = doctorRepository.findById(userID)
                 .orElseThrow(() -> new ApiNotFoundException("ID not found", "Id"));
 
-        if (req.experience() != null)
-            d.setExperience(trimOrNull(req.experience()));
-        if (req.education() != null)
-            d.setEducation(trimOrNull(req.education()));
-        if (req.description() != null)
-            d.setDescription(trimOrNull(req.description()));
-        if (req.pwzNumber() != null)
-            d.setPwzNumber(trimOrNull(req.pwzNumber()));
+        doctor.setExperience(command.experience());
+        doctor.setEducation(command.education());
+        doctor.setDescription(command.description());
 
-        return mapper.toResponse(d);
-    }
-    @PostMapping("/doctors/me/profile-picture")
-    @Transactional(rollbackFor = {IOException.class})
-    public ResponseEntity<ApiResponse<?>> uploadProfilePicture(
-            @RequestParam MultipartFile image,
-            @AuthenticationPrincipal Long doctorId
-    ) throws IOException {
-        handleUploadProfilePicture(image, doctorId);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
+        String imagePath = null;
+        if (image != null) {
+            imagePath = objectStorageService.uploadObject(image);
+        }
+        doctor.setProfilePicture(imagePath);
 
-    private void handleUploadProfilePicture(MultipartFile image, Long doctorId) throws IOException {
-        Doctor doctorFromDb = doctorRepository.findById(doctorId).orElseThrow(
-                () -> new ApiNotFoundException("Id not found", "id")
-        );
-        String imagePath = objectStorageService.uploadObject(image);
-        doctorFromDb.setProfilePicture(imagePath);
-    }
-
-    private String trimOrNull(String s) {
-        if (s == null) return null;
-        String t = s.trim();
-        return t.isEmpty() ? null : t;
+        return mapper.toResponse(doctor);
     }
 }
