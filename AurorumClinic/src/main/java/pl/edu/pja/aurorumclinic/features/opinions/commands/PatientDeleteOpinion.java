@@ -10,47 +10,40 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
-import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
-import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
+import java.util.Objects;
+
 @RestController
-@RequestMapping("/api/patients/me/appointments")
+@RequestMapping("/api/patients/me/opinions")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('PATIENT')")
 public class PatientDeleteOpinion {
 
-    private final AppointmentRepository appointmentRepository;
     private final OpinionRepository opinionRepository;
 
-    @DeleteMapping("/{appointmentId}/opinion")
+    @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<ApiResponse<Boolean>> delete(
             @AuthenticationPrincipal Long userID,
-            @PathVariable Long appointmentId
+            @PathVariable("id") Long opinionId
     ) {
-        return ResponseEntity.ok(ApiResponse.success(handle(userID, appointmentId)));
+        return ResponseEntity.ok(ApiResponse.success(handle(userID, opinionId)));
     }
 
-    private Boolean handle(Long userID, Long appointmentId) {
+    private Boolean handle(Long userID, Long opinionId) {
 
-        Appointment appt = appointmentRepository.getAppointmentByIdAndPatientId(appointmentId, userID);
-        if (appt == null) {
-            throw new ApiNotFoundException(
-                    "You can delete only your own opinion",
-                    "appointmentId"
-            );
+        Opinion opinionFromDb = opinionRepository.findById(opinionId).orElseThrow(
+                () -> new ApiNotFoundException("Opinion not found", "opinionId")
+        );
+        if (!Objects.equals(opinionFromDb.getAppointment().getPatient().getId(), userID)) {
+            throw new ApiAuthorizationException("Opinions appointment is not assigned to this user");
         }
-
-        if (appt.getOpinion() == null) {
-            throw new ApiNotFoundException("Opinion not found", "opinionId");
-        }
-
-        opinionRepository.delete(appt.getOpinion());
-
-        appt.setOpinion(null);
-
+        opinionFromDb.getAppointment().setOpinion(null);
+        opinionRepository.delete(opinionFromDb);
         return true;
     }
 }

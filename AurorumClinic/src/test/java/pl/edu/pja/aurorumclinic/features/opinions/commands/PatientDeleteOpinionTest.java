@@ -10,7 +10,11 @@ import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
+import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiAuthorizationException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -19,9 +23,6 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(classes = {PatientDeleteOpinion.class})
 @ActiveProfiles("test")
 class PatientDeleteOpinionTest {
-
-    @MockitoBean
-    AppointmentRepository appointmentRepository;
 
     @MockitoBean
     OpinionRepository opinionRepository;
@@ -33,20 +34,29 @@ class PatientDeleteOpinionTest {
     void shouldDeleteOpinionWhenExistsAndBelongsToPatient() {
         Long userId = 1L;
         Long appointmentId = 10L;
+        Long opinionId = 20L;
 
-        Appointment appt = new Appointment();
-        appt.setId(appointmentId);
-        Opinion op = new Opinion();
-        op.setId(5L);
-        appt.setOpinion(op);
+        Patient patient = Patient.builder()
+                .id(userId)
+                .build();
 
-        when(appointmentRepository.getAppointmentByIdAndPatientId(appointmentId, userId))
-                .thenReturn(appt);
+        Appointment appointment = Appointment.builder()
+                .id(appointmentId)
+                .patient(patient)
+                .build();
 
-        var resp = controller.delete(userId, appointmentId);
+        Opinion opinion = Opinion.builder()
+                .id(opinionId)
+                .appointment(appointment)
+                .build();
 
-        verify(opinionRepository).delete(op);
-        assertThat(appt.getOpinion()).isNull();
+        when(opinionRepository.findById(opinionId))
+                .thenReturn(Optional.of(opinion));
+
+        var resp = controller.delete(userId, opinionId);
+
+        verify(opinionRepository).delete(opinion);
+        assertThat(appointment.getOpinion()).isNull();
 
         assertThat(resp.getBody()).isNotNull();
         ApiResponse<Boolean> body = resp.getBody();
@@ -54,30 +64,49 @@ class PatientDeleteOpinionTest {
     }
 
     @Test
-    void shouldThrowNotFoundWhenAppointmentNotBelongsToPatient() {
+    void shouldThrowAuthorizationExceptionWhenAppointmentNotBelongsToPatient() {
         Long userId = 1L;
         Long appointmentId = 10L;
+        Long opinionId = 20L;
 
-        when(appointmentRepository.getAppointmentByIdAndPatientId(anyLong(), anyLong()))
-                .thenReturn(null);
+        Patient patient = Patient.builder()
+                .id(userId)
+                .build();
 
-        assertThatThrownBy(() -> controller.delete(userId, appointmentId))
-                .isExactlyInstanceOf(ApiNotFoundException.class);
+        Appointment appointment = Appointment.builder()
+                .id(appointmentId)
+                .patient(patient)
+                .build();
+
+        Opinion opinion = Opinion.builder()
+                .id(opinionId)
+                .appointment(Appointment.builder()
+                        .patient(Patient.builder()
+                                .id(100L)
+                                .build())
+                        .build())
+                .build();
+
+        appointment.setOpinion(Opinion.builder()
+                .id(15L)
+                .build());
+
+        when(opinionRepository.findById(opinionId))
+                .thenReturn(Optional.of(opinion));
+
+        assertThatThrownBy(() -> controller.delete(userId, opinionId))
+                .isExactlyInstanceOf(ApiAuthorizationException.class);
     }
 
     @Test
     void shouldThrowNotFoundWhenOpinionDoesNotExist() {
         Long userId = 1L;
-        Long appointmentId = 10L;
+        Long opinionId = 10L;
 
-        Appointment appt = new Appointment();
-        appt.setId(appointmentId);
-        appt.setOpinion(null);
+        when(opinionRepository.findById(opinionId))
+                .thenReturn(Optional.empty());
 
-        when(appointmentRepository.getAppointmentByIdAndPatientId(appointmentId, userId))
-                .thenReturn(appt);
-
-        assertThatThrownBy(() -> controller.delete(userId, appointmentId))
+        assertThatThrownBy(() -> controller.delete(userId, opinionId))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
     }
 }
