@@ -11,6 +11,7 @@ import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.moderation.ContentModerationService;
@@ -49,6 +50,7 @@ class PatientCreateOpinionTest {
         Appointment appt = new Appointment();
         appt.setId(appointmentId);
         appt.setFinishedAt(LocalDateTime.now().minusMinutes(5));
+        appt.setStatus(AppointmentStatus.FINISHED);
         Doctor d = new Doctor();
         d.setId(100L);
         appt.setDoctor(d);

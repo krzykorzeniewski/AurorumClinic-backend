@@ -62,6 +62,7 @@ public class PatientGetAllAppointments {
                         .amount(appointmentFromDb.getPayment().getAmount())
                         .status(appointmentFromDb.getPayment().getStatus())
                         .build())
+                .hasOpinion(appointmentFromDb.getOpinion() != null)
                 .build());
         return response;
     }

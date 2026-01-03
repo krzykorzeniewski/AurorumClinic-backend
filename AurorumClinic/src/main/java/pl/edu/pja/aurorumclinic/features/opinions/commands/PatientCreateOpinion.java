@@ -17,6 +17,7 @@ import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.moderation.ContentModerationService;
@@ -60,7 +61,7 @@ public class PatientCreateOpinion {
             throw new ApiNotFoundException("You can only rate your own appointment", "appointmentId");
         }
 
-        if (appt.getFinishedAt() == null) {
+        if (appt.getStatus() != AppointmentStatus.FINISHED) {
             throw new ApiConflictException("You can rate only finished appointments", "appointmentId");
         }
 
