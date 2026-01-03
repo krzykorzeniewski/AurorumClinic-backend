@@ -23,16 +23,16 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/doctors/me/opinions")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('DOCTOR')")
-public class DoctorAnswerOpinion {
+public class DoctorUpdateAnswerOpinion {
 
     private final OpinionRepository opinionRepository;
     private final ContentModerationService contentModerationService;
 
     public record Request(@NotBlank @Size(max = 2000) String answer) {}
 
-    @PostMapping("/{opinionId}/answer")
+    @PatchMapping("/{opinionId}/answer")
     @Transactional
-    public ResponseEntity<ApiResponse<String>> answer(
+    public ResponseEntity<ApiResponse<String>> updateAnswer(
             @AuthenticationPrincipal Long doctorId,
             @PathVariable Long opinionId,
             @RequestBody @Valid Request req
@@ -45,18 +45,18 @@ public class DoctorAnswerOpinion {
                 .orElseThrow(() -> new ApiNotFoundException("Opinion not found", "opinionId"));
 
         if (!op.getAppointment().getDoctor().getId().equals(doctorId)) {
-            throw new ApiAuthorizationException("You cannot answer an opinion for another doctor");
+            throw new ApiAuthorizationException("You cannot edit an answer for another doctor");
         }
 
-        if (op.getAnswer() != null && !op.getAnswer().isBlank()) {
-            throw new ApiConflictException("Answer already exists. Use update endpoint.", "answer");
+        if (op.getAnswer() == null || op.getAnswer().isBlank()) {
+            throw new ApiConflictException("No existing answer to edit", "answer");
         }
 
         contentModerationService.assertAllowed(req.answer(), "answer");
 
         op.setAnswer(req.answer());
         op.setAnsweredAt(LocalDateTime.now());
-        return "Answer added successfully";
+
+        return "Answer updated successfully";
     }
 }
-
