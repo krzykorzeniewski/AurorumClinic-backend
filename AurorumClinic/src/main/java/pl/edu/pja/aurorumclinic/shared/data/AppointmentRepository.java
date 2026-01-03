@@ -4,10 +4,12 @@ import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -167,4 +169,14 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Page<Appointment> findAllByDoctorId(Pageable pageable, Long doctorId);
 
     List<Appointment> findByPatient_IdAndFinishedAtAfter(Long patientId, LocalDateTime finishedAtAfter);
+
+    @NativeQuery("""
+        select a.* from appointment a where a.fk_doctor = :doctorId and cast(a.started_at as date) = :date
+    """)
+    Page<Appointment> findAllByDoctorIdAndStartedAtEquals(Pageable pageable, Long doctorId, LocalDate date);
+
+    @NativeQuery("""
+        select a.* from appointment a where cast(a.started_at as date) = :date
+    """)
+    Page<Appointment> findAllByDate(Pageable pageable, LocalDate date);
 }

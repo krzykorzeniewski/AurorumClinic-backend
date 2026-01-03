@@ -24,6 +24,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -55,7 +56,7 @@ public class EmployeeGetAllAppointmentsTest {
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> employeeGetAllAppointments.getAllAppointments(pageable, empId))
+        assertThatThrownBy(() -> employeeGetAllAppointments.getAllAppointments(pageable, null, empId))
                 .isExactlyInstanceOf(ApiNotFoundException.class);
         verify(userRepository).findById(empId);
     }
@@ -141,7 +142,7 @@ public class EmployeeGetAllAppointmentsTest {
         when(objectStorageService.generateUrl(anyString())).thenReturn(imageUrl);
 
         ResponseEntity<ApiResponse<Page<GetAppointmentResponse>>> resultResponse =
-                employeeGetAllAppointments.getAllAppointments(pageable, empId);
+                employeeGetAllAppointments.getAllAppointments(pageable, null, empId);
 
         assertThat(resultResponse.getBody()).isNotNull();
 
@@ -241,7 +242,7 @@ public class EmployeeGetAllAppointmentsTest {
         when(objectStorageService.generateUrl(anyString())).thenReturn(imageUrl);
 
         ResponseEntity<ApiResponse<Page<GetAppointmentResponse>>> resultResponse =
-                employeeGetAllAppointments.getAllAppointments(pageable, empId);
+                employeeGetAllAppointments.getAllAppointments(pageable, null, empId);
 
         assertThat(resultResponse.getBody()).isNotNull();
 

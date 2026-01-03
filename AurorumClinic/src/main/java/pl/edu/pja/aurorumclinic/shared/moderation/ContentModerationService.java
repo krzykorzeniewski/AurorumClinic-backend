@@ -30,53 +30,54 @@ public class ContentModerationService {
     }
 
     private void checkModerationResults(CategoryScores categoryScores) {
-        if (categoryScores.getSexual() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "sexual");
+        System.out.println(categoryScores);
+        if (categoryScores.getSexual() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getHate() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "hate");
+        if (categoryScores.getHate() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getHarassment() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "harassment");
+        if (categoryScores.getHarassment() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getSelfHarm() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "self-harm");
+        if (categoryScores.getSelfHarm() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getSexualMinors() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "sexual/minors");
+        if (categoryScores.getSexualMinors() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getHateThreatening() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "hate/threatening");
+        if (categoryScores.getHateThreatening() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getViolenceGraphic() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "violence/graphic");
+        if (categoryScores.getViolenceGraphic() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getSelfHarmIntent() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "self-harm/intent");
+        if (categoryScores.getSelfHarmIntent() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getSelfHarmInstructions() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "self-harm/instructions");
+        if (categoryScores.getSelfHarmInstructions() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getHarassmentThreatening() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "harassment/threatening");
+        if (categoryScores.getHarassmentThreatening() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getViolence() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "violence");
+        if (categoryScores.getViolence() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getDangerousAndCriminalContent() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "dangerous-and-criminal-content");
+        if (categoryScores.getDangerousAndCriminalContent() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getHealth() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "health");
+        if (categoryScores.getHealth() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getFinancial() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "financial");
+        if (categoryScores.getFinancial() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getLaw() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "law");
+        if (categoryScores.getLaw() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
-        if (categoryScores.getPii() > 0.2) {
-            throw new ApiException("Content rejected by moderation", "pii");
+        if (categoryScores.getPii() > 0.09) {
+            throw new ApiException("Content rejected by moderation", "opinionContent");
         }
     }
 }
