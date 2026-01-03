@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiConflictException;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
 import java.util.List;
 
@@ -38,8 +39,12 @@ class ContentModerationServiceTest {
     }
 
     @Test
-    void shouldPassWhenContentNotFlagged() {
+    void shouldPassWhenContentValidAndNotFlagged() {
+
+        CategoryScores categoryScores = mock(CategoryScores.class);
+
         ModerationResult result = mock(ModerationResult.class);
+        when(result.getCategoryScores()).thenReturn(categoryScores);
         when(result.isFlagged()).thenReturn(false);
 
         Moderation moderation = mock(Moderation.class);
@@ -60,10 +65,14 @@ class ContentModerationServiceTest {
     }
 
     @Test
-    void shouldThrowConflictWhenContentFlagged() {
+    void shouldThrowApiExceptionWhenContentFlagged() {
+
+        CategoryScores categoryScores = mock(CategoryScores.class);
+        when(categoryScores.getSexual()).thenReturn(0.8);
 
         ModerationResult result = mock(ModerationResult.class);
         when(result.isFlagged()).thenReturn(true);
+        when(result.getCategoryScores()).thenReturn(categoryScores);
 
         Moderation moderation = mock(Moderation.class);
         when(moderation.getResults()).thenReturn(List.of(result));
@@ -77,7 +86,7 @@ class ContentModerationServiceTest {
         when(moderationModel.call(any(ModerationPrompt.class))).thenReturn(response);
 
         assertThatThrownBy(() -> service.assertAllowed("toxic tekst", "comment"))
-                .isExactlyInstanceOf(ApiConflictException.class)
+                .isExactlyInstanceOf(ApiException.class)
                 .hasMessageContaining("Content rejected by moderation");
 
         verify(moderationModel).call(any(ModerationPrompt.class));
