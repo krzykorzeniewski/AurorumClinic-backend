@@ -31,7 +31,9 @@ public record GetAppointmentResponse(Long id,
     @Builder
     public record PatientDto(Long id,
                       String name,
-                      String surname) {
+                      String surname,
+                      String email,
+                      String phoneNumber) {
     }
     @Builder
     public record DoctorDto(Long id,

@@ -23,7 +23,6 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 import java.time.LocalDate;
-import java.time.temporal.TemporalField;
 import java.util.Objects;
 
 @RestController
@@ -94,6 +93,8 @@ public class EmployeeGetAllAppointments {
                         .id(appointment.getPatient().getId())
                         .name(appointment.getPatient().getName())
                         .surname(appointment.getPatient().getSurname())
+                        .email(appointment.getPatient().getEmail())
+                        .phoneNumber(appointment.getPatient().getPhoneNumber())
                         .build())
                 .build());
     }

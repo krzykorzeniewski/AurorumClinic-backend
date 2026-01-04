@@ -81,6 +81,8 @@ public class GetAppointmentById {
                         .id(appointmentFromDb.getPatient().getId())
                         .name(appointmentFromDb.getPatient().getName())
                         .surname(appointmentFromDb.getPatient().getSurname())
+                        .email(appointmentFromDb.getPatient().getEmail())
+                        .phoneNumber(appointmentFromDb.getPatient().getPhoneNumber())
                         .build())
                 .build();
         return response;
