@@ -15,4 +15,14 @@ public interface OpinionRepository extends JpaRepository<Opinion, Long> {
     long countByAppointment_Doctor_Id(Long doctorId);
 
     Page<Opinion> findByAppointment_Doctor_Id(Long doctorId, Pageable pageable);
+
+    @Query("""
+           select case
+                when exists (select 1 from Opinion o
+                                where o.appointment.doctor.id = :doctorId and o.appointment.patient.id = :patientId)
+                then true
+                else false
+           end
+           """)
+    boolean existsByAppointmentDoctorIdAndPatientId(Long patientId, Long doctorId);
 }

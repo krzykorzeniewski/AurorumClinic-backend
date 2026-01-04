@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 @RestController
@@ -24,6 +26,7 @@ public class PatientGetAllAppointments {
 
     private final AppointmentRepository appointmentRepository;
     private final ObjectStorageService objectStorageService;
+    private final OpinionRepository opinionRepository;
 
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<PatientGetAppointmentResponse>>> getMyAppointments(
@@ -62,9 +65,14 @@ public class PatientGetAllAppointments {
                         .amount(appointmentFromDb.getPayment().getAmount())
                         .status(appointmentFromDb.getPayment().getStatus())
                         .build())
-                .hasOpinion(appointmentFromDb.getOpinion() != null)
+                .hasOpinion(checkIfCanRate(appointmentFromDb))
                 .build());
         return response;
     }
 
+    private boolean checkIfCanRate(Appointment appointment) {
+        Long patientId = appointment.getPatient().getId();
+        Long doctorId = appointment.getDoctor().getId();
+        return opinionRepository.existsByAppointmentDoctorIdAndPatientId(patientId, doctorId);
+    }
 }
