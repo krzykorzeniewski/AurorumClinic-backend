@@ -14,7 +14,7 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 @RestController
-@RequestMapping("/api/admin/me/opinions")
+@RequestMapping("/api/opinions")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminDeleteOpinion {
