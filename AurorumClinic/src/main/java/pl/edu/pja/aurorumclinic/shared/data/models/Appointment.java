@@ -51,7 +51,7 @@ public class Appointment {
     @ToString.Exclude
     private Service service;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "FK_Opinion")
     @ToString.Exclude
     private Opinion opinion;

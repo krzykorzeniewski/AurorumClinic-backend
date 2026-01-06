@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
+import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
+import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Opinion;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
@@ -20,6 +22,7 @@ import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 public class AdminDeleteOpinion {
 
     private final OpinionRepository opinionRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @DeleteMapping("/{opinionId}")
     @Transactional
@@ -31,7 +34,9 @@ public class AdminDeleteOpinion {
         Opinion op = opinionRepository.findById(opinionId)
                 .orElseThrow(() -> new ApiNotFoundException("Opinion not found", "opinionId"));
 
-        opinionRepository.delete(op);
+        Appointment ap = appointmentRepository.findById(op.getAppointment().getId())
+                .orElseThrow(() -> new ApiNotFoundException("Appointment not found", "opinionId"));
+        ap.setOpinion(null);
         return "Opinion deleted successfully";
     }
 }
