@@ -32,9 +32,7 @@ class GetAllSpecializationsTest {
     GetAllSpecializations controller;
 
     @Test
-    void shouldReturnPagedSpecializations() {
-        Pageable pageable = PageRequest.of(0, 2, Sort.by("name").ascending());
-
+    void shouldReturnSpecializations() {
         GetSpecializationResponse s1 = new GetSpecializationResponse(
                 1L,
                 "Psychiatria"
@@ -44,23 +42,18 @@ class GetAllSpecializationsTest {
                 "Psychologia"
         );
 
-        Page<GetSpecializationResponse> page =
-                new PageImpl<>(List.of(s1, s2), pageable, 2);
 
-        when(specializationRepository.findAllSpecializationDtos(pageable))
-                .thenReturn(page);
+        when(specializationRepository.findAllSpecializationDtos())
+                .thenReturn(List.of(s1, s2));
 
-        var resp = controller.getAll(pageable);
+        var resp = controller.getAll();
 
         assertThat(resp.getBody()).isNotNull();
-        ApiResponse<Page<GetSpecializationResponse>> body = resp.getBody();
+        ApiResponse<List<GetSpecializationResponse>> body = resp.getBody();
 
         assertThat(body.getStatus()).isEqualTo("success");
-        assertThat(body.getData()).isEqualTo(page);
-        assertThat(body.getData().getContent())
+        assertThat(body.getData())
                 .hasSize(2)
                 .containsExactly(s1, s2);
-
-        verify(specializationRepository).findAllSpecializationDtos(pageable);
     }
 }
