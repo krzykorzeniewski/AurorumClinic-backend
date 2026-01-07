@@ -54,10 +54,29 @@ public class ScheduleValidatorTest {
     Integer startOfDay;
 
     @Test
-    void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleIsShorterThenMinServiceDuration() {
+    void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleIsAtWeekend() {
         Schedule testSchedule = Schedule.builder()
                 .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 8, 10))
+                .finishedAt(LocalDateTime.of(2025, 11, 22, 15, 10))
+                .doctor(Doctor.builder()
+                        .id(1L)
+                        .build())
+                .services(Set.of(Service.builder()
+                        .id(1L)
+                        .build()))
+                .build();
+
+        assertThatThrownBy(() -> scheduleValidator.validateTimeslotAndServices(testSchedule.getStartedAt(),
+                testSchedule.getFinishedAt(), testSchedule.getDoctor(), List.copyOf(testSchedule.getServices())))
+                .isExactlyInstanceOf(ApiException.class)
+                .message().containsIgnoringCase("weekend");
+    }
+
+    @Test
+    void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleIsShorterThenMinServiceDuration() {
+        Schedule testSchedule = Schedule.builder()
+                .startedAt(LocalDateTime.of(2025, 11, 20, 8, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 20, 8, 10))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -172,8 +191,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleExistsWithinTimeslot() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2025, 11, 20, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 20, 18, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -197,8 +216,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenAbsenceExistsWithinTimeslot() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2025, 11, 20, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 20, 18, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -239,8 +258,8 @@ public class ScheduleValidatorTest {
                 ))
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2025, 11, 20, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 20, 18, 0))
                 .doctor(testDoctor)
                 .services(Set.of(testService2))
                 .build();
@@ -277,8 +296,8 @@ public class ScheduleValidatorTest {
                 ))
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2025, 11, 20, 9, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 20, 18, 0))
                 .doctor(testDoctor)
                 .services(Set.of(testService2))
                 .build();
@@ -298,8 +317,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateNewTimeSlotAndServicesShouldThrowApiExceptionWhenNewScheduleIsLongerThanOneDay() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2025, 11, 20, 8, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 20, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -666,5 +685,27 @@ public class ScheduleValidatorTest {
                 .checkIfScheduleHasAppointmentsInOldTimeslot(testSchedule, newStartedAt, newFinishedAt));
         verify(appointmentRepository, never()).getAppointmentIdsInPreviousScheduleTimeslot(testSchedule.getDoctor().getId(),
                 testSchedule.getStartedAt(), testSchedule.getFinishedAt(), newStartedAt, newFinishedAt);
+    }
+
+    @Test
+    void validateNewTimeslotAndServicesShouldThrowApiExceptionWhenScheduleIsAtWeekend() {
+        Schedule testSchedule = Schedule.builder()
+                .startedAt(LocalDateTime.of(2025, 11, 14, 8, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 14, 18, 0))
+                .doctor(Doctor.builder()
+                        .id(1L)
+                        .build())
+                .services(Set.of(Service.builder()
+                        .id(1L)
+                        .build()))
+                .build();
+
+        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 22, 8, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 22, 20, 0);
+
+        assertThatThrownBy(() -> scheduleValidator.validateNewTimeslotAndServices(newStartedAt,
+                newFinishedAt, testSchedule.getDoctor(), List.copyOf(testSchedule.getServices()), testSchedule))
+                .isExactlyInstanceOf(ApiException.class)
+                .message().containsIgnoringCase("weekend");
     }
 }

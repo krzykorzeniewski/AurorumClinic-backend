@@ -13,9 +13,11 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Component
@@ -115,6 +117,10 @@ public class ScheduleValidator {
         }
         if (finishedAt.getHour() > endOfDay) {
             throw new ApiException("End date cannot be after work hours", "finishedAt");
+        }
+        if (Objects.equals(startedAt.getDayOfWeek(), DayOfWeek.SATURDAY) ||
+                Objects.equals(startedAt.getDayOfWeek(), DayOfWeek.SUNDAY)) {
+            throw new ApiException("Weekends are free of work", "startedAt");
         }
         int minDuration = serviceRepository.getMinServiceDuration();
         if (ChronoUnit.MINUTES.between(startedAt, finishedAt) < minDuration) {
