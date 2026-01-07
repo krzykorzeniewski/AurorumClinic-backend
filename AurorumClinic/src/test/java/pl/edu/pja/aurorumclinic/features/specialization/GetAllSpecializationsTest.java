@@ -18,7 +18,6 @@ import pl.edu.pja.aurorumclinic.shared.data.SpecializationRepository;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {GetAllSpecializations.class})
@@ -42,14 +41,15 @@ class GetAllSpecializationsTest {
                 "Psychologia"
         );
 
+        Pageable pageable = Pageable.unpaged();
 
-        when(specializationRepository.findAllSpecializationDtos())
-                .thenReturn(List.of(s1, s2));
+        when(specializationRepository.findAllSpecializationDtos(pageable))
+                .thenReturn(new PageImpl<>(List.of(s1, s2), pageable, 2));
 
-        var resp = controller.getAll();
+        var resp = controller.getAll(pageable);
 
         assertThat(resp.getBody()).isNotNull();
-        ApiResponse<List<GetSpecializationResponse>> body = resp.getBody();
+        ApiResponse<Page<GetSpecializationResponse>> body = resp.getBody();
 
         assertThat(body.getStatus()).isEqualTo("success");
         assertThat(body.getData())
