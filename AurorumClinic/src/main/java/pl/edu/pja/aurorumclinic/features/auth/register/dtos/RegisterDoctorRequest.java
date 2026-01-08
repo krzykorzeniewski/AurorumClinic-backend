@@ -11,9 +11,9 @@ public record RegisterDoctorRequest(@NotBlank @Size(max = 50) String name,
                                     @NotNull LocalDate birthDate,
                                     @NotBlank @Email @Size(max = 100) String email,
                                     @NotBlank @Size(max = 9) String phoneNumber,
-                                    @NotBlank @Size(max = 100) String description,
-                                    @NotBlank @Size(max = 100) String education,
-                                    @NotBlank @Size(max = 100) String experience,
-                                    @NotBlank @Size(max = 50) String pwzNumber,
+                                    @NotBlank @Size(max = 5000) String description,
+                                    @NotBlank @Size(max = 1000) String education,
+                                    @NotBlank @Size(max = 1000) String experience,
+                                    @Size(max = 50) String pwzNumber,
                                     @NotEmpty Set<Long> specializationIds) {
 }

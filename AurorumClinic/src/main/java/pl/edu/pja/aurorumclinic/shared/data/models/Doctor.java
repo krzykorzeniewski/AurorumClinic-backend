@@ -23,7 +23,7 @@ import java.util.Set;
         ))
 public class Doctor extends User {
     @Column(name = "Description", columnDefinition = "nvarchar(500)")
-    @Size(max = 500, message = "Maximum length for this field is 500 characters")
+    @Size(max = 5000, message = "Maximum length for this field is 500 characters")
     @NotBlank(message = "This field is required")
     private String description;
 
@@ -31,12 +31,12 @@ public class Doctor extends User {
     private String profilePicture;
 
     @Column(name = "Education", columnDefinition = "nvarchar(100)")
-    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    @Size(max = 1000, message = "Maximum length for this field is 100 characters")
     @NotBlank(message = "This field is required")
     private String education;
 
     @Column(name = "Experience", columnDefinition = "nvarchar(100)")
-    @Size(max = 100, message = "Maximum length for this field is 100 characters")
+    @Size(max = 1000, message = "Maximum length for this field is 100 characters")
     @NotBlank(message = "This field is required")
     private String experience;
 

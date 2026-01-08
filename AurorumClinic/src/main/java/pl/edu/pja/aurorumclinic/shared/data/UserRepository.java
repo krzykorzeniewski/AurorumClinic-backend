@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import pl.edu.pja.aurorumclinic.features.users.users.queries.UserGetUserById;
+import pl.edu.pja.aurorumclinic.features.users.users.queries.shared.GetMeByIdResponse;
 import pl.edu.pja.aurorumclinic.features.users.users.queries.shared.GetUserResponse;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.UserRole;
@@ -48,4 +50,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             lower(u.phoneNumber) like lower(concat('%', :query, '%')))
             """)
     Page<GetUserResponse> searchAllUserResponseDtos(Pageable pageable, String query, UserRole role);
+
+    @Query("""
+           select new pl.edu.pja.aurorumclinic.features.users.users.queries.shared.GetMeByIdResponse (
+           u.id, u.name, u.surname, u.pesel, u.birthdate, u.email,
+           u.phoneNumber, u.twoFactorAuth, u.emailVerified, u.phoneNumberVerified           
+           ) from User u where u.id = :userId
+           """)
+    GetMeByIdResponse getMeByIdResponseDto(Long userId);
 }

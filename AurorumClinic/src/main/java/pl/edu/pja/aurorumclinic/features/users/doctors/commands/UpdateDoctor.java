@@ -56,6 +56,7 @@ public class UpdateDoctor {
         doctorFromDb.setPhoneNumberVerified(request.phoneNumberVerified);
         doctorFromDb.setEducation(request.education);
         doctorFromDb.setExperience(request.experience);
+        doctorFromDb.setDescription(request.description);
         doctorFromDb.setPwzNumber(request.pwzNumber);
         doctorFromDb.setSpecializations(new HashSet<>(specializationsFromDb));
 
@@ -72,6 +73,7 @@ public class UpdateDoctor {
                 .education(doctorFromDb.getEducation())
                 .experience(doctorFromDb.getExperience())
                 .pwzNumber(doctorFromDb.getPwzNumber())
+                .description(doctorFromDb.getDescription())
                 .specializations(doctorFromDb.getSpecializations().stream().map(specialization ->
                         UpdateDoctorResponse.SpecializationDto.builder()
                         .id(specialization.getId())
@@ -89,9 +91,10 @@ public class UpdateDoctor {
                                @NotBlank @Email @Size(max = 100) String email,
                                boolean twoFactorAuth,
                                boolean phoneNumberVerified,
-                               @NotBlank @Size(max = 100) String education,
-                               @NotBlank @Size(max = 100) String experience,
-                               @NotBlank @Size(max = 100) String pwzNumber,
+                               @NotBlank @Size (max = 5000) String description,
+                               @NotBlank @Size(max = 1000) String education,
+                               @NotBlank @Size(max = 1000) String experience,
+                               @NotBlank @Size(max = 50) String pwzNumber,
                                @NotEmpty Set<Long> specializationIds) {
 
     }
@@ -108,6 +111,7 @@ public class UpdateDoctor {
             boolean phoneNumberVerified,
             String education,
             String experience,
+            String description,
             String pwzNumber,
             Set<SpecializationDto> specializations) {
 
