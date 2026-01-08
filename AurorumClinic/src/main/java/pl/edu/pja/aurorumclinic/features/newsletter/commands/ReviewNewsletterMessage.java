@@ -17,6 +17,7 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.NewsletterMessage;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
+import pl.edu.pja.aurorumclinic.shared.exceptions.ApiException;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDateTime;
@@ -47,6 +48,9 @@ public class ReviewNewsletterMessage {
         NewsletterMessage newsletterMessFromDb = newsletterMessageRepository.findById(newsletterMessId).orElseThrow(
                 () -> new ApiNotFoundException("Id not found", "newsletterMessageId")
         );
+        if (newsletterMessFromDb.getReviewedAt() != null) {
+            throw new ApiException("Newsletter message has already been reviewed", "id");
+        }
         newsletterMessFromDb.setText(request.text);
         newsletterMessFromDb.setApproved(request.approved);
         newsletterMessFromDb.setSubject(request.subject);
