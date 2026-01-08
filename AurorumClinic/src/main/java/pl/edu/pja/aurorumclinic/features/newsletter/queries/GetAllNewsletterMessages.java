@@ -30,7 +30,7 @@ public class GetAllNewsletterMessages {
     }
 
     private Page<GetNewsletterMessageResponse> handle(Pageable pageable) {
-        Page<NewsletterMessage> newsletterMessFromDb = newsletterMessageRepository.findAll(pageable);
+        Page<NewsletterMessage> newsletterMessFromDb = newsletterMessageRepository.findAllNotReviewed(pageable);
 
         return newsletterMessFromDb.map(
                 newsletterMessage -> GetNewsletterMessageResponse.builder()
