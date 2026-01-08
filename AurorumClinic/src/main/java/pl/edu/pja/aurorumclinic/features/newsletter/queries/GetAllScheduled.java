@@ -36,6 +36,7 @@ public class GetAllScheduled {
 
         return newsletterMessFromDb.map(
                 newsletterMessage -> GetNewsletterMessageResponse.builder()
+                        .id(newsletterMessage.getId())
                         .createdAt(newsletterMessage.getCreatedAt())
                         .subject(newsletterMessage.getSubject())
                         .text(newsletterMessage.getText())

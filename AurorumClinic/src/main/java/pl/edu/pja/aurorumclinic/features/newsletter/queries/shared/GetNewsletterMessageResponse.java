@@ -5,7 +5,9 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record GetNewsletterMessageResponse(LocalDateTime createdAt,
+public record GetNewsletterMessageResponse(
+                                    Long id,
+                                    LocalDateTime createdAt,
                                     String subject,
                                     String text,
                                     Boolean approved,

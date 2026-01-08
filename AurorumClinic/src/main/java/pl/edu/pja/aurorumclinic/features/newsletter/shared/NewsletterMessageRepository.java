@@ -15,7 +15,7 @@ public interface NewsletterMessageRepository extends JpaRepository<NewsletterMes
     Page<NewsletterMessage> findAllByScheduledAtNotNullAndSentAtNull(Pageable pageable);
 
     @Query("""
-           select nm from NewsletterMessage nm where nm.reviewedAt is null
+           select nm from NewsletterMessage nm where (nm.reviewedAt is null) or (nm.sentAt < CURRENT_TIMESTAMP)
            """)
     Page<NewsletterMessage> findAllNotReviewed(Pageable pageable);
 }

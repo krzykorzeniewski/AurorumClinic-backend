@@ -34,6 +34,7 @@ public class GetNewsletterMessageById {
         );
 
         return GetNewsletterMessageResponse.builder()
+                        .id(newsletterMessFromDb.getId())
                         .createdAt(newsletterMessFromDb.getCreatedAt())
                         .subject(newsletterMessFromDb.getSubject())
                         .text(newsletterMessFromDb.getText())
