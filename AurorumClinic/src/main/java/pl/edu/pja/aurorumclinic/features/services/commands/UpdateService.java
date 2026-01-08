@@ -1,6 +1,5 @@
 package pl.edu.pja.aurorumclinic.features.services.commands;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +11,6 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.ServiceRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Service;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
-
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/services")
@@ -37,11 +34,9 @@ public class UpdateService {
         );
         serviceFromDb.setName(request.name());
         serviceFromDb.setDescription(request.description());
-        serviceFromDb.setPrice(request.price());
     }
 
     public record UpdateServiceRequest(@NotBlank @Size(max = 150) String name,
-                                       @NotNull @Digits(integer = 10, fraction = 2) @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal price,
                                        @NotBlank @Size(max = 500) String description) {
     }
 

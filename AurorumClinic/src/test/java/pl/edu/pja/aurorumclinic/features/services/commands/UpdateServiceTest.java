@@ -33,7 +33,6 @@ class UpdateServiceTest {
         UpdateService.UpdateServiceRequest request =
                 new UpdateService.UpdateServiceRequest(
                         "Nowa nazwa",
-                        new BigDecimal("200.00"),
                         "Opis"
                 );
 
@@ -53,7 +52,6 @@ class UpdateServiceTest {
         UpdateService.UpdateServiceRequest request =
                 new UpdateService.UpdateServiceRequest(
                         "Nowa nazwa",
-                        new BigDecimal("200.00"),
                         "Opis"
                 );
 
@@ -75,7 +73,6 @@ class UpdateServiceTest {
         assertThat(body.getData()).isNull();
 
         assertThat(serviceFromDb.getName()).isEqualTo(request.name());
-        assertThat(serviceFromDb.getPrice()).isEqualByComparingTo(request.price());
         assertThat(serviceFromDb.getDescription()).isEqualTo(request.description());
         verify(serviceRepository).findById(serviceId);
     }
