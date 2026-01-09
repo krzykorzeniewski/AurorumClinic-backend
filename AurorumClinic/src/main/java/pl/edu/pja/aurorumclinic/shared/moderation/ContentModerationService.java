@@ -30,7 +30,6 @@ public class ContentModerationService {
     }
 
     private void checkModerationResults(CategoryScores categoryScores) {
-        System.out.println(categoryScores);
         if (categoryScores.getSexual() > 0.09) {
             throw new ApiException("Content rejected by moderation", "opinionContent");
         }

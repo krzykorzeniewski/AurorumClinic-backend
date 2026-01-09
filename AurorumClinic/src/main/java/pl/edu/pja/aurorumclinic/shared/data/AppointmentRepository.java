@@ -179,4 +179,20 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         select a.* from appointment a where cast(a.started_at as date) = :date
     """)
     Page<Appointment> findAllByDate(Pageable pageable, LocalDate date);
+
+    @Query("""
+            select a1.id as id,
+                   a1.startedAt as startedAt
+                   from Appointment a1
+            where a1.status = :status
+            """)
+    List<Tuple> getAllByStatus(AppointmentStatus status);
+
+    @Query("""
+            select a1.id as id,
+                   a1.startedAt as startedAt
+                   from Appointment a1
+            where a1.notificationSent = :b
+            """)
+    List<Tuple> getAllByNotificationSent(boolean b);
 }
