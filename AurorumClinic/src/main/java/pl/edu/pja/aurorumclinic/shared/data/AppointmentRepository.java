@@ -68,6 +68,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             where a.doctor.id = :doctorId
             and a.startedAt >= :startedAt
             and a.finishedAt <= :finishedAt
+            and a.status = pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus.CREATED
             """)
     List<Appointment> findAllBySchedule(Long doctorId, LocalDateTime startedAt, LocalDateTime finishedAt);
 
@@ -117,7 +118,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                 exists (select 1 from Appointment a
                             where a.doctor.id = :doctorId
                             and a.startedAt >= :startedAt
-                            and a.finishedAt <= :finishedAt)
+                            and a.finishedAt <= :finishedAt
+                            and a.status = pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus.CREATED)
                 then true
                 else false
             end
