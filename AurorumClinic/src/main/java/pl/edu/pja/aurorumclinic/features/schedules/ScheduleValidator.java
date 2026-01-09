@@ -66,7 +66,7 @@ public class ScheduleValidator {
         }
         Set<Long> appointmentIdsInTimeslot = appointmentRepository.getAppointmentIdsInPreviousScheduleTimeslot
                 (schedule.getDoctor().getId(), oldStartedAt, oldFinishedAt, newStartedAt, newFinishedAt);
-
+        //dodać sprawdzenie czy są created
         if (!appointmentIdsInTimeslot.isEmpty()) {
             throw new ApiException(appointmentIdsInTimeslot.toString(), "appointments");
         }
