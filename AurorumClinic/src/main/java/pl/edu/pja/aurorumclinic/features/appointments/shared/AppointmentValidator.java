@@ -24,6 +24,9 @@ public class AppointmentValidator {
         if (finishedAt.isBefore(startedAt)) {
             throw new ApiException("End date cannot be before start date", "finishedAt");
         }
+        if (startedAt.isBefore(LocalDateTime.now())) {
+            throw new ApiException("Start date cannot be in the past", "startedAt");
+        }
         validateSpecialization(doctor, service);
         if (!appointmentRepository.isTimeSlotAvailable(startedAt, finishedAt, doctor.getId(), service.getId())) {
             throw new ApiException("Timeslot is not available", "appointment");
@@ -32,6 +35,15 @@ public class AppointmentValidator {
 
     public void validateRescheduledAppointment(LocalDateTime startedAt, LocalDateTime finishedAt, Doctor doctor,
                                                Service service, Appointment appointment) {
+        if (startedAt.isAfter(finishedAt)) {
+            throw new ApiException("Start date cannot be after end date", "startedAt");
+        }
+        if (finishedAt.isBefore(startedAt)) {
+            throw new ApiException("End date cannot be before start date", "finishedAt");
+        }
+        if (startedAt.isBefore(LocalDateTime.now())) {
+            throw new ApiException("Start date cannot be in the past", "startedAt");
+        }
         validateSpecialization(doctor, service);
         if (!appointmentRepository.isTimeSlotAvailableExcludingId(startedAt, finishedAt, doctor.getId(), service.getId(),
                 appointment.getId())) {

@@ -43,6 +43,17 @@ public class AbsenceValidatorTest {
     }
 
     @Test
+    void validateTimeslotShouldThrowApiExceptionWhenStartDateIsInThePast() {
+        LocalDateTime startedAt = LocalDateTime.now().minusHours(1);
+        LocalDateTime finishedAt = LocalDateTime.now();
+        Doctor testDoctor = Doctor.builder().build();
+
+        assertThatThrownBy(() -> absenceValidator.validateTimeslot(startedAt, finishedAt, testDoctor))
+                .isExactlyInstanceOf(ApiException.class)
+                .message().containsIgnoringCase("past");
+    }
+
+    @Test
     void validateTimeslotShouldThrowApiExceptionWhenScheduleExistsBetweenStartedAtAndFinishedAt() {
         LocalDateTime startedAt = LocalDateTime.now();
         LocalDateTime finishedAt = startedAt.plusDays(10);
@@ -61,7 +72,7 @@ public class AbsenceValidatorTest {
 
     @Test
     void validateTimeslotShouldThrowApiExceptionWhenAbsenceExistsBetweenStartedAtAndFinishedAt() {
-        LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(10);
         LocalDateTime finishedAt = startedAt.plusDays(10);
         Long doctorId = 1L;
         Doctor testDoctor = Doctor.builder()
@@ -108,6 +119,18 @@ public class AbsenceValidatorTest {
     }
 
     @Test
+    void validateNewTimeslotShouldThrowApiExceptionWhenStartDateIsInThePast() {
+        LocalDateTime startedAt = LocalDateTime.now().minusHours(1);
+        LocalDateTime finishedAt = LocalDateTime.now();
+        Doctor testDoctor = Doctor.builder().build();
+        Absence testAbsence = Absence.builder().build();
+
+        assertThatThrownBy(() -> absenceValidator.validateNewTimeslot(startedAt, finishedAt, testDoctor, testAbsence))
+                .isExactlyInstanceOf(ApiException.class)
+                .message().containsIgnoringCase("past");
+    }
+
+    @Test
     void validateNewTimeslotShouldThrowApiExceptionWhenScheduleExistsBetweenStartedAtAndFinishedAt() {
         LocalDateTime startedAt = LocalDateTime.now();
         LocalDateTime finishedAt = startedAt.plusDays(10);
@@ -130,7 +153,7 @@ public class AbsenceValidatorTest {
 
     @Test
     void validateNewTimeslotShouldThrowApiExceptionWhenOtherAbsenceExistsBetweenStartedAtAndFinishedAt() {
-        LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(10);
         LocalDateTime finishedAt = startedAt.plusDays(10);
         Long doctorId = 1L;
         Doctor testDoctor = Doctor.builder()

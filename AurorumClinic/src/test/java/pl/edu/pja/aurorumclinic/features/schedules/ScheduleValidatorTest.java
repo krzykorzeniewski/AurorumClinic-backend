@@ -56,8 +56,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleIsAtWeekend() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 15, 10))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 15, 10))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -75,8 +75,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleIsShorterThenMinServiceDuration() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 20, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 20, 8, 10))
+                .startedAt(LocalDateTime.of(2031, 11, 20, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 20, 8, 10))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -96,8 +96,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleIsLongerThanOneDay() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 23, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 23, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -115,8 +115,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleStartedAtIsBeforeStartOfWorkDay() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, startOfDay - 1, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, startOfDay - 1, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -134,8 +134,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleFinishedAtIsAfterEndOfWorkDay() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 10, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, endOfDay + 1, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 10, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, endOfDay + 1, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -153,8 +153,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleStartedAtIsAfterFinishedAt() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 10, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 10, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -170,10 +170,29 @@ public class ScheduleValidatorTest {
     }
 
     @Test
+    void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleStartedAtIsInThePast() {
+        Schedule testSchedule = Schedule.builder()
+                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2025, 11, 22, 19, 0))
+                .doctor(Doctor.builder()
+                        .id(1L)
+                        .build())
+                .services(Set.of(Service.builder()
+                        .id(1L)
+                        .build()))
+                .build();
+
+        assertThatThrownBy(() -> scheduleValidator.validateTimeslotAndServices(testSchedule.getStartedAt(),
+                testSchedule.getFinishedAt(), testSchedule.getDoctor(), List.copyOf(testSchedule.getServices())))
+                .isExactlyInstanceOf(ApiException.class)
+                .message().containsIgnoringCase("past");
+    }
+
+    @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleFinishedAtIsBeforeStartedAt() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 10, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 10, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -191,8 +210,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenScheduleExistsWithinTimeslot() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 20, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 20, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 20, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 20, 18, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -216,8 +235,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateTimeslotAndServicesShouldThrowApiExceptionWhenAbsenceExistsWithinTimeslot() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 20, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 20, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 20, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 20, 18, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -258,8 +277,8 @@ public class ScheduleValidatorTest {
                 ))
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 20, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 20, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 20, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 20, 18, 0))
                 .doctor(testDoctor)
                 .services(Set.of(testService2))
                 .build();
@@ -296,8 +315,8 @@ public class ScheduleValidatorTest {
                 ))
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 20, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 20, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 20, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 20, 18, 0))
                 .doctor(testDoctor)
                 .services(Set.of(testService2))
                 .build();
@@ -317,8 +336,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateNewTimeSlotAndServicesShouldThrowApiExceptionWhenNewScheduleIsLongerThanOneDay() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 20, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 20, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 20, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 20, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -326,8 +345,8 @@ public class ScheduleValidatorTest {
                         .id(1L)
                         .build()))
                 .build();
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 22, 8, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 23, 21, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 22, 8, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 23, 21, 0);
 
         assertThatThrownBy(() -> scheduleValidator.validateNewTimeslotAndServices(newStartedAt,
                 newFinishedAt, testSchedule.getDoctor(), List.of(new Service()), testSchedule))
@@ -338,8 +357,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateNewTimeSlotAndServicesShouldThrowApiExceptionWhenNewScheduleStartedAtIsBeforeStartOfWorkDay() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -347,8 +366,8 @@ public class ScheduleValidatorTest {
                         .id(1L)
                         .build()))
                 .build();
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, startOfDay - 1, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, 16, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, startOfDay - 1, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, 16, 0);
 
         assertThatThrownBy(() -> scheduleValidator.validateNewTimeslotAndServices(newStartedAt,
                 newFinishedAt, testSchedule.getDoctor(), List.of(new Service()), testSchedule))
@@ -359,8 +378,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateNewTimeSlotAndServicesShouldThrowApiExceptionWhenNewScheduleFinishedAtIsAfterEndOfWorkDay() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -368,8 +387,8 @@ public class ScheduleValidatorTest {
                         .id(1L)
                         .build()))
                 .build();
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, 8, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, endOfDay + 1, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, 8, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, endOfDay + 1, 0);
 
         assertThatThrownBy(() -> scheduleValidator.validateNewTimeslotAndServices(newStartedAt,
                 newFinishedAt, testSchedule.getDoctor(), List.of(new Service()), testSchedule))
@@ -380,8 +399,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateNewTimeslotAndServicesShouldThrowApiExceptionWhenNewScheduleStartedAtIsAfterNewFinishedAt() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -389,8 +408,8 @@ public class ScheduleValidatorTest {
                         .id(1L)
                         .build()))
                 .build();
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, 10, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, 9, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, 10, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, 9, 0);
 
         assertThatThrownBy(() -> scheduleValidator.validateNewTimeslotAndServices(newStartedAt,
                 newFinishedAt, testSchedule.getDoctor(), List.of(new Service()), testSchedule))
@@ -401,8 +420,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateNewTimeslotAndServicesShouldThrowApiExceptionWhenNewScheduleIsShorterThanMinimunServiceDuration() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -410,8 +429,8 @@ public class ScheduleValidatorTest {
                         .id(1L)
                         .build()))
                 .build();
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, 10, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, 10, 10);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, 10, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, 10, 10);
 
         when(serviceRepository.getMinServiceDuration()).thenReturn(15);
 
@@ -424,8 +443,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateNewTimeslotAndServicesShouldThrowApiExceptionWhenNewScheduleFinishedAtIsBeforeNewStartedAt() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -433,8 +452,8 @@ public class ScheduleValidatorTest {
                         .id(1L)
                         .build()))
                 .build();
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, 10, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, 9, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, 10, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, 9, 0);
 
         assertThatThrownBy(() -> scheduleValidator.validateNewTimeslotAndServices(newStartedAt,
                 newFinishedAt, testSchedule.getDoctor(), List.of(new Service()), testSchedule))
@@ -449,15 +468,15 @@ public class ScheduleValidatorTest {
                 .build();
         Schedule testSchedule = Schedule.builder()
                 .id(100L)
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
                 .services(Set.of(testService))
                 .build();
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, 9, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, 18, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, 9, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, 18, 0);
 
         when(serviceRepository.getMinServiceDuration()).thenReturn(15);
         when(scheduleRepository.scheduleExistsInIntervalForDoctorExcludingId(any(), any(), anyLong(), anyLong())).thenReturn(true);
@@ -477,15 +496,15 @@ public class ScheduleValidatorTest {
                 .build();
         Schedule testSchedule = Schedule.builder()
                 .id(100L)
-                .startedAt(LocalDateTime.of(2025, 11, 22, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 21, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 21, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
                 .services(Set.of(testService))
                 .build();
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, 9, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, 18, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, 9, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, 18, 0);
 
         when(serviceRepository.getMinServiceDuration()).thenReturn(15);
         when(scheduleRepository.scheduleExistsInIntervalForDoctorExcludingId(any(), any(), anyLong(), anyLong())).thenReturn(false);
@@ -519,14 +538,14 @@ public class ScheduleValidatorTest {
                 ))
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 18, 0))
                 .doctor(testDoctor)
                 .services(Set.of(testService2))
                 .build();
 
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, 9, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, 18, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, 9, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, 18, 0);
 
         when(serviceRepository.getMinServiceDuration()).thenReturn(15);
         when(scheduleRepository.scheduleExistsInIntervalForDoctorExcludingId(any(), any(), anyLong(), anyLong())).thenReturn(false);
@@ -560,14 +579,14 @@ public class ScheduleValidatorTest {
                 ))
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 18, 0))
                 .doctor(testDoctor)
                 .services(Set.of(testService2, testService1))
                 .build();
 
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 25, 9, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 25, 18, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 25, 9, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 25, 18, 0);
 
         when(serviceRepository.getMinServiceDuration()).thenReturn(15);
         when(scheduleRepository.scheduleExistsInIntervalForDoctorExcludingId(any(), any(), anyLong(), anyLong())).thenReturn(false);
@@ -587,8 +606,8 @@ public class ScheduleValidatorTest {
                 .id(1L)
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 18, 0))
                 .doctor(testDoctor)
                 .build();
 
@@ -606,8 +625,8 @@ public class ScheduleValidatorTest {
                 .id(1L)
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 18, 0))
                 .doctor(testDoctor)
                 .build();
 
@@ -626,8 +645,8 @@ public class ScheduleValidatorTest {
                 .id(1L)
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 18, 0))
                 .doctor(testDoctor)
                 .build();
         LocalDateTime newStartedAt = testSchedule.getStartedAt().plusHours(3);
@@ -651,8 +670,8 @@ public class ScheduleValidatorTest {
                 .id(1L)
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 18, 0))
                 .doctor(testDoctor)
                 .build();
         LocalDateTime newStartedAt = testSchedule.getStartedAt().plusHours(3);
@@ -674,8 +693,8 @@ public class ScheduleValidatorTest {
                 .id(1L)
                 .build();
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 22, 9, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 22, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 22, 9, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 22, 18, 0))
                 .doctor(testDoctor)
                 .build();
         LocalDateTime newStartedAt = testSchedule.getStartedAt();
@@ -690,8 +709,8 @@ public class ScheduleValidatorTest {
     @Test
     void validateNewTimeslotAndServicesShouldThrowApiExceptionWhenScheduleIsAtWeekend() {
         Schedule testSchedule = Schedule.builder()
-                .startedAt(LocalDateTime.of(2025, 11, 14, 8, 0))
-                .finishedAt(LocalDateTime.of(2025, 11, 14, 18, 0))
+                .startedAt(LocalDateTime.of(2031, 11, 14, 8, 0))
+                .finishedAt(LocalDateTime.of(2031, 11, 14, 18, 0))
                 .doctor(Doctor.builder()
                         .id(1L)
                         .build())
@@ -700,8 +719,8 @@ public class ScheduleValidatorTest {
                         .build()))
                 .build();
 
-        LocalDateTime newStartedAt = LocalDateTime.of(2025, 11, 22, 8, 0);
-        LocalDateTime newFinishedAt = LocalDateTime.of(2025, 11, 22, 20, 0);
+        LocalDateTime newStartedAt = LocalDateTime.of(2031, 11, 22, 8, 0);
+        LocalDateTime newFinishedAt = LocalDateTime.of(2031, 11, 22, 20, 0);
 
         assertThatThrownBy(() -> scheduleValidator.validateNewTimeslotAndServices(newStartedAt,
                 newFinishedAt, testSchedule.getDoctor(), List.copyOf(testSchedule.getServices()), testSchedule))

@@ -21,6 +21,9 @@ public class AbsenceValidator {
         if (startedAt.isAfter(finishedAt) || finishedAt.isBefore(startedAt)) {
             throw new ApiException("Start date cannot be after end date", "startedAt, finishedAt");
         }
+        if (startedAt.isBefore(LocalDateTime.now())) {
+            throw new ApiException("Start date cannot be in the past", "startedAt");
+        }
         if (scheduleRepository.scheduleExistsInIntervalForDoctor(startedAt,
                 finishedAt, doctor.getId())) {
             throw new ApiException("Absence overlaps with already existing schedule", "absence");
@@ -34,6 +37,9 @@ public class AbsenceValidator {
                                     Absence absenceFromDb) {
         if (startedAt.isAfter(finishedAt) || finishedAt.isBefore(startedAt)) {
             throw new ApiException("Start date cannot be after end date", "startedAt, finishedAt");
+        }
+        if (startedAt.isBefore(LocalDateTime.now())) {
+            throw new ApiException("Start date cannot be in the past", "startedAt");
         }
         if (scheduleRepository.scheduleExistsInIntervalForDoctor(startedAt,
                 finishedAt, doctorFromDb.getId())) {

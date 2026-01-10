@@ -66,7 +66,6 @@ public class ScheduleValidator {
         }
         Set<Long> appointmentIdsInTimeslot = appointmentRepository.getAppointmentIdsInPreviousScheduleTimeslot
                 (schedule.getDoctor().getId(), oldStartedAt, oldFinishedAt, newStartedAt, newFinishedAt);
-        //dodać sprawdzenie czy są created
         if (!appointmentIdsInTimeslot.isEmpty()) {
             throw new ApiException(appointmentIdsInTimeslot.toString(), "appointments");
         }
@@ -108,6 +107,9 @@ public class ScheduleValidator {
     private void validateDates(LocalDateTime startedAt, LocalDateTime finishedAt) {
         if (startedAt.isAfter(finishedAt) || startedAt.equals(finishedAt)) {
             throw new ApiException("Start date must be before end date", "startedAt");
+        }
+        if (startedAt.isBefore(LocalDateTime.now())) {
+            throw new ApiException("Start date cannot be in the past", "startedAt");
         }
         if (!startedAt.toLocalDate().equals(finishedAt.toLocalDate())) {
             throw new ApiException("Schedule can be one day long", "startedAt, finishedAt");
