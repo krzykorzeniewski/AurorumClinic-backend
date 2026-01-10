@@ -53,10 +53,6 @@ public class UpdateDoctor {
         doctorFromDb.setPhoneNumber(request.phoneNumber);
         doctorFromDb.setEmail(request.email);
         doctorFromDb.setTwoFactorAuth(request.twoFactorAuth);
-        doctorFromDb.setPhoneNumberVerified(request.phoneNumberVerified);
-        doctorFromDb.setEducation(request.education);
-        doctorFromDb.setExperience(request.experience);
-        doctorFromDb.setDescription(request.description);
         doctorFromDb.setPwzNumber(request.pwzNumber);
         doctorFromDb.setSpecializations(new HashSet<>(specializationsFromDb));
 
@@ -70,10 +66,7 @@ public class UpdateDoctor {
                 .email(doctorFromDb.getEmail())
                 .twoFactorAuth(doctorFromDb.isTwoFactorAuth())
                 .phoneNumberVerified(doctorFromDb.isPhoneNumberVerified())
-                .education(doctorFromDb.getEducation())
-                .experience(doctorFromDb.getExperience())
                 .pwzNumber(doctorFromDb.getPwzNumber())
-                .description(doctorFromDb.getDescription())
                 .specializations(doctorFromDb.getSpecializations().stream().map(specialization ->
                         UpdateDoctorResponse.SpecializationDto.builder()
                         .id(specialization.getId())
@@ -85,15 +78,11 @@ public class UpdateDoctor {
 
     record UpdateDoctorRequest(@NotBlank @Size(max = 50) String name,
                                @NotBlank @Size(max = 50) String surname,
-                               @NotBlank @Size(min = 11, max = 11) String pesel,
+                               @Size(min = 11, max = 11) String pesel,
                                @NotNull LocalDate birthdate,
                                @NotBlank @Size(min = 9, max = 9) String phoneNumber,
                                @NotBlank @Email @Size(max = 100) String email,
                                boolean twoFactorAuth,
-                               boolean phoneNumberVerified,
-                               @NotBlank @Size (max = 5000) String description,
-                               @NotBlank @Size(max = 1000) String education,
-                               @NotBlank @Size(max = 1000) String experience,
                                @NotBlank @Size(max = 50) String pwzNumber,
                                @NotEmpty Set<Long> specializationIds) {
 
@@ -109,9 +98,6 @@ public class UpdateDoctor {
             String email,
             boolean twoFactorAuth,
             boolean phoneNumberVerified,
-            String education,
-            String experience,
-            String description,
             String pwzNumber,
             Set<SpecializationDto> specializations) {
 

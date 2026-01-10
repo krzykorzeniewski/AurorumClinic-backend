@@ -56,10 +56,6 @@ class UpdateDoctorTest {
                 "123456789",
                 "jan.kowalski@test.com",
                 true,
-                true,
-                "Opis",
-                "Edukacja",
-                "Doświadczenie",
                 "PWZ123",
                 specIds
         );
@@ -79,16 +75,12 @@ class UpdateDoctorTest {
         assertThat(doctor.getPhoneNumber()).isEqualTo("123456789");
         assertThat(doctor.getEmail()).isEqualTo("jan.kowalski@test.com");
         assertThat(doctor.isTwoFactorAuth()).isTrue();
-        assertThat(doctor.isPhoneNumberVerified()).isTrue();
-        assertThat(doctor.getEducation()).isEqualTo("Edukacja");
-        assertThat(doctor.getExperience()).isEqualTo("Doświadczenie");
-        assertThat(doctor.getDescription()).isEqualTo("Opis");
         assertThat(doctor.getPwzNumber()).isEqualTo("PWZ123");
         assertThat(doctor.getSpecializations())
                 .extracting(Specialization::getId)
                 .containsExactlyInAnyOrder(1L, 2L);
 
-        UpdateDoctor.UpdateDoctorResponse bodyData = extractData(res.getBody());
+        UpdateDoctor.UpdateDoctorResponse bodyData = res.getBody().getData();
         assertThat(bodyData).isNotNull();
         assertThat(bodyData.id()).isEqualTo(doctorId);
         assertThat(bodyData.name()).isEqualTo("Jan");
@@ -115,10 +107,6 @@ class UpdateDoctorTest {
                 "123456789",
                 "jan.kowalski@test.com",
                 false,
-                false,
-                "Opis",
-                "Edukacja",
-                "Doświadczenie",
                 "PWZ123",
                 specIds
         );
@@ -153,10 +141,6 @@ class UpdateDoctorTest {
                 "123456789",
                 "jan.kowalski@test.com",
                 false,
-                false,
-                "Opis",
-                "Edukacja",
-                "Doświadczenie",
                 "PWZ123",
                 specIds
         );

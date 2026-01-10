@@ -44,7 +44,6 @@ public class UpdateUser { //admin & employee
         userFromDb.setPhoneNumber(request.phoneNumber);
         userFromDb.setEmail(request.email);
         userFromDb.setTwoFactorAuth(request.twoFactorAuth);
-        userFromDb.setPhoneNumberVerified(request.phoneNumberVerified);
 
         return UpdateUserResponse.builder()
                 .id(userFromDb.getId())
@@ -62,12 +61,11 @@ public class UpdateUser { //admin & employee
     @Builder
     record UpdateUserRequest(@NotBlank @Size(max = 50) String name,
                              @NotBlank @Size(max = 50) String surname,
-                             @NotBlank @Size(min = 11, max = 11) String pesel,
+                             @Size(min = 11, max = 11) String pesel,
                              @NotNull LocalDate birthdate,
                              @NotBlank @Size(min = 9, max = 9) String phoneNumber,
                              @NotBlank @Email @Size(max = 100) String email,
-                             boolean twoFactorAuth,
-                             boolean phoneNumberVerified) {
+                             boolean twoFactorAuth) {
 
     }
 

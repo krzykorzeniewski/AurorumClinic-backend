@@ -22,9 +22,6 @@ public class NewsletterEmailListener {
     @Value("${mail.backend.newsletter-address}")
     private String newsletterEmailAddress;
 
-    @Value("${mail.frontent.newsletter.unsubscribe-link}")
-    private String unsubscribeLink;
-
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void onNewsletterEmailMessageCreatedEvent(NewsletterEmailMessageCreated event) {
         String subject = event.newsletterEmailMessage().subject();
@@ -35,7 +32,6 @@ public class NewsletterEmailListener {
         Context context = new Context();
         context.setVariable("subject", subject);
         context.setVariable("content", content);
-        context.setVariable("unsubscribeLink", unsubscribeLink);
 
         String htmlPageAsText = springTemplateEngine.process("newsletter-message-email", context);
 
