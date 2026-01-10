@@ -1,4 +1,4 @@
-package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
+package pl.edu.pja.aurorumclinic.features.users.doctors.commands;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +7,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 import pl.edu.pja.aurorumclinic.features.users.doctors.DoctorProfileMapper;
-import pl.edu.pja.aurorumclinic.features.users.doctors.commands.DocUpdateProfile;
-import pl.edu.pja.aurorumclinic.features.users.doctors.commands.MeUpdateProfileRequest;
 import pl.edu.pja.aurorumclinic.features.users.doctors.queries.shared.DoctorProfileResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;

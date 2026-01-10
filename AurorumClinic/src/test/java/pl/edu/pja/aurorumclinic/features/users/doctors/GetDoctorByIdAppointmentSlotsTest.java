@@ -1,9 +1,9 @@
-package pl.edu.pja.aurorumclinic.features.users.doctors.queries;
+package pl.edu.pja.aurorumclinic.features.users.doctors;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import pl.edu.pja.aurorumclinic.features.users.doctors.queries.GetDoctorByIdAppointmentSlots;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
