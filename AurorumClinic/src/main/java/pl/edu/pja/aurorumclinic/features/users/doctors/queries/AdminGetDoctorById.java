@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.DoctorRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Doctor;
+import pl.edu.pja.aurorumclinic.shared.data.models.Specialization;
 import pl.edu.pja.aurorumclinic.shared.exceptions.ApiNotFoundException;
 
 import java.time.LocalDate;
@@ -46,11 +47,8 @@ public class AdminGetDoctorById {
                 .twoFactorAuth(doctorFromDb.isTwoFactorAuth())
                 .phoneNumberVerified(doctorFromDb.isPhoneNumberVerified())
                 .pwzNumber(doctorFromDb.getPwzNumber())
-                .specializations(doctorFromDb.getSpecializations().stream().map(specialization ->
-                        GetDoctorByIdResponse.SpecializationDto.builder()
-                                .id(specialization.getId())
-                                .name(specialization.getName())
-                                .build()).collect(Collectors.toSet()))
+                .specializationIds(doctorFromDb.getSpecializations().stream()
+                        .map(Specialization::getId).collect(Collectors.toSet()))
                 .build();
     }
 
@@ -65,12 +63,7 @@ public class AdminGetDoctorById {
                                  boolean twoFactorAuth,
                                  boolean phoneNumberVerified,
                                  String pwzNumber,
-                                 Set<SpecializationDto> specializations) {
-
-        @Builder
-        record SpecializationDto(Long id,
-                                 String name) {
-        }
+                                 Set<Long> specializationIds) {
 
     }
 }
