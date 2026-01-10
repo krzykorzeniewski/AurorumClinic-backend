@@ -1,5 +1,7 @@
 package pl.edu.pja.aurorumclinic.features.appointments.patients.queries;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
@@ -16,6 +19,7 @@ import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
+import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
 
 @RestController
@@ -30,13 +34,14 @@ public class PatientGetAllAppointments {
 
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<PatientGetAppointmentResponse>>> getMyAppointments(
-                                                            @AuthenticationPrincipal Long patientId,
-                                                            @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(handle(patientId, pageable)));
+            @AuthenticationPrincipal Long patientId,
+            @PageableDefault Pageable pageable,
+            @RequestParam @NotNull AppointmentStatus status) {
+        return ResponseEntity.ok(ApiResponse.success(handle(patientId, pageable, status)));
     }
 
-    private Page<PatientGetAppointmentResponse> handle(Long patientId, Pageable pageable) {
-        Page<Appointment> appointmentsFromDb = appointmentRepository.findAllByPatientId(patientId, pageable);
+    private Page<PatientGetAppointmentResponse> handle(Long patientId, Pageable pageable, @Valid AppointmentStatus status) {
+        Page<Appointment> appointmentsFromDb = appointmentRepository.findAllByPatientIdAndStatus(patientId, status, pageable);
         Page<PatientGetAppointmentResponse> response = appointmentsFromDb.map(appointmentFromDb -> PatientGetAppointmentResponse.builder()
                 .id(appointmentFromDb.getId())
                 .status(appointmentFromDb.getStatus())

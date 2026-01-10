@@ -108,11 +108,11 @@ public class PatientGetAllAppointmentsTest {
                         .status(testAppointment.getPayment().getStatus())
                         .build())
                 .build();
-        when(appointmentRepository.findAllByPatientId(anyLong(), any())).thenReturn(appointmentsPage);
+        when(appointmentRepository.findAllByPatientIdAndStatus(anyLong(), any(), any())).thenReturn(appointmentsPage);
         when(objectStorageService.generateUrl(anyString())).thenReturn(imageUrl);
 
         ResponseEntity<ApiResponse<Page<PatientGetAppointmentResponse>>> resultResponse =
-                patientGetAllAppointments.getMyAppointments(testPatient.getId(), pageable);
+                patientGetAllAppointments.getMyAppointments(testPatient.getId(), pageable, AppointmentStatus.FINISHED);
 
         assertThat(resultResponse.getBody()).isNotNull();
 
@@ -123,7 +123,7 @@ public class PatientGetAllAppointmentsTest {
         assertThat(resultDto)
                         .isEqualTo(testResponse);
 
-        verify(appointmentRepository).findAllByPatientId(testPatient.getId(), pageable);
+        verify(appointmentRepository).findAllByPatientIdAndStatus(testPatient.getId(), AppointmentStatus.FINISHED, pageable);
         verify(objectStorageService).generateUrl(testAppointment.getDoctor().getProfilePicture());
     }
 

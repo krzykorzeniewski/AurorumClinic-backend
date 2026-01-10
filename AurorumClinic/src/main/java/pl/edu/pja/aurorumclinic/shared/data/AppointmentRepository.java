@@ -199,4 +199,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             where a1.notificationSent = :b
             """)
     List<Tuple> getAllByNotificationSent(boolean b);
+
+    Page<Appointment> findAllByPatientIdAndStatus(Long patientId, AppointmentStatus status, Pageable pageable);
+
 }
