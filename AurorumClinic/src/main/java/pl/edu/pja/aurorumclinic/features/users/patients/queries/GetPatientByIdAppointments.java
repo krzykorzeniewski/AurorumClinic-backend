@@ -1,6 +1,8 @@
 package pl.edu.pja.aurorumclinic.features.users.patients.queries;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,17 +39,18 @@ public class GetPatientByIdAppointments {
     @GetMapping("/{id}/appointments")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<ApiResponse<Page<GetPatientByIdAppointmentResponse>>> getPatientAppointments(
-                                            @PathVariable("id") Long patientId,
-                                            @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(handle(patientId, pageable)));
+            @PathVariable("id") Long patientId,
+            @PageableDefault Pageable pageable,
+            @NotNull AppointmentStatus status) {
+        return ResponseEntity.ok(ApiResponse.success(handle(patientId, pageable, status)));
     }
 
-    private Page<GetPatientByIdAppointmentResponse> handle(Long patientId, Pageable pageable) {
+    private Page<GetPatientByIdAppointmentResponse> handle(Long patientId, Pageable pageable, @Valid AppointmentStatus status) {
         if (!patientRepository.existsById(patientId)) {
             throw new ApiNotFoundException("Id not found", "id");
         }
         Page<Appointment> appointmentsFromDb = appointmentRepository
-                .findAllByPatientId(patientId, pageable);
+                .findAllByPatientIdAndStatus(patientId, status, pageable);
         Page<GetPatientByIdAppointmentResponse> response = appointmentsFromDb.map(appointmentFromDb ->
                 GetPatientByIdAppointmentResponse.builder()
                 .id(appointmentFromDb.getId())

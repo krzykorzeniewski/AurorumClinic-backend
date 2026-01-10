@@ -1,6 +1,5 @@
 package pl.edu.pja.aurorumclinic.features.appointments.employees.queries;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
