@@ -83,7 +83,7 @@ public class UpdateDoctor {
                                @NotBlank @Size(min = 9, max = 9) String phoneNumber,
                                @NotBlank @Email @Size(max = 100) String email,
                                boolean twoFactorAuth,
-                               @NotBlank @Size(max = 50) String pwzNumber,
+                               @Size(max = 50) String pwzNumber,
                                @NotEmpty Set<Long> specializationIds) {
 
     }
