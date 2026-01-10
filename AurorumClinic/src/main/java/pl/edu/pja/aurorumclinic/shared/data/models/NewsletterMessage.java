@@ -24,8 +24,8 @@ public class NewsletterMessage {
     @Column(name = "PK_Newsletter_Message")
     private Long id;
 
-    @Column(name = "Text", columnDefinition = "nvarchar(500)")
-    @Size(max = 500, message = "Required length for this field is 500 characters")
+    @Column(name = "Text", columnDefinition = "nvarchar(1000)")
+    @Size(max = 1000, message = "Required length for this field is 1000 characters")
     @NotEmpty(message = "This field is required")
     private String text;
 

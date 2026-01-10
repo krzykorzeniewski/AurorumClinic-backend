@@ -1,6 +1,7 @@
 package pl.edu.pja.aurorumclinic.features.users.users.commands;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,7 +45,7 @@ public class UpdatePassword {
         userFromDb.setPassword(passwordEncoder.encode(request.password));
     }
 
-    record UpdatePasswordRequest(String password) {
+    record UpdatePasswordRequest(@NotBlank String password) {
     }
 
 }

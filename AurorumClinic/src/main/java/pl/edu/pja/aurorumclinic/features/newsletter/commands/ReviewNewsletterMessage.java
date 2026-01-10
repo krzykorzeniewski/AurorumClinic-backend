@@ -63,7 +63,7 @@ public class ReviewNewsletterMessage {
         }
     }
 
-    record UpdateNewsletterMessageRequest(@NotEmpty @Size(max = 500) String text,
+    record UpdateNewsletterMessageRequest(@NotEmpty @Size(max = 1000) String text,
                                           @NotEmpty @Size(max = 100) String subject,
                                           @NotNull Boolean approved,
                                           LocalDateTime scheduledAt) {

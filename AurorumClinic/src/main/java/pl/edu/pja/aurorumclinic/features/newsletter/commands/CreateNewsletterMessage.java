@@ -23,8 +23,12 @@ import java.time.LocalDateTime;
 @PreAuthorize("hasRole('ADMIN')")
 public class CreateNewsletterMessage {
 
-    @Value("${openai.chat.default-prompt}")
-    private String defaultPrompt;
+    @Value("${openai.newsletter.default-prompt}")
+    private String defaultPromptStructure;
+
+    @Value("${openai.newsletter.default-prompt-instructions}")
+    private String defaultPromptContent;
+
     private final OpenAiChatModel chatModel;
     private final NewsletterMessageRepository newsletterMessageRepository;
 
@@ -35,10 +39,11 @@ public class CreateNewsletterMessage {
         return ResponseEntity.ok(ApiResponse.success(handle(prompt)));
     }
 
-    private CreateNewsletterMessageResponse handle(String prompt) {
+    private CreateNewsletterMessageResponse handle(String userPrompt) {
         CreateNewsletterMessagePromptResponse response = ChatClient.create(chatModel)
                 .prompt()
-                .user(u -> u.text(prompt != null ? prompt : defaultPrompt))
+                .user(u -> u.text(userPrompt != null ? String.format(defaultPromptStructure, userPrompt)
+                        : String.format(defaultPromptStructure, defaultPromptContent)))
                 .call()
                 .entity(CreateNewsletterMessagePromptResponse.class);
 

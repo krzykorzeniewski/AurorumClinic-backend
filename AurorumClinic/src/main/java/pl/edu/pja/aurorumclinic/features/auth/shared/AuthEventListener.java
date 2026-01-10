@@ -17,13 +17,11 @@ import pl.edu.pja.aurorumclinic.shared.data.models.Token;
 import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
-import pl.edu.pja.aurorumclinic.shared.services.TokenService;
 
 @Component
 @RequiredArgsConstructor
 public class AuthEventListener {
 
-    private final TokenService tokenService;
     private final SmsService smsService;
     private final EmailService emailService;
     private final SpringTemplateEngine springTemplateEngine;
