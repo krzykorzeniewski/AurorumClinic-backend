@@ -12,6 +12,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -47,16 +48,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf((csrf) -> csrf
-                        .csrfTokenRepository(csrfTokenRepository())
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+//                .csrf((csrf) -> csrf
+//                        .csrfTokenRepository(csrfTokenRepository())
+//                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+                .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class)
-                .addFilterAfter(csrfFilter, AuthorizationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class);
+//                .addFilterAfter(csrfFilter, AuthorizationFilter.class);
         return httpSecurity.build();
     }
 

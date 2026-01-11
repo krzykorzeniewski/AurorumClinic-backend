@@ -114,9 +114,4 @@ public class LoginController {
                 .body(ApiResponse.success(null));
     }
 
-    @GetMapping("/csrf")
-    public CsrfToken csrf(CsrfToken csrfToken) {
-        return csrfToken;
-    }
-
 }
