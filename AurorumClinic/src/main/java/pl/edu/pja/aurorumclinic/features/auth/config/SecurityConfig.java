@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -43,10 +45,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-//                .csrf((csrf) -> csrf
-//                        .csrfTokenRepository(csrfTokenRepository())
-//                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf((csrf) -> csrf
+                        .csrfTokenRepository(csrfTokenRepository())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
@@ -99,15 +100,15 @@ public class SecurityConfig {
         return expressionHandler;
     }
 
-//    @Bean
-//    public CookieCsrfTokenRepository csrfTokenRepository() {
-//        CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-//        cookieCsrfTokenRepository.setCookieCustomizer(responseCookieBuilder ->
-//                responseCookieBuilder
-//                    .secure(false)
-//                    .build());
-//        cookieCsrfTokenRepository.setCookiePath("*");
-//        return cookieCsrfTokenRepository;
-//    }
-
+    @Bean
+    public CookieCsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        cookieCsrfTokenRepository.setCookieCustomizer(responseCookieBuilder ->
+                responseCookieBuilder
+                    .secure(true)
+                    .path("/")
+                    .sameSite("None")
+                    .build());
+        return cookieCsrfTokenRepository;
+    }
 }
