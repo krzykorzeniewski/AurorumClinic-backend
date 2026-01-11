@@ -39,7 +39,6 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     @Value("${client.app-url}")
     private String clientUrl;
-    private final CsrfFilter csrfFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -52,8 +51,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class)
-                .addFilterAfter(csrfFilter, BasicAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class);
         return httpSecurity.build();
     }
 
@@ -77,7 +75,7 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(clientUrl));
-        configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "PATCH"));
+        configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
