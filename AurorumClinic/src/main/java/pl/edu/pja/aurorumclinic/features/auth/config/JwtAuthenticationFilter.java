@@ -82,6 +82,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 "/api/doctors/search",
                 "/api/doctors/recommended",
                 "/api/doctors/*/appointment-slots",
+                "/api/doctors/*/opinions",
+                "/api/specializations/*/services",
+                "/api/auth/csrf",
                 "/ws",
                 "/ws/info"
         );
@@ -91,7 +94,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         boolean isGetServices = pathMatcher.match("/api/services", path)
                 && method.equalsIgnoreCase("GET");
-        return isExcluded || isGetServices;
+
+        boolean isGetSpecializations = pathMatcher.match("/api/specializations", path)
+                && method.equalsIgnoreCase("GET");
+
+        boolean isGetDoctor = pathMatcher.match("/api/doctors/*", path)
+                && method.equalsIgnoreCase("GET");
+
+        return isExcluded || isGetServices || isGetSpecializations || isGetDoctor;
     }
 
 }
