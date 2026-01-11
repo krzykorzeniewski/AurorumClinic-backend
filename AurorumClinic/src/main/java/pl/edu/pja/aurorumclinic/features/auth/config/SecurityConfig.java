@@ -99,15 +99,15 @@ public class SecurityConfig {
         return expressionHandler;
     }
 
-    @Bean
-    public CookieCsrfTokenRepository csrfTokenRepository() {
-        CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        cookieCsrfTokenRepository.setCookieCustomizer(responseCookieBuilder ->
-                responseCookieBuilder
-                    .secure(false)
-                    .build());
-        cookieCsrfTokenRepository.setCookiePath("*");
-        return cookieCsrfTokenRepository;
-    }
+//    @Bean
+//    public CookieCsrfTokenRepository csrfTokenRepository() {
+//        CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+//        cookieCsrfTokenRepository.setCookieCustomizer(responseCookieBuilder ->
+//                responseCookieBuilder
+//                    .secure(false)
+//                    .build());
+//        cookieCsrfTokenRepository.setCookiePath("*");
+//        return cookieCsrfTokenRepository;
+//    }
 
 }
