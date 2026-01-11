@@ -29,10 +29,14 @@ public class LoginController {
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
                 .path("/")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
@@ -48,13 +52,13 @@ public class LoginController {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
@@ -68,13 +72,13 @@ public class LoginController {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
@@ -94,14 +98,14 @@ public class LoginController {
                 .httpOnly(true)
                 .maxAge(0)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", "")
                 .path("/")
                 .httpOnly(true)
                 .maxAge(0)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         return ResponseEntity
                 .status(HttpStatus.OK)
