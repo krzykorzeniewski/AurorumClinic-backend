@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
@@ -39,6 +38,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     @Value("${client.app-url}")
     private String clientUrl;
+    private final CsrfFilter csrfFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -51,7 +51,8 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class)
+                .addFilterAfter(csrfFilter, AuthorizationFilter.class);
         return httpSecurity.build();
     }
 
