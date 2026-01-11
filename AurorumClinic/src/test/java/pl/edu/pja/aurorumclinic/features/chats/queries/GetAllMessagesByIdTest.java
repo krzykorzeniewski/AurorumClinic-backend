@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import pl.edu.pja.aurorumclinic.features.chats.shared.MessageRepository;
+import pl.edu.pja.aurorumclinic.shared.data.MessageRepository;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import pl.edu.pja.aurorumclinic.features.chats.shared.MessageRepository;
+import pl.edu.pja.aurorumclinic.shared.data.MessageRepository;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
 import pl.edu.pja.aurorumclinic.shared.data.UserRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Message;

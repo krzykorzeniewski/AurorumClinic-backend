@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.shared.data.MessageRepository;
 import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Appointment;
+import pl.edu.pja.aurorumclinic.shared.data.models.Message;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
 import pl.edu.pja.aurorumclinic.shared.services.ObjectStorageService;
@@ -31,6 +33,7 @@ public class PatientGetAllAppointments {
     private final AppointmentRepository appointmentRepository;
     private final ObjectStorageService objectStorageService;
     private final OpinionRepository opinionRepository;
+    private final MessageRepository messageRepository;
 
     @GetMapping("")
     public ResponseEntity<ApiResponse<Page<PatientGetAppointmentResponse>>> getMyAppointments(
@@ -71,6 +74,7 @@ public class PatientGetAllAppointments {
                         .status(appointmentFromDb.getPayment().getStatus())
                         .build())
                 .hasOpinion(checkIfCanRate(appointmentFromDb))
+                .hasChat(checkIfHasChat(appointmentFromDb))
                 .build());
         return response;
     }
@@ -79,5 +83,11 @@ public class PatientGetAllAppointments {
         Long patientId = appointment.getPatient().getId();
         Long doctorId = appointment.getDoctor().getId();
         return opinionRepository.existsByAppointmentDoctorIdAndPatientId(patientId, doctorId);
+    }
+
+    private boolean checkIfHasChat(Appointment appointment) {
+        Long patientId = appointment.getPatient().getId();
+        Long doctorId = appointment.getDoctor().getId();
+        return messageRepository.existsBetweenUsers(patientId, doctorId);
     }
 }

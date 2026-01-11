@@ -17,7 +17,8 @@ public record PatientGetAppointmentResponse(Long id,
                                             DoctorDto doctor,
                                             ServiceDto service,
                                             PaymentDto payment,
-                                            boolean hasOpinion) {
+                                            boolean hasOpinion,
+                                            boolean hasChat) {
     @Builder
     public record PaymentDto(Long id,
                              @JsonFormat(shape = JsonFormat.Shape.NUMBER_FLOAT) BigDecimal amount,
