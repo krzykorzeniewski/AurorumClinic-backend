@@ -4,6 +4,7 @@ import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import pl.edu.pja.aurorumclinic.features.auth.login.dtos.*;
@@ -46,10 +47,14 @@ public class LoginController {
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
                 .path("/")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
@@ -62,10 +67,14 @@ public class LoginController {
         HttpCookie accessTokenCookie = ResponseCookie.from("Access-Token", responseDto.accessToken())
                 .path("/")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
                 .path("/")
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
@@ -84,11 +93,15 @@ public class LoginController {
                 .path("/")
                 .httpOnly(true)
                 .maxAge(0)
+                .secure(true)
+                .sameSite("Lax")
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", "")
                 .path("/")
                 .httpOnly(true)
                 .maxAge(0)
+                .secure(true)
+                .sameSite("Lax")
                 .build();
         return ResponseEntity
                 .status(HttpStatus.OK)
