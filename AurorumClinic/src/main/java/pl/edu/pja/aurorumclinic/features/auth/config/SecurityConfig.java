@@ -106,7 +106,8 @@ public class SecurityConfig {
                 responseCookieBuilder
                     .secure(true)
                     .path("/")
-                    .sameSite("None")
+                    .domain("aurorumclinic.pl")
+                    .sameSite("Lax")
                     .build());
         return cookieCsrfTokenRepository;
     }
