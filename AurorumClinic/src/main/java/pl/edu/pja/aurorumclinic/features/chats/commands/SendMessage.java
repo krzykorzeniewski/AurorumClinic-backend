@@ -49,13 +49,25 @@ public class SendMessage {
                 .sentAt(message.sentAt())
                 .text(message.text())
                 .build();
+        SendMessageResponse res = new SendMessageResponse(
+                message.text(),
+                message.sentAt(),
+                message.receiverId(),
+                sender.getId()
+        );
         messageRepository.save(newMessage);
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(receiver.getId()),
-                "/queue/messages", message);
+                "/queue/messages", res);
     }
 
     record SendMessageRequest(@NotEmpty @Size(max = 500) String text,
-                                     @NotNull LocalDateTime sentAt,
-                                     @NotNull Long receiverId) {
+                              @NotNull LocalDateTime sentAt,
+                              @NotNull Long receiverId) {
+    }
+
+    record SendMessageResponse(@NotEmpty @Size(max = 500) String text,
+                               @NotNull LocalDateTime sentAt,
+                               @NotNull Long receiverId,
+                               @NotNull Long authorId) {
     }
 }
