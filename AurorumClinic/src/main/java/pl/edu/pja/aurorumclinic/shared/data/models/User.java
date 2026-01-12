@@ -91,10 +91,10 @@ public class User implements UserDetails {
     @NotNull(message = "This field is required")
     private UserRole role;
 
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.REMOVE)
     private List<Message> sentMessages;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.REMOVE)
     private List<Message> receivedMessages;
 
     @Column(name = "Email_Verified", columnDefinition = "bit")
