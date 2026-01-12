@@ -193,7 +193,7 @@ public class AppointmentRepositoryIntegrationTest extends IntegrationTest {
 
     @Test
     void findAllByScheduleShouldReturnAppointmentsWhenExistForDoctorIdBetweenDates() {
-        Schedule scheduleWith2Appointments = scheduleRepository.findById(1L).orElse(null);
+        Schedule scheduleWith2Appointments = scheduleRepository.findById(2L).orElse(null);
         LocalDateTime scheduleStartedAt = scheduleWith2Appointments.getStartedAt();
         LocalDateTime scheduleFinishedAt = scheduleWith2Appointments.getFinishedAt();
         Long scheduleDoctorId = scheduleWith2Appointments.getDoctor().getId();
@@ -236,8 +236,8 @@ public class AppointmentRepositoryIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void existsByScheduleShouldReturnTrueWhenAppointmentExistForDoctorIdBetweenDates() {
-        Schedule scheduleWith2Appointments = scheduleRepository.findById(1L).orElse(null);
+    void existsByScheduleShouldReturnFalseWhenNoCreatedAppointmentExistForDoctorIdBetweenDates() {
+        Schedule scheduleWith2Appointments = scheduleRepository.findById(2L).orElse(null);
         LocalDateTime scheduleStartedAt = scheduleWith2Appointments.getStartedAt();
         LocalDateTime scheduleFinishedAt = scheduleWith2Appointments.getFinishedAt();
         Long scheduleDoctorId = scheduleWith2Appointments.getDoctor().getId();
