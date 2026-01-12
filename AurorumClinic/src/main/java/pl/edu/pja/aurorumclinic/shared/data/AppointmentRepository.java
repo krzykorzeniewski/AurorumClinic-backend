@@ -175,12 +175,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByPatient_IdAndFinishedAtAfter(Long patientId, LocalDateTime finishedAtAfter);
 
     @NativeQuery("""
-        select a.* from appointment a where a.fk_doctor = :doctorId and cast(a.started_at as date) = :date
+        select * from appointment a where a.fk_doctor = :doctorId and cast(a.started_at as date) = :date
     """)
     Page<Appointment> findAllByDoctorIdAndStartedAtEquals(Pageable pageable, Long doctorId, LocalDate date);
 
     @NativeQuery("""
-        select a.* from appointment a where cast(a.started_at as date) = :date
+        select * from appointment a where cast(a.started_at as date) = :date
     """)
     Page<Appointment> findAllByDate(Pageable pageable, LocalDate date);
 
