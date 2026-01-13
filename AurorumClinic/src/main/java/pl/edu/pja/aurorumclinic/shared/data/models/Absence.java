@@ -23,7 +23,7 @@ public class Absence {
 
     @Size(max = 100)
     @NotBlank
-    @Column(name = "Name")
+    @Column(name = "Name", columnDefinition = "nvarchar(100)")
     private String name;
 
     @Column(name = "Started_At", columnDefinition = "datetime2(2)")
