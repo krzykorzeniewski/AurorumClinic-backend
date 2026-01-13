@@ -22,8 +22,8 @@ import java.util.Set;
                 columnNames = {"PWZ_Number"}
         ))
 public class Doctor extends User {
-    @Column(name = "Description", columnDefinition = "nvarchar(5000)")
-    @Size(max = 5000, message = "Maximum length for this field is 5000 characters")
+    @Column(name = "Description", columnDefinition = "nvarchar(4000)")
+    @Size(max = 4000, message = "Maximum length for this field is 4000 characters")
     @NotBlank(message = "This field is required")
     private String description;
 

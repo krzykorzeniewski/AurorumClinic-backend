@@ -6,4 +6,4 @@ import jakarta.validation.constraints.Size;
 public record MeUpdateProfileRequest(
         @NotBlank @Size(max = 1000) String experience,
         @NotBlank @Size(max = 1000) String education,
-        @NotBlank @Size(max = 5000) String description) {}
+        @NotBlank @Size(max = 4000) String description) {}
