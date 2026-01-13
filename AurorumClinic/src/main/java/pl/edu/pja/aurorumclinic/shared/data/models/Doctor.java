@@ -22,21 +22,21 @@ import java.util.Set;
                 columnNames = {"PWZ_Number"}
         ))
 public class Doctor extends User {
-    @Column(name = "Description", columnDefinition = "nvarchar(500)")
-    @Size(max = 5000, message = "Maximum length for this field is 500 characters")
+    @Column(name = "Description", columnDefinition = "nvarchar(5000)")
+    @Size(max = 5000, message = "Maximum length for this field is 5000 characters")
     @NotBlank(message = "This field is required")
     private String description;
 
     @Column(name = "Profile_Picture", columnDefinition = "nvarchar(max)")
     private String profilePicture;
 
-    @Column(name = "Education", columnDefinition = "nvarchar(100)")
-    @Size(max = 1000, message = "Maximum length for this field is 100 characters")
+    @Column(name = "Education", columnDefinition = "nvarchar(1000)")
+    @Size(max = 1000, message = "Maximum length for this field is 1000 characters")
     @NotBlank(message = "This field is required")
     private String education;
 
-    @Column(name = "Experience", columnDefinition = "nvarchar(100)")
-    @Size(max = 1000, message = "Maximum length for this field is 100 characters")
+    @Column(name = "Experience", columnDefinition = "nvarchar(1000)")
+    @Size(max = 1000, message = "Maximum length for this field is 1000 characters")
     @NotBlank(message = "This field is required")
     private String experience;
 
