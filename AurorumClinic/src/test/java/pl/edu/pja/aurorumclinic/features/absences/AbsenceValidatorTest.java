@@ -1,6 +1,5 @@
 package pl.edu.pja.aurorumclinic.features.absences;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.edu.pja.aurorumclinic.shared.data.AbsenceRepository;
@@ -19,9 +18,7 @@ import static org.mockito.Mockito.*;
 public class AbsenceValidatorTest {
 
     ScheduleRepository scheduleRepository;
-
     AbsenceRepository absenceRepository;
-
     AbsenceValidator absenceValidator;
 
     @BeforeEach
@@ -33,8 +30,8 @@ public class AbsenceValidatorTest {
 
     @Test
     void validateTimeslotShouldThrowApiExceptionWhenStartDateIsAfterFinishDate() {
-        LocalDateTime startedAt = LocalDateTime.now().plusHours(1);
-        LocalDateTime finishedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now().plusHours(2);
+        LocalDateTime finishedAt = LocalDateTime.now().plusHours(1);
         Doctor testDoctor = Doctor.builder().build();
 
         assertThatThrownBy(() -> absenceValidator.validateTimeslot(startedAt, finishedAt, testDoctor))
@@ -45,7 +42,7 @@ public class AbsenceValidatorTest {
     @Test
     void validateTimeslotShouldThrowApiExceptionWhenStartDateIsInThePast() {
         LocalDateTime startedAt = LocalDateTime.now().minusHours(1);
-        LocalDateTime finishedAt = LocalDateTime.now();
+        LocalDateTime finishedAt = LocalDateTime.now().plusHours(1);
         Doctor testDoctor = Doctor.builder().build();
 
         assertThatThrownBy(() -> absenceValidator.validateTimeslot(startedAt, finishedAt, testDoctor))
@@ -55,29 +52,29 @@ public class AbsenceValidatorTest {
 
     @Test
     void validateTimeslotShouldThrowApiExceptionWhenScheduleExistsBetweenStartedAtAndFinishedAt() {
-        LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(5);
         LocalDateTime finishedAt = startedAt.plusDays(10);
+
         Long doctorId = 1L;
-        Doctor testDoctor = Doctor.builder()
-                .id(doctorId)
-                .build();
+        Doctor testDoctor = Doctor.builder().id(doctorId).build();
 
         when(scheduleRepository.scheduleExistsInIntervalForDoctor(any(), any(), anyLong())).thenReturn(true);
 
         assertThatThrownBy(() -> absenceValidator.validateTimeslot(startedAt, finishedAt, testDoctor))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("existing schedule");
+
         verify(scheduleRepository).scheduleExistsInIntervalForDoctor(startedAt, finishedAt, doctorId);
+        verifyNoInteractions(absenceRepository);
     }
 
     @Test
     void validateTimeslotShouldThrowApiExceptionWhenAbsenceExistsBetweenStartedAtAndFinishedAt() {
-        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(10);
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(5);
         LocalDateTime finishedAt = startedAt.plusDays(10);
+
         Long doctorId = 1L;
-        Doctor testDoctor = Doctor.builder()
-                .id(doctorId)
-                .build();
+        Doctor testDoctor = Doctor.builder().id(doctorId).build();
 
         when(scheduleRepository.scheduleExistsInIntervalForDoctor(any(), any(), anyLong())).thenReturn(false);
         when(absenceRepository.absenceExistsInIntervalForDoctor(any(), any(), anyLong())).thenReturn(true);
@@ -85,31 +82,32 @@ public class AbsenceValidatorTest {
         assertThatThrownBy(() -> absenceValidator.validateTimeslot(startedAt, finishedAt, testDoctor))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("existing absence");
+
         verify(scheduleRepository).scheduleExistsInIntervalForDoctor(startedAt, finishedAt, doctorId);
         verify(absenceRepository).absenceExistsInIntervalForDoctor(startedAt, finishedAt, doctorId);
     }
 
     @Test
     void validateTimeslotShouldNotThrowWhenScheduleOrAbsenceDoNotExistsBetweenStartedAtAndFinishedAt() {
-        LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(5);
         LocalDateTime finishedAt = startedAt.plusDays(10);
+
         Long doctorId = 1L;
-        Doctor testDoctor = Doctor.builder()
-                .id(doctorId)
-                .build();
+        Doctor testDoctor = Doctor.builder().id(doctorId).build();
 
         when(scheduleRepository.scheduleExistsInIntervalForDoctor(any(), any(), anyLong())).thenReturn(false);
         when(absenceRepository.absenceExistsInIntervalForDoctor(any(), any(), anyLong())).thenReturn(false);
 
         assertThatNoException().isThrownBy(() -> absenceValidator.validateTimeslot(startedAt, finishedAt, testDoctor));
+
         verify(scheduleRepository).scheduleExistsInIntervalForDoctor(startedAt, finishedAt, doctorId);
         verify(absenceRepository).absenceExistsInIntervalForDoctor(startedAt, finishedAt, doctorId);
     }
 
     @Test
     void validateNewTimeslotShouldThrowApiExceptionWhenStartDateIsAfterFinishDate() {
-        LocalDateTime startedAt = LocalDateTime.now().plusHours(1);
-        LocalDateTime finishedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now().plusHours(2);
+        LocalDateTime finishedAt = LocalDateTime.now().plusHours(1);
         Doctor testDoctor = Doctor.builder().build();
         Absence testAbsence = Absence.builder().build();
 
@@ -121,7 +119,7 @@ public class AbsenceValidatorTest {
     @Test
     void validateNewTimeslotShouldThrowApiExceptionWhenStartDateIsInThePast() {
         LocalDateTime startedAt = LocalDateTime.now().minusHours(1);
-        LocalDateTime finishedAt = LocalDateTime.now();
+        LocalDateTime finishedAt = LocalDateTime.now().plusHours(1);
         Doctor testDoctor = Doctor.builder().build();
         Absence testAbsence = Absence.builder().build();
 
@@ -132,37 +130,33 @@ public class AbsenceValidatorTest {
 
     @Test
     void validateNewTimeslotShouldThrowApiExceptionWhenScheduleExistsBetweenStartedAtAndFinishedAt() {
-        LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(5);
         LocalDateTime finishedAt = startedAt.plusDays(10);
+
         Long doctorId = 1L;
-        Doctor testDoctor = Doctor.builder()
-                .id(doctorId)
-                .build();
+        Doctor testDoctor = Doctor.builder().id(doctorId).build();
         Long absenceId = 2L;
-        Absence testAbsence = Absence.builder()
-                .id(absenceId)
-                .build();
+        Absence testAbsence = Absence.builder().id(absenceId).build();
 
         when(scheduleRepository.scheduleExistsInIntervalForDoctor(any(), any(), anyLong())).thenReturn(true);
 
         assertThatThrownBy(() -> absenceValidator.validateNewTimeslot(startedAt, finishedAt, testDoctor, testAbsence))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("existing schedule");
+
         verify(scheduleRepository).scheduleExistsInIntervalForDoctor(startedAt, finishedAt, doctorId);
+        verifyNoInteractions(absenceRepository);
     }
 
     @Test
     void validateNewTimeslotShouldThrowApiExceptionWhenOtherAbsenceExistsBetweenStartedAtAndFinishedAt() {
-        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(10);
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(5);
         LocalDateTime finishedAt = startedAt.plusDays(10);
+
         Long doctorId = 1L;
-        Doctor testDoctor = Doctor.builder()
-                .id(doctorId)
-                .build();
+        Doctor testDoctor = Doctor.builder().id(doctorId).build();
         Long absenceId = 2L;
-        Absence testAbsence = Absence.builder()
-                .id(absenceId)
-                .build();
+        Absence testAbsence = Absence.builder().id(absenceId).build();
 
         when(scheduleRepository.scheduleExistsInIntervalForDoctor(any(), any(), anyLong())).thenReturn(false);
         when(absenceRepository.absenceExistsInIntervalForDoctorExcludingId(any(), any(), anyLong(), anyLong()))
@@ -171,22 +165,20 @@ public class AbsenceValidatorTest {
         assertThatThrownBy(() -> absenceValidator.validateNewTimeslot(startedAt, finishedAt, testDoctor, testAbsence))
                 .isExactlyInstanceOf(ApiException.class)
                 .message().containsIgnoringCase("existing absence");
+
         verify(scheduleRepository).scheduleExistsInIntervalForDoctor(startedAt, finishedAt, doctorId);
         verify(absenceRepository).absenceExistsInIntervalForDoctorExcludingId(startedAt, finishedAt, doctorId, absenceId);
     }
 
     @Test
     void validateNewTimeslotShouldNotThrowApiExceptionWhenOtherAbsenceOrScheduleDontExistBetweenStartedAtAndFinishedAt() {
-        LocalDateTime startedAt = LocalDateTime.now();
+        LocalDateTime startedAt = LocalDateTime.now().plusMinutes(5);
         LocalDateTime finishedAt = startedAt.plusDays(10);
+
         Long doctorId = 1L;
-        Doctor testDoctor = Doctor.builder()
-                .id(doctorId)
-                .build();
+        Doctor testDoctor = Doctor.builder().id(doctorId).build();
         Long absenceId = 2L;
-        Absence testAbsence = Absence.builder()
-                .id(absenceId)
-                .build();
+        Absence testAbsence = Absence.builder().id(absenceId).build();
 
         when(scheduleRepository.scheduleExistsInIntervalForDoctor(any(), any(), anyLong())).thenReturn(false);
         when(absenceRepository.absenceExistsInIntervalForDoctorExcludingId(any(), any(), anyLong(), anyLong()))
@@ -194,8 +186,8 @@ public class AbsenceValidatorTest {
 
         assertThatNoException().isThrownBy(
                 () -> absenceValidator.validateNewTimeslot(startedAt, finishedAt, testDoctor, testAbsence));
+
         verify(scheduleRepository).scheduleExistsInIntervalForDoctor(startedAt, finishedAt, doctorId);
         verify(absenceRepository).absenceExistsInIntervalForDoctorExcludingId(startedAt, finishedAt, doctorId, absenceId);
     }
-
 }

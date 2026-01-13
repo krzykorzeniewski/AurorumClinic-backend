@@ -1,11 +1,10 @@
-package pl.edu.pja.aurorumclinic.features.users.patient.commands;
+package pl.edu.pja.aurorumclinic.features.users.patients.commands;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import pl.edu.pja.aurorumclinic.features.users.patients.commands.UpdatePatient;
 import pl.edu.pja.aurorumclinic.shared.data.PatientRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.Patient;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.CommunicationPreference;

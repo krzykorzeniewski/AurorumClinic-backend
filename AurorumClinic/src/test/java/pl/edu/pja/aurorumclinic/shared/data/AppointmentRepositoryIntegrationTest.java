@@ -183,13 +183,19 @@ public class AppointmentRepositoryIntegrationTest extends IntegrationTest {
 
     @Test
     void findAllByScheduleShouldReturnEmptyWhenNoExistForDoctorIdBetweenDates() {
-        Schedule scheduleWithNoAppointments = scheduleRepository.findById(3L).orElse(null);
+        Schedule anySchedule = scheduleRepository.findById(2L).orElseThrow();
+        Long doctorId = anySchedule.getDoctor().getId();
 
-        List<Appointment> allBySchedule = appointmentRepository.findAllBySchedule(scheduleWithNoAppointments.getDoctor().getId(),
-                scheduleWithNoAppointments.getStartedAt(), scheduleWithNoAppointments.getFinishedAt());
+        LocalDateTime startedAt = LocalDateTime.of(2099, 1, 1, 10, 0);
+        LocalDateTime finishedAt = startedAt.plusHours(2);
+
+        List<Appointment> allBySchedule = appointmentRepository.findAllBySchedule(
+                doctorId, startedAt, finishedAt
+        );
 
         assertThat(allBySchedule).isEmpty();
     }
+
 
     @Test
     void findAllByScheduleShouldReturnAppointmentsWhenExistForDoctorIdBetweenDates() {
@@ -224,16 +230,17 @@ public class AppointmentRepositoryIntegrationTest extends IntegrationTest {
 
     @Test
     void existsByScheduleShouldReturnFalseWhenNoAppointmentExistForDoctorIdBetweenDates() {
-        Schedule scheduleWithNoAppointments = scheduleRepository.findById(3L).orElse(null);
-        LocalDateTime scheduleStartedAt = scheduleWithNoAppointments.getStartedAt();
-        LocalDateTime scheduleFinishedAt = scheduleWithNoAppointments.getFinishedAt();
-        Long scheduleDoctorId = scheduleWithNoAppointments.getDoctor().getId();
+        Schedule anySchedule = scheduleRepository.findById(2L).orElseThrow();
+        Long doctorId = anySchedule.getDoctor().getId();
 
-        boolean existsBySchedule =
-                appointmentRepository.existsBySchedule(scheduleDoctorId, scheduleStartedAt, scheduleFinishedAt);
+        LocalDateTime startedAt = LocalDateTime.of(2099, 1, 1, 10, 0);
+        LocalDateTime finishedAt = startedAt.plusHours(2);
 
-        assertThat(existsBySchedule).isFalse();
+        boolean exists = appointmentRepository.existsBySchedule(doctorId, startedAt, finishedAt);
+
+        assertThat(exists).isFalse();
     }
+
 
     @Test
     void existsByScheduleShouldReturnFalseWhenNoCreatedAppointmentExistForDoctorIdBetweenDates() {
@@ -250,19 +257,26 @@ public class AppointmentRepositoryIntegrationTest extends IntegrationTest {
 
     @Test
     void getAppointmentIdsInPreviousScheduleTimeslotShouldReturnEmptyWhenScheduleHadNoAppointments() {
-        Schedule scheduleWithNoAppointments = scheduleRepository.findById(3L).orElse(null);
-        LocalDateTime scheduleStartedAt = scheduleWithNoAppointments.getStartedAt();
-        LocalDateTime scheduleFinishedAt = scheduleWithNoAppointments.getFinishedAt();
-        Long scheduleDoctorId = scheduleWithNoAppointments.getDoctor().getId();
+        Schedule anySchedule = scheduleRepository.findById(2L).orElseThrow();
+        Long doctorId = anySchedule.getDoctor().getId();
 
-        LocalDateTime newScheduleStartedAt = scheduleStartedAt.plusHours(24);
-        LocalDateTime newScheduleFinishedAt = newScheduleStartedAt.minusHours(12);
+        LocalDateTime prevScheduleStartedAt = LocalDateTime.of(2099, 1, 1, 10, 0);
+        LocalDateTime prevScheduleFinishedAt = prevScheduleStartedAt.plusHours(4);
 
-        Set<Long> appointmentIdsInPreviousScheduleTimeslot = appointmentRepository.getAppointmentIdsInPreviousScheduleTimeslot(scheduleDoctorId, scheduleStartedAt,
-                scheduleFinishedAt, newScheduleStartedAt, newScheduleFinishedAt);
+        LocalDateTime newScheduleStartedAt = prevScheduleStartedAt.plusDays(1);
+        LocalDateTime newScheduleFinishedAt = newScheduleStartedAt.plusHours(2);
 
-        assertThat(appointmentIdsInPreviousScheduleTimeslot).isEmpty();
+        Set<Long> ids = appointmentRepository.getAppointmentIdsInPreviousScheduleTimeslot(
+                doctorId,
+                prevScheduleStartedAt,
+                prevScheduleFinishedAt,
+                newScheduleStartedAt,
+                newScheduleFinishedAt
+        );
+
+        assertThat(ids).isEmpty();
     }
+
 
     @Test
     void getAppointmentIdsInPreviousScheduleTimeslotShouldReturnAppointmentIdsWhenScheduleHadAppointments() {

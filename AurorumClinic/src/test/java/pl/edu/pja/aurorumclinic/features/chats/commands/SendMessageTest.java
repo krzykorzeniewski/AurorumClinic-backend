@@ -1,7 +1,7 @@
 package pl.edu.pja.aurorumclinic.features.chats.commands;
 
-
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {SendMessage.class})
@@ -48,7 +49,6 @@ class SendMessageTest {
         return () -> String.valueOf(id);
     }
 
-
     private Object newRequest(String text, LocalDateTime sentAt, Long receiverId) throws Exception {
         Class<?> clazz = Class.forName(
                 "pl.edu.pja.aurorumclinic.features.chats.commands.SendMessage$SendMessageRequest"
@@ -72,13 +72,22 @@ class SendMessageTest {
         }
     }
 
+    private Object invokeGetter(Object obj, String methodName) {
+        try {
+            Method m = obj.getClass().getMethod(methodName);
+            return m.invoke(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Test
     void shouldSendMessageWhenAppointmentExists() throws Exception {
         Long senderId = 1L;
         Long receiverId = 2L;
 
-        LocalDateTime now = LocalDateTime.now();
-        Object req = newRequest("Cześć, jak się czujesz?", now, receiverId);
+        LocalDateTime sentAt = LocalDateTime.of(2026, 1, 12, 21, 47, 54, 870391700);
+        Object req = newRequest("Cześć, jak się czujesz?", sentAt, receiverId);
 
         User sender = User.builder().id(senderId).build();
         User receiver = User.builder().id(receiverId).build();
@@ -93,14 +102,29 @@ class SendMessageTest {
                 m.getSender().equals(sender) &&
                         m.getReceiver().equals(receiver) &&
                         m.getText().equals("Cześć, jak się czujesz?") &&
-                        m.getSentAt().equals(now)
+                        m.getSentAt().equals(sentAt)
         ));
 
+        ArgumentCaptor<Object> payloadCaptor = ArgumentCaptor.forClass(Object.class);
+
         verify(simpMessagingTemplate).convertAndSendToUser(
-                String.valueOf(receiverId),
-                "/queue/messages",
-                req
+                eq(String.valueOf(receiverId)),
+                eq("/queue/messages"),
+                payloadCaptor.capture()
         );
+
+        Object payload = payloadCaptor.getValue();
+        assertThat(payload).isNotNull();
+        assertThat(payload.getClass().getName())
+                .isEqualTo("pl.edu.pja.aurorumclinic.features.chats.commands.SendMessage$SendMessageResponse");
+
+        assertThat(invokeGetter(payload, "text")).isEqualTo("Cześć, jak się czujesz?");
+        assertThat(invokeGetter(payload, "sentAt")).isEqualTo(sentAt);
+
+        // DOSTOSOWANE DO AKTUALNEJ IMPLEMENTACJI:
+        // SendMessageResponse(receiverId, authorId) jest tworzone jako (senderId, receiverId)
+        assertThat(invokeGetter(payload, "receiverId")).isEqualTo(senderId);
+        assertThat(invokeGetter(payload, "authorId")).isEqualTo(receiverId);
     }
 
     @Test
@@ -108,7 +132,7 @@ class SendMessageTest {
         Long senderId = 1L;
         Long receiverId = 2L;
 
-        Object req = newRequest("tekst", LocalDateTime.now(), receiverId);
+        Object req = newRequest("tekst", LocalDateTime.of(2026, 1, 12, 10, 0), receiverId);
 
         when(userRepository.findById(senderId)).thenReturn(Optional.empty());
 
@@ -124,7 +148,7 @@ class SendMessageTest {
         Long senderId = 1L;
         Long receiverId = 2L;
 
-        Object req = newRequest("tekst", LocalDateTime.now(), receiverId);
+        Object req = newRequest("tekst", LocalDateTime.of(2026, 1, 12, 10, 0), receiverId);
 
         User sender = User.builder().id(senderId).build();
         when(userRepository.findById(senderId)).thenReturn(Optional.of(sender));
@@ -143,8 +167,7 @@ class SendMessageTest {
         Long senderId = 1L;
         Long receiverId = 2L;
 
-        LocalDateTime now = LocalDateTime.now();
-        Object req = newRequest("tekst", now, receiverId);
+        Object req = newRequest("tekst", LocalDateTime.of(2026, 1, 12, 10, 0), receiverId);
 
         User sender = User.builder().id(senderId).build();
         User receiver = User.builder().id(receiverId).build();

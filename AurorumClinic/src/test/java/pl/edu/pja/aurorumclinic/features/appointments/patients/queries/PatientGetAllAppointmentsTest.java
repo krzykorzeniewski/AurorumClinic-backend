@@ -13,6 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import pl.edu.pja.aurorumclinic.features.appointments.patients.queries.shared.PatientGetAppointmentResponse;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
+import pl.edu.pja.aurorumclinic.shared.data.MessageRepository;
 import pl.edu.pja.aurorumclinic.shared.data.OpinionRepository;
 import pl.edu.pja.aurorumclinic.shared.data.models.*;
 import pl.edu.pja.aurorumclinic.shared.data.models.enums.AppointmentStatus;
@@ -24,14 +25,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {PatientGetAllAppointments.class}) //looks for all controllers which is actually so sigma with our queries/handlers approach;)
+@SpringBootTest(classes = {PatientGetAllAppointments.class})
 @ActiveProfiles("test")
-public class PatientGetAllAppointmentsTest {
+class PatientGetAllAppointmentsTest {
 
     @MockitoBean
     AppointmentRepository appointmentRepository;
@@ -42,6 +43,9 @@ public class PatientGetAllAppointmentsTest {
     @MockitoBean
     ObjectStorageService objectStorageService;
 
+    @MockitoBean
+    MessageRepository messageRepository;
+
     @Autowired
     PatientGetAllAppointments patientGetAllAppointments;
 
@@ -50,21 +54,25 @@ public class PatientGetAllAppointmentsTest {
         Patient testPatient = Patient.builder()
                 .id(1L)
                 .build();
+
         Pageable pageable = PageRequest.of(0, 5);
+
+        LocalDateTime startedAt = LocalDateTime.of(2026, 1, 1, 10, 0);
+
         Appointment testAppointment = Appointment.builder()
                 .id(1L)
                 .status(AppointmentStatus.FINISHED)
-                .startedAt(LocalDateTime.now().minusMinutes(30))
+                .startedAt(startedAt)
                 .description("Lęki")
                 .doctor(Doctor.builder()
                         .id(1L)
                         .name("Mariusz")
                         .surname("Mariuszowski")
-                        .profilePicture("example.pmg")
+                        .profilePicture("example.png")
                         .specializations(Set.of(Specialization.builder()
-                                        .id(1L)
-                                        .name("Psychiatra dorosłych")
-                                        .build()))
+                                .id(1L)
+                                .name("Psychiatra dorosłych")
+                                .build()))
                         .build())
                 .service(Service.builder()
                         .id(1L)
@@ -78,9 +86,16 @@ public class PatientGetAllAppointmentsTest {
                         .build())
                 .patient(testPatient)
                 .build();
+
         String imageUrl = "http://some-example.png.url";
-        PageImpl<Appointment> appointmentsPage = new PageImpl<>(List.of(testAppointment), pageable, 1);
-        PatientGetAppointmentResponse testResponse = PatientGetAppointmentResponse.builder()
+
+        PageImpl<Appointment> appointmentsPage = new PageImpl<>(
+                List.of(testAppointment),
+                pageable,
+                1
+        );
+
+        PatientGetAppointmentResponse expected = PatientGetAppointmentResponse.builder()
                 .id(testAppointment.getId())
                 .status(testAppointment.getStatus())
                 .startedAt(testAppointment.getStartedAt())
@@ -90,12 +105,12 @@ public class PatientGetAllAppointmentsTest {
                         .name(testAppointment.getDoctor().getName())
                         .surname(testAppointment.getDoctor().getSurname())
                         .profilePicture(imageUrl)
-                        .specializations(testAppointment.getDoctor().getSpecializations()
-                                .stream().map(spec -> PatientGetAppointmentResponse.
-                                        DoctorDto.SpecializationDto.builder()
+                        .specializations(testAppointment.getDoctor().getSpecializations().stream()
+                                .map(spec -> PatientGetAppointmentResponse.DoctorDto.SpecializationDto.builder()
                                         .id(spec.getId())
                                         .name(spec.getName())
-                                        .build()).toList())
+                                        .build())
+                                .toList())
                         .build())
                 .service(PatientGetAppointmentResponse.ServiceDto.builder()
                         .id(testAppointment.getService().getId())
@@ -108,8 +123,12 @@ public class PatientGetAllAppointmentsTest {
                         .status(testAppointment.getPayment().getStatus())
                         .build())
                 .build();
-        when(appointmentRepository.findAllByPatientIdAndStatus(anyLong(), any(), any())).thenReturn(appointmentsPage);
-        when(objectStorageService.generateUrl(anyString())).thenReturn(imageUrl);
+
+        when(appointmentRepository.findAllByPatientIdAndStatus(eq(testPatient.getId()), eq(AppointmentStatus.FINISHED), eq(pageable)))
+                .thenReturn(appointmentsPage);
+
+        when(objectStorageService.generateUrl(eq(testAppointment.getDoctor().getProfilePicture())))
+                .thenReturn(imageUrl);
 
         ResponseEntity<ApiResponse<Page<PatientGetAppointmentResponse>>> resultResponse =
                 patientGetAllAppointments.getMyAppointments(testPatient.getId(), pageable, AppointmentStatus.FINISHED);
@@ -120,11 +139,9 @@ public class PatientGetAllAppointmentsTest {
         assertThat(resultPage.getContent()).hasSize(1);
 
         PatientGetAppointmentResponse resultDto = resultPage.getContent().get(0);
-        assertThat(resultDto)
-                        .isEqualTo(testResponse);
+        assertThat(resultDto).isEqualTo(expected);
 
         verify(appointmentRepository).findAllByPatientIdAndStatus(testPatient.getId(), AppointmentStatus.FINISHED, pageable);
         verify(objectStorageService).generateUrl(testAppointment.getDoctor().getProfilePicture());
     }
-
 }
