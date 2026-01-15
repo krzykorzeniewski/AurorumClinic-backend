@@ -18,8 +18,6 @@ import pl.edu.pja.aurorumclinic.shared.data.models.User;
 import pl.edu.pja.aurorumclinic.shared.services.EmailService;
 import pl.edu.pja.aurorumclinic.shared.services.SmsService;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -123,8 +121,8 @@ public class AuthEventListener {
     public void onEmailVerificationTokenCreatedEvent(EmailVerificationTokenCreatedEvent event) {
         User user = event.user();
         Token emailVerificationtoken = event.token();
-        String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue() + "?value=" +
-                URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8);
+        String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue() + "?email=" +
+                user.getEmail();
 
         Context context = new Context();
         context.setVariable("verificationLink", verificationLink);
@@ -143,8 +141,8 @@ public class AuthEventListener {
     public void onResetPasswordTokenCreatedEvent(ResetPasswordTokenCreatedEvent event) {
         User user = event.user();
         Token token = event.token();
-        String resetLink = resetPasswordLink + token.getRawValue() + "?value=" +
-                URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8);
+        String resetLink = resetPasswordLink + token.getRawValue() + "?email=" +
+                user.getEmail();
 
         Context context = new Context();
         context.setVariable("resetLink", resetLink);
