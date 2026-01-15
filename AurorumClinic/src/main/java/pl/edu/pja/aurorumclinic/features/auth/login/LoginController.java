@@ -4,6 +4,7 @@ import com.giffing.bucket4j.spring.boot.starter.context.RateLimiting;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.*;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -19,6 +20,8 @@ import pl.edu.pja.aurorumclinic.shared.ApiResponse;
 public class LoginController {
 
     private final LoginService loginService;
+    @Value("${client.app-domain}")
+    private String clientAppDomain;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginUserResponse>> loginUser(@Valid @RequestBody LoginUserRequest requestDto) {
@@ -31,13 +34,15 @@ public class LoginController {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
+                .domain(clientAppDomain)
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
+                .domain(clientAppDomain)
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
@@ -53,13 +58,15 @@ public class LoginController {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
+                .domain(clientAppDomain)
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
+                .domain(clientAppDomain)
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
@@ -73,13 +80,15 @@ public class LoginController {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
+                .domain(clientAppDomain)
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", responseDto.refreshToken())
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
+                .domain(clientAppDomain)
                 .build();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString(), refreshTokenCookie.toString())
@@ -99,14 +108,16 @@ public class LoginController {
                 .httpOnly(true)
                 .maxAge(0)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
+                .domain(clientAppDomain)
                 .build();
         HttpCookie refreshTokenCookie = ResponseCookie.from("Refresh-Token", "")
                 .path("/")
                 .httpOnly(true)
                 .maxAge(0)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
+                .domain(clientAppDomain)
                 .build();
         return ResponseEntity
                 .status(HttpStatus.OK)
