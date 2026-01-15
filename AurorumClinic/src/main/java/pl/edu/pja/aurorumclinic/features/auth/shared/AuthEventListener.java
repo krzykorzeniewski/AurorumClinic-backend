@@ -123,7 +123,7 @@ public class AuthEventListener {
     public void onEmailVerificationTokenCreatedEvent(EmailVerificationTokenCreatedEvent event) {
         User user = event.user();
         Token emailVerificationtoken = event.token();
-        String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue() + "?email=" +
+        String verificationLink = mailVerificationLink + emailVerificationtoken.getRawValue() + "?value=" +
                 URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8);
 
         Context context = new Context();
@@ -143,7 +143,7 @@ public class AuthEventListener {
     public void onResetPasswordTokenCreatedEvent(ResetPasswordTokenCreatedEvent event) {
         User user = event.user();
         Token token = event.token();
-        String resetLink = resetPasswordLink + token.getRawValue() + "?email=" +
+        String resetLink = resetPasswordLink + token.getRawValue() + "?value=" +
                 URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8);
 
         Context context = new Context();
