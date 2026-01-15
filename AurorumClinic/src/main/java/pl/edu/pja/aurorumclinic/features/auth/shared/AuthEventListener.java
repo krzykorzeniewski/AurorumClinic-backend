@@ -102,7 +102,8 @@ public class AuthEventListener {
     public void onPatientRegisteredEvent(PatientRegisteredEvent event) {
         User user = event.user();
         Token emailVerificationToken = event.token();
-        String verificationLink = mailVerificationLink + emailVerificationToken.getRawValue();
+        String verificationLink = mailVerificationLink + emailVerificationToken.getRawValue() + "?email=" +
+                user.getEmail();;
 
         Context context = new Context();
         context.setVariable("verificationLink", verificationLink);
