@@ -7,6 +7,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
@@ -25,7 +26,7 @@ public class AppointmentJobService {
     private final AppointmentRepository appointmentRepository;
 
     @Order(1)
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void onAppointmentCreatedEventStatus(AppointmentCreatedEvent event) {
         taskScheduler.schedule(() -> finishAppointmentJob.execute(event.getAppointment().getId()),
                 event.getAppointment().getStartedAt()
@@ -34,7 +35,7 @@ public class AppointmentJobService {
     }
 
     @Order(2)
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void onAppointmentCreatedEventNotification(AppointmentCreatedEvent event) {
         if (event.getAppointment().getStartedAt().minusHours(24).isBefore(LocalDateTime.now())) {
             return;
