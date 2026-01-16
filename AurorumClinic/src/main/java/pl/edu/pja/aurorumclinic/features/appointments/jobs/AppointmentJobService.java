@@ -6,6 +6,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -44,6 +45,20 @@ public class AppointmentJobService {
                 event.getAppointment().getStartedAt().minusHours(24)
                         .atZone(ZoneId.systemDefault())
                         .toInstant());
+    }
+
+    @Scheduled(cron = "0 */15 * * * *")
+    public void finishAppointments() {
+        List<Tuple> notFinishedAppointments = appointmentRepository
+                .getAllByStatusAndFinishedAt(AppointmentStatus.CREATED, LocalDateTime.now());
+        if (!notFinishedAppointments.isEmpty()) {
+            for (Tuple appointment : notFinishedAppointments) {
+                taskScheduler.schedule(() -> finishAppointmentJob.execute(appointment.get("id", Long.class)),
+                        appointment.get("startedAt", LocalDateTime.class)
+                                .atZone(ZoneId.systemDefault())
+                                .toInstant());
+            }
+        }
     }
 
     @EventListener

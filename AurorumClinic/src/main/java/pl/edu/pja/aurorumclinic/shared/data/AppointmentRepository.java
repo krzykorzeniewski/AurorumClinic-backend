@@ -202,4 +202,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     Page<Appointment> findAllByPatientIdAndStatus(Long patientId, AppointmentStatus status, Pageable pageable);
 
+    @Query("""
+            select a1.id as id,
+                   a1.startedAt as startedAt
+                   from Appointment a1
+            where a1.status = :status and a1.startedAt < :now
+            """)
+    List<Tuple> getAllByStatusAndFinishedAt(AppointmentStatus appointmentStatus, LocalDateTime now);
 }
