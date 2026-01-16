@@ -208,5 +208,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                    from Appointment a1
             where a1.status = :status and a1.startedAt < :now
             """)
-    List<Tuple> getAllByStatusAndFinishedAt(AppointmentStatus appointmentStatus, LocalDateTime now);
+    List<Tuple> getAllByStatusAndFinishedAt(AppointmentStatus status, LocalDateTime now);
 }
