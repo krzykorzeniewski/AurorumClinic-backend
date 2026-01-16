@@ -26,7 +26,7 @@ public class AppointmentJobService {
     private final AppointmentRepository appointmentRepository;
 
     @Order(1)
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @TransactionalEventListener
     public void onAppointmentCreatedEventStatus(AppointmentCreatedEvent event) {
         taskScheduler.schedule(() -> finishAppointmentJob.execute(event.getAppointment().getId()),
                 event.getAppointment().getStartedAt()
@@ -35,7 +35,7 @@ public class AppointmentJobService {
     }
 
     @Order(2)
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @TransactionalEventListener
     public void onAppointmentCreatedEventNotification(AppointmentCreatedEvent event) {
         if (event.getAppointment().getStartedAt().minusHours(24).isBefore(LocalDateTime.now())) {
             return;
