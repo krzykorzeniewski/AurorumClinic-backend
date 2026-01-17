@@ -8,7 +8,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import pl.edu.pja.aurorumclinic.features.appointments.shared.events.AppointmentCreatedEvent;
 import pl.edu.pja.aurorumclinic.shared.data.AppointmentRepository;
@@ -47,7 +46,7 @@ public class AppointmentJobService {
                         .toInstant());
     }
 
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "0 */15 7-22 * * *")
     public void finishAppointments() {
         List<Tuple> notFinishedAppointments = appointmentRepository
                 .getAllByStatusAndFinishedAt(AppointmentStatus.CREATED, LocalDateTime.now());
