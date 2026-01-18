@@ -52,8 +52,8 @@ public class SendMessage {
         SendMessageResponse res = new SendMessageResponse(
                 message.text(),
                 message.sentAt(),
-                sender.getId(),
-                message.receiverId());
+                message.receiverId(),
+                sender.getId());
         messageRepository.save(newMessage);
         simpMessagingTemplate.convertAndSendToUser(String.valueOf(receiver.getId()),
                 "/queue/messages", res);
