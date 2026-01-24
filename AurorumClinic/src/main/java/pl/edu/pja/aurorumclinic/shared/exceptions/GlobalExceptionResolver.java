@@ -15,6 +15,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import pl.edu.pja.aurorumclinic.features.auth.shared.ApiAuthenticationException;
 import pl.edu.pja.aurorumclinic.shared.ApiResponse;
@@ -162,6 +163,13 @@ public class GlobalExceptionResolver {
     public ApiResponse<?> handleRateLimitException(RateLimitException ex) {
         logger.error("Exception: {} ", ex.getMessage(), ex);
         return ApiResponse.fail(null);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<?> handleSizeExceededException(MaxUploadSizeExceededException ex) {
+        logger.error("Exception: {} ", ex.getMessage(), ex);
+        return ApiResponse.fail(Map.of("file", "Maximum upload size exceeded"));
     }
 
 }
