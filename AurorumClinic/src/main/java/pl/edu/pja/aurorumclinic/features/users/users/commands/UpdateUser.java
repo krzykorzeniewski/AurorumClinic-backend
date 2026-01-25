@@ -43,6 +43,9 @@ public class UpdateUser { //admin & employee
         userFromDb.setBirthdate(request.birthdate);
         userFromDb.setPhoneNumber(request.phoneNumber);
         userFromDb.setEmail(request.email);
+        if (request.twoFactorAuth) {
+            userFromDb.setPhoneNumberVerified(true);
+        }
         userFromDb.setTwoFactorAuth(request.twoFactorAuth);
 
         return UpdateUserResponse.builder()

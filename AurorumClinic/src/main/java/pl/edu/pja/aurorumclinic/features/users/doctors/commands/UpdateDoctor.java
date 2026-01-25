@@ -52,6 +52,9 @@ public class UpdateDoctor {
         doctorFromDb.setBirthdate(request.birthdate);
         doctorFromDb.setPhoneNumber(request.phoneNumber);
         doctorFromDb.setEmail(request.email);
+        if (request.twoFactorAuth) {
+            doctorFromDb.setPhoneNumberVerified(true);
+        }
         doctorFromDb.setTwoFactorAuth(request.twoFactorAuth);
         doctorFromDb.setPwzNumber(request.pwzNumber);
         doctorFromDb.setSpecializations(new HashSet<>(specializationsFromDb));
